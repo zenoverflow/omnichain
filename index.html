@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>OmniChain Alpha</title>
+        <style>
+            html,
+            body,
+            .root {
+                height: 100vh;
+                width: 100vw;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+                background: darkgray;
+            }
+
+            .c__centerflex {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .c__centerflex-inline {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .c__msg {
+                margin-top: 30px;
+                width: 100%;
+                max-width: 1000px;
+            }
+
+            .c__msg:first-of-type {
+                margin-top: 0;
+            }
+
+            .ant-btn {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            @keyframes fadeIn {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes glow {
+                0% {
+                    box-shadow: 0 0 10px #ffe58f;
+                }
+                50% {
+                    box-shadow: 0 0 30px #ffe58f;
+                }
+                100% {
+                    box-shadow: 0 0 10px #ffe58f;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/renderer.ts"></script>
+    </body>
+</html>
