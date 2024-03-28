@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Menu, MenuProps } from "antd";
 import { useAtom } from "jotai";
 
@@ -7,10 +7,13 @@ import { getMenuIcon } from "../../nodes/icons";
 
 export const ContextMenu: React.FC = () => {
     const [menu] = useAtom(menuStateAtom);
+    const menuRef = useRef<any>();
 
     const [active, setActive] = useState(!!menu);
 
-    const [hideTimeout, setHideTimeout] = useState<number | undefined>();
+    const [hideTimeout, setHideTimeout] = useState<
+        NodeJS.Timeout | undefined
+    >();
 
     const haltTimeout = () => {
         if (hideTimeout) clearTimeout(hideTimeout);
@@ -20,7 +23,7 @@ export const ContextMenu: React.FC = () => {
         setHideTimeout(
             setTimeout(() => {
                 hideContextMenu();
-            }, 2500)
+            }, 1200)
         );
     };
 
@@ -38,6 +41,19 @@ export const ContextMenu: React.FC = () => {
     useEffect(() => {
         if (active) startTimeout();
     }, [active]);
+
+    useEffect(() => {
+        const listener = () => {
+            haltTimeout();
+            hideContextMenu();
+        };
+
+        document.addEventListener("click", listener);
+
+        return () => {
+            document.removeEventListener("click", listener);
+        };
+    }, [menuRef]);
 
     if (!menu || !active) return <></>;
 
@@ -64,6 +80,7 @@ export const ContextMenu: React.FC = () => {
 
     return (
         <Menu
+            ref={menuRef}
             style={{
                 position: "fixed",
                 zIndex: 9001,
