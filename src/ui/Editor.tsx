@@ -12,6 +12,7 @@ import { Button, Layout, Space } from "antd";
 import { Sider } from "./Sider";
 import { EditorGraph } from "./EditorGraph";
 import { ChatInterface } from "./Chat";
+import { BtnOptions } from "./_Header/BtnOptions";
 
 import { executorAtom } from "../state/executor";
 import { closeEditor } from "../state/editor";
@@ -103,17 +104,7 @@ export const Editor: React.FC = () => {
                                 alignItems: "center",
                             }}
                         />
-                        <Button
-                            type="primary"
-                            shape="circle"
-                            size="large"
-                            icon={<SettingOutlined />}
-                            style={{
-                                display: "inline-flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        />
+                        <BtnOptions />
                     </Space>
                 </Space>
             </Header>
