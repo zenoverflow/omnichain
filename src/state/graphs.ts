@@ -25,6 +25,7 @@ class _DB extends Dexie {
 export const db = new _DB();
 
 const _graphStorageAtom = atom<Record<string, SerializedGraph>>(
+    // @ts-ignore
     Object.fromEntries((await db.chains.toArray()).map((c) => [c.graphId, c]))
 );
 

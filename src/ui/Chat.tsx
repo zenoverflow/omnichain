@@ -1,9 +1,10 @@
 import { useRef, useEffect } from "react";
 import { Input, Avatar, Space } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+// @ts-ignore
+import Markdown from "react-markdown";
 
 const { TextArea } = Input;
 

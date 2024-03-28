@@ -27,9 +27,9 @@ export const menuStateAtom = atom<_MenuStateAtom>(
 );
 
 export const showContextMenu = (menu: MenuState) => {
-    appStore.set(_menuStateAtom, menu);
+    appStore.set(_menuStateAtom as any, menu);
 };
 
 export const hideContextMenu = () => {
-    appStore.set(_menuStateAtom, null);
+    appStore.set(_menuStateAtom as any, null);
 };
