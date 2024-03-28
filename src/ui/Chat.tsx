@@ -118,7 +118,7 @@ export const ChatInterface: React.FC = () => {
                 // value={value}
                 // onChange={(e) => setValue(e.target.value)}
                 placeholder="Ask me anything..."
-                autoSize={{ minRows: 3, maxRows: 10 }}
+                autoSize={{ minRows: 2, maxRows: 8 }}
             />
         </div>
     );
