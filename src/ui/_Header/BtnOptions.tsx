@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useAtom } from "jotai";
 import { Button, Input, Modal, Select, Space } from "antd";
 import {
     SettingOutlined,
@@ -6,12 +7,28 @@ import {
     DownloadOutlined,
 } from "@ant-design/icons";
 
-// import { createModule } from "../../state/editor";
+import {
+    optionsAtom,
+    setChatChain,
+    setApiChain,
+    setApiPort,
+} from "../../state/options";
+import { graphStorageAtom } from "../../state/graphs";
 
 export const BtnOptions: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
+    const [{ chain_chat_id, chain_api_id, api_port }] = useAtom(optionsAtom);
+    const [graphStorage] = useAtom(graphStorageAtom);
+    const chains: { label: string; value: string }[] = Object.values(
+        graphStorage
+    )
+        .sort((a, b) => b.created - a.created)
+        .map((c) => ({
+            label: c.name,
+            value: c.graphId,
+        }));
     // const [valOfName, setValOfName] = useState<string>("New Module");
-    const inputRef = useRef<any>();
+    // const inputRef = useRef<any>();
 
     const handleOpenModal = () => {
         setModalOpen(true);
@@ -22,6 +39,11 @@ export const BtnOptions: React.FC = () => {
 
     const handleCloseModal = () => {
         // setValOfName("New Module");
+        setModalOpen(false);
+    };
+
+    const handleApply = () => {
+        // TODO
         setModalOpen(false);
     };
 
@@ -48,7 +70,7 @@ export const BtnOptions: React.FC = () => {
             <Modal
                 title={<h3>Options</h3>}
                 open={modalOpen}
-                onOk={handleCloseModal}
+                onOk={handleApply}
                 onCancel={handleCloseModal}
                 okText="Apply"
                 footer={(_, { OkBtn, CancelBtn }) => (
@@ -83,10 +105,8 @@ export const BtnOptions: React.FC = () => {
                         <Select
                             style={{ width: "100%" }}
                             placeholder="Select a chain..."
-                            options={[
-                                { label: "Chain 1", value: "c1" },
-                                { label: "Chain 2", value: "c2" },
-                            ]}
+                            defaultValue={chain_chat_id}
+                            options={chains}
                         />
                     </Space>
 
@@ -99,10 +119,8 @@ export const BtnOptions: React.FC = () => {
                         <Select
                             style={{ width: "100%" }}
                             placeholder="Select a chain..."
-                            options={[
-                                { label: "Chain 1", value: "c1" },
-                                { label: "Chain 2", value: "c2" },
-                            ]}
+                            defaultValue={chain_api_id}
+                            options={chains}
                         />
                     </Space>
 
@@ -115,7 +133,7 @@ export const BtnOptions: React.FC = () => {
                         <Input
                             type="number"
                             style={{ width: "100%" }}
-                            defaultValue={13000}
+                            defaultValue={api_port}
                         />
                     </Space>
                 </Space>
