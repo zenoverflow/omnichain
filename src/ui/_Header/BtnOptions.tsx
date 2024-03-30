@@ -1,6 +1,10 @@
 import React, { useRef, useState } from "react";
 import { Button, Input, Modal, Select, Space } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
+import {
+    SettingOutlined,
+    UploadOutlined,
+    DownloadOutlined,
+} from "@ant-design/icons";
 
 // import { createModule } from "../../state/editor";
 
@@ -46,36 +50,30 @@ export const BtnOptions: React.FC = () => {
                 open={modalOpen}
                 onOk={handleCloseModal}
                 onCancel={handleCloseModal}
-                okText="Close"
+                okText="Apply"
                 footer={(_, { OkBtn, CancelBtn }) => (
                     <>
-                        {/* <CancelBtn /> */}
-                        {/* <OkBtn /> */}
+                        <CancelBtn />
+                        <OkBtn />
                     </>
                 )}
             >
-                {/* <Input
-                    // onPointerDown={(e) => e.stopPropagation()}
-                    ref={inputRef}
-                    type="text"
-                    placeholder="Name of module"
-                    value={valOfName}
-                    onChange={(e) => {
-                        setValOfName(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            handleCreate();
-                        }
-                    }}
-                    autoFocus
-                /> */}
-
                 <Space
                     direction="vertical"
                     size="large"
                     style={{ width: "100%", marginTop: "10px" }}
                 >
+                    <Space
+                        direction="horizontal"
+                        size="middle"
+                        style={{ width: "100%" }}
+                    >
+                        <Button icon={<DownloadOutlined />}>
+                            Export chains
+                        </Button>
+                        <Button icon={<UploadOutlined />}>Import chains</Button>
+                    </Space>
+
                     <Space
                         direction="vertical"
                         size="small"
