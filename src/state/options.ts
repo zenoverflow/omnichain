@@ -3,44 +3,53 @@ import { atom } from "jotai";
 import { appStore } from ".";
 
 type OptionsState = {
-    chain_chat_id: string | null;
-    chain_api_id: string | null;
-    api_port: number | 13000;
+    chainChatId: string | null;
+    chainApiId: string | null;
+    apiPort: number | 13000;
 };
 
 const _optionsAtom = atom<OptionsState>({
-    chain_chat_id: localStorage.getItem("chain_chat_id") || null,
-    chain_api_id: localStorage.getItem("chain_api_id") || null,
-    api_port: Number.parseInt(localStorage.getItem("api_port") || "13000"),
+    chainChatId: localStorage.getItem("chainChatId") || null,
+    chainApiId: localStorage.getItem("chainApiId") || null,
+    apiPort: Number.parseInt(localStorage.getItem("apiPort") || "13000"),
 });
 
 export const optionsAtom = atom<OptionsState>((get) => ({
     ...get(_optionsAtom),
 }));
 
-export const setChatChain = (chain_chat_id: string) => {
+export const setChatChain = (chainChatId: string | null) => {
     const s = appStore.get(_optionsAtom);
     appStore.set(_optionsAtom, {
         ...s,
-        chain_chat_id,
+        chainChatId,
     });
-    localStorage.setItem("chain_chat_id", chain_chat_id);
+
+    if (!chainChatId) {
+        localStorage.removeItem("chainChatId");
+    } else {
+        localStorage.setItem("chainChatId", chainChatId);
+    }
 };
 
-export const setApiChain = (chain_api_id: string) => {
+export const setApiChain = (chainApiId: string) => {
     const s = appStore.get(_optionsAtom);
     appStore.set(_optionsAtom, {
         ...s,
-        chain_api_id,
+        chainApiId,
     });
-    localStorage.setItem("chain_api_id", chain_api_id);
+    if (!chainApiId) {
+        localStorage.removeItem("chainApiId");
+    } else {
+        localStorage.setItem("chainApiId", chainApiId);
+    }
 };
 
-export const setApiPort = (api_port: number) => {
+export const setApiPort = (apiPort: number) => {
     const s = appStore.get(_optionsAtom);
     appStore.set(_optionsAtom, {
         ...s,
-        api_port,
+        apiPort,
     });
-    localStorage.setItem("api_port", `${api_port}`);
+    localStorage.setItem("apiPort", `${apiPort}`);
 };

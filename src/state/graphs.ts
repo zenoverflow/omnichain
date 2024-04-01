@@ -250,6 +250,7 @@ export const deleteGraph = (path: string[]) => {
             )
         );
         db.chains.delete(targetId);
+        // TODO: update options state
     }
     // module of graph
     else if (path.length === 2) {
