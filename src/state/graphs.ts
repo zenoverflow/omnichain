@@ -8,6 +8,7 @@ import { appStore } from ".";
 import { GraphUtils, SerializedGraph } from "../util/GraphUtils";
 import { NodeContextObj } from "../nodes/context";
 import { openPath } from "./editor";
+import { optionsAtom, setApiChain, setChatChain } from "./options";
 
 class _DB extends Dexie {
     // 'friends' is added by dexie when declaring the stores()
@@ -250,7 +251,13 @@ export const deleteGraph = (path: string[]) => {
             )
         );
         db.chains.delete(targetId);
-        // TODO: update options state
+        const optionsState = appStore.get(optionsAtom);
+        if (optionsState.chainChatId === targetId) {
+            setChatChain(null);
+        }
+        if (optionsState.chainApiId === targetId) {
+            setApiChain(null);
+        }
     }
     // module of graph
     else if (path.length === 2) {

@@ -36,27 +36,6 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         [graphStorage]
     );
 
-    // validate and fix
-    useEffect(() => {
-        const currentChains = Object.values(graphStorage).map((c) => c.graphId);
-        const chatChainValid = currentChains.find(
-            //
-            (v) => v === chainChatId
-        );
-        const apiChainValid = currentChains.find(
-            //
-            (v) => v === chainApiId
-        );
-        if (!chatChainValid) {
-            setChatChain(null);
-            setUpdates((u) => ({ ...u, chainChatId: null }));
-        }
-        if (!apiChainValid) {
-            setApiChain(null);
-            setUpdates((u) => ({ ...u, chainApiId: null }));
-        }
-    }, []);
-
     const handleApply = () => {
         setChatChain(updates.chainChatId);
         setApiChain(updates.chainApiId);
@@ -72,12 +51,12 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
             onOk={handleApply}
             onCancel={closeModal}
             okText="Apply"
-            footer={(_, { OkBtn, CancelBtn }) => (
-                <>
-                    <CancelBtn />
-                    <OkBtn />
-                </>
-            )}
+            // footer={(_, { OkBtn, CancelBtn }) => (
+            //     <>
+            //         <CancelBtn />
+            //         <OkBtn />
+            //     </>
+            // )}
         >
             <Space
                 direction="vertical"
