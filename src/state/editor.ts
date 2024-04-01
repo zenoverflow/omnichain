@@ -13,7 +13,7 @@ import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
 import { signalEditorUpdate } from "./watcher";
 import { NodeContextObj } from "../nodes/context";
 import { NODE_MAKERS } from "../nodes/contextMenu";
-import { EntrypointNode, ModuleOutputNode } from "../nodes";
+import { EntrypointNode, ModuleInputNode, ModuleOutputNode } from "../nodes";
 
 type EditorState = {
     path: string[];
@@ -108,27 +108,36 @@ export const duplicateNode = async (
     const original = editor.getNode(id);
     if (!original) return;
 
-    const nodeView = area.nodeViews.get(id);
-    if (!nodeView) return;
+    // Special nodes cannot be duplicated
+    if (
+        ![
+            EntrypointNode.name,
+            ModuleOutputNode.name,
+            ModuleInputNode.name,
+        ].includes(original.label)
+    ) {
+        const nodeView = area.nodeViews.get(id);
+        if (!nodeView) return;
 
-    const Maker = (NODE_MAKERS as any)[original.label];
-    if (!Maker) return;
+        const Maker = (NODE_MAKERS as any)[original.label];
+        if (!Maker) return;
 
-    const duplicate = new Maker(nodeContext);
-    // Copy control values
-    for (const [key, control] of Object.entries<any>(original.controls)) {
-        duplicate.controls[key].value = control.value;
-    }
+        const duplicate = new Maker(nodeContext);
+        // Copy control values
+        for (const [key, control] of Object.entries<any>(original.controls)) {
+            duplicate.controls[key].value = control.value;
+        }
 
-    await editor.addNode(duplicate);
+        await editor.addNode(duplicate);
 
-    // Move node near original
-    const duplicateView = area.nodeViews.get(duplicate.id);
-    if (duplicateView) {
-        await duplicateView.translate(
-            nodeView.position.x + 50,
-            nodeView.position.y + 50
-        );
+        // Move node near original
+        const duplicateView = area.nodeViews.get(duplicate.id);
+        if (duplicateView) {
+            await duplicateView.translate(
+                nodeView.position.x + 50,
+                nodeView.position.y + 50
+            );
+        }
     }
 
     signalEditorUpdate();
@@ -151,7 +160,7 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
 
     const targetNode = editor.getNode(id);
 
-    // EntrypointNode and ModuleOutputNode cannot be deleted
+    // Special nodes cannot be deleted
     if (
         ![ModuleOutputNode.name, EntrypointNode.name].includes(targetNode.label)
     ) {

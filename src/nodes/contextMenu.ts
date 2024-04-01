@@ -47,6 +47,14 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
         throw new Error("Context menu: editor/area missing!");
     }
 
+    const entrypointsCount = editor
+        .getNodes()
+        .filter((n) => n instanceof EntrypointNode).length;
+
+    const moduleInputsCount = editor
+        .getNodes()
+        .filter((n) => n instanceof ModuleInputNode).length;
+
     const moduleOutputsCount = editor
         .getNodes()
         .filter((n) => n instanceof ModuleOutputNode).length;
@@ -56,18 +64,25 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
     const filtered = Object.entries(NODE_MAKERS)
         .filter(([key]) => {
             if (pathToGraph.length === 1) {
+                if (key === EntrypointNode.name) {
+                    // Prevent adding more than 1 entrypoint
+                    return entrypointsCount < 1;
+                }
                 // Block module-specific nodes in main graph
                 return ![ModuleInputNode.name, ModuleOutputNode.name].includes(
                     key
                 );
             }
             if (pathToGraph.length === 2) {
+                // Prevent adding more than one module input
+                if (key === ModuleInputNode.name) {
+                    return moduleInputsCount < 1;
+                }
                 // Prevent adding more than one module output
                 if (key === ModuleOutputNode.name) {
                     return moduleOutputsCount < 1;
                 }
-                // Block stuff inside modules
-                // TODO: add missing nodes
+                // Main-graph-specific nodes are forbidden inside modules
                 return ![ModuleNode.name, EntrypointNode.name].includes(key);
             }
             return true;
@@ -87,7 +102,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
         label: CATEGORY,
         handler: () => null,
         subitems: filtered.filter(({ key }) => _CATEGORIZER[key] === CATEGORY),
-    }));
+    })).filter((c) => c.subitems.length >= 1);
     const uncategorized: any[] = filtered.filter(
         ({ key }) => !_CATEGORIZER[key]
     );
@@ -96,16 +111,6 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
 };
 
 const makeNodeMenu = (nodeContext: NodeContextObj, context: any) => {
-    const target = nodeContext.editor.getNode(context.id);
-
-    if (target.label === EntrypointNode.name) {
-        throw new Error("EntrypointNode cannot be duplicated or deleted!");
-    }
-
-    if (target.label === ModuleOutputNode.name) {
-        throw new Error("ModuleOutputNode cannot be duplicated or deleted!");
-    }
-
     return [
         {
             key: "duplicate",
