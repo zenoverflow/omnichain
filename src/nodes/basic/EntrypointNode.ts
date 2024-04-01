@@ -4,22 +4,21 @@ import { TriggerSocket } from "../_sockets/TriggerSocket";
 
 import { NodeContextObj } from "../context";
 
-import { NumberControl } from "../_controls/NumberControl";
-
-export class TriggerIntervalNode extends ClassicPreset.Node<
+export class EntrypointNode extends ClassicPreset.Node<
     {},
     { trigger: TriggerSocket },
-    { millis: NumberControl }
+    {}
 > {
-    width: number = 280;
-    height: number = 130;
+    width: number = 200;
+    height: number = 90;
 
     constructor(
         private context: NodeContextObj,
         id: string | null = null,
+        // @ts-ignore
         controls: Record<string, any> = {}
     ) {
-        super(TriggerIntervalNode.name);
+        super(EntrypointNode.name);
         const self = this;
         self.id = id ?? self.id;
         //
@@ -41,34 +40,16 @@ export class TriggerIntervalNode extends ClassicPreset.Node<
             async data() {
                 if (!self.context.getIsActive()) return {};
 
-                self.context.onFlowNode(self.id);
+                // self.context.onFlowNode(self.id);
 
                 return {};
             },
         });
         //
         //
-        const run = () => {
-            if (!self.context.getIsActive()) return;
-            self.context.onAutoExecute(self.id);
-            setTimeout(run, self.controls.millis.value);
-        };
-        //
-        //
         self.addOutput(
             "trigger",
             new ClassicPreset.Output(new TriggerSocket(), "trigger-out")
         );
-        this.addControl(
-            "millis",
-            new NumberControl({
-                initial: controls.millis || 1000,
-                name: "milliseconds",
-                min: 10,
-            })
-        );
-        //
-        //
-        run();
     }
 }

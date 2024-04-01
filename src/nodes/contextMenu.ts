@@ -1,17 +1,12 @@
 import {
-    TriggerOnceNode,
+    EntrypointNode,
     ModuleInputNode,
     ModuleOutputNode,
-    TriggerIntervalNode,
     LogOutputNode,
     ModuleNode,
     DelayOutputNode,
     TextNode,
     AutoTextSlicerNode,
-    HashVectorizerNode,
-    MemoRexNode,
-    VectorWriteNode,
-    VectorQueryNode,
 } from ".";
 
 import { NodeContextObj } from "./context";
@@ -20,36 +15,26 @@ import { showContextMenu } from "../state/editorContextMenu";
 import { isGraphActive } from "../state/executor";
 
 export const NODE_MAKERS = {
-    TriggerOnceNode,
-    TriggerIntervalNode,
+    EntrypointNode,
     LogOutputNode,
-    VectorWriteNode,
     TextNode,
     DelayOutputNode,
     AutoTextSlicerNode,
-    HashVectorizerNode,
-    VectorQueryNode,
-    MemoRexNode,
     ModuleNode,
     ModuleInputNode,
     ModuleOutputNode,
 };
 
-export type CtxMenuCategory = "Triggers" | "Content" | "Modules";
+export type CtxMenuCategory = "Basic" | "Content" | "Modules";
 
-const CATEGORIES = ["Triggers", "Content", "Modules"];
+const CATEGORIES = ["Basic", "Content", "Modules"];
 
 const _CATEGORIZER: Record<string, CtxMenuCategory> = {
-    [TriggerOnceNode.name]: "Triggers",
-    [TriggerIntervalNode.name]: "Triggers",
-    [LogOutputNode.name]: "Triggers",
-    [VectorWriteNode.name]: "Triggers",
+    [EntrypointNode.name]: "Basic",
+    [LogOutputNode.name]: "Basic",
     [TextNode.name]: "Content",
     [DelayOutputNode.name]: "Content",
     [AutoTextSlicerNode.name]: "Content",
-    [HashVectorizerNode.name]: "Content",
-    [VectorQueryNode.name]: "Content",
-    [MemoRexNode.name]: "Content",
     [ModuleNode.name]: "Modules",
     [ModuleInputNode.name]: "Modules",
     [ModuleOutputNode.name]: "Modules",
@@ -83,11 +68,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
                 }
                 // Block stuff inside modules
                 // TODO: add missing nodes
-                return ![
-                    ModuleNode.name,
-                    TriggerOnceNode.name,
-                    TriggerIntervalNode.name,
-                ].includes(key);
+                return ![ModuleNode.name, EntrypointNode.name].includes(key);
             }
             return true;
         })
@@ -116,6 +97,10 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
 
 const makeNodeMenu = (nodeContext: NodeContextObj, context: any) => {
     const target = nodeContext.editor.getNode(context.id);
+
+    if (target.label === EntrypointNode.name) {
+        throw new Error("EntrypointNode cannot be duplicated or deleted!");
+    }
 
     if (target.label === ModuleOutputNode.name) {
         throw new Error("ModuleOutputNode cannot be duplicated or deleted!");

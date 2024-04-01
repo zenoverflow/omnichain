@@ -13,7 +13,7 @@ import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
 import { signalEditorUpdate } from "./watcher";
 import { NodeContextObj } from "../nodes/context";
 import { NODE_MAKERS } from "../nodes/contextMenu";
-import { ModuleOutputNode } from "../nodes";
+import { EntrypointNode, ModuleOutputNode } from "../nodes";
 
 type EditorState = {
     path: string[];
@@ -149,22 +149,24 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
     }
     updateNodeSelection([]);
 
-    // Delete related connections
-    for (const conn of editor.getConnections()) {
-        if (
-            !conn.source ||
-            !conn.target ||
-            conn.source === id ||
-            conn.target === id
-        ) {
-            await editor.removeConnection(conn.id);
-        }
-    }
-
-    // Prevent module output node deletion
     const targetNode = editor.getNode(id);
-    if (targetNode.label !== ModuleOutputNode.name) {
-        // Delete the node
+
+    // EntrypointNode and ModuleOutputNode cannot be deleted
+    if (
+        ![ModuleOutputNode.name, EntrypointNode.name].includes(targetNode.label)
+    ) {
+        // Delete related connections
+        for (const conn of editor.getConnections()) {
+            if (
+                !conn.source ||
+                !conn.target ||
+                conn.source === id ||
+                conn.target === id
+            ) {
+                await editor.removeConnection(conn.id);
+            }
+        }
+
         await editor.removeNode(id);
     }
 

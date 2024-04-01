@@ -6,9 +6,8 @@ import { appStore } from ".";
 import { graphStorageAtom, updateNodeControl } from "./graphs";
 import { showNotification } from "./notifications";
 
-import { TriggerOnceNode } from "../nodes/triggers/TriggerOnceNode";
+import { EntrypointNode } from "../nodes/basic/EntrypointNode";
 import { GraphUtils } from "../util/GraphUtils";
-import { TriggerIntervalNode } from "../nodes";
 
 type ExecutorInstance = {
     graphId: string;
@@ -129,9 +128,9 @@ export const stopGraph = (id: string) => {
 export const runGraph = async (id: string) => {
     const target = appStore.get(graphStorageAtom)[id];
 
-    // Ensure trigger presence
-    const triggers = target.nodes.filter((n) =>
-        [TriggerOnceNode.name, TriggerIntervalNode.name].includes(n.nodeType)
+    // Ensure entrypoint presence
+    const triggers = target.nodes.filter(
+        (n) => n.nodeType === EntrypointNode.name
     );
 
     if (!triggers.length) {
@@ -139,7 +138,7 @@ export const runGraph = async (id: string) => {
             type: "error",
             duration: 3,
             ts: Date.now(),
-            text: "The Chain needs Triggers to do something!",
+            text: "The Chain needs an Entrypoint to start execution!",
         });
         return;
     }
@@ -212,7 +211,7 @@ export const runGraph = async (id: string) => {
     try {
         // Work one-time auto triggers
         const targets = Object.keys({
-            TriggerOnceNode,
+            EntrypointNode,
         });
         const triggerNodes = editor
             .getNodes()

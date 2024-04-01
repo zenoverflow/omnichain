@@ -2,7 +2,6 @@ import {
     FileTextOutlined,
     PlayCircleOutlined,
     CodeOutlined,
-    RedoOutlined,
     BuildOutlined,
     BorderOutlined,
     ImportOutlined,
@@ -11,25 +10,21 @@ import {
     DeleteOutlined,
     CopyOutlined,
     GroupOutlined,
-    NumberOutlined,
 } from "@ant-design/icons";
 
 import {
     LogOutputNode,
-    TriggerIntervalNode,
     ModuleNode,
     ModuleInputNode,
     ModuleOutputNode,
     DelayOutputNode,
     AutoTextSlicerNode,
     TextNode,
-    TriggerOnceNode,
-    HashVectorizerNode,
+    EntrypointNode,
 } from ".";
 
 const ICONS: Record<string, any> = {
-    [TriggerOnceNode.name]: PlayCircleOutlined,
-    [TriggerIntervalNode.name]: RedoOutlined,
+    [EntrypointNode.name]: PlayCircleOutlined,
     [LogOutputNode.name]: CodeOutlined,
     [ModuleNode.name]: BuildOutlined,
     [ModuleInputNode.name]: ImportOutlined,
@@ -37,12 +32,11 @@ const ICONS: Record<string, any> = {
     [DelayOutputNode.name]: HourglassOutlined,
     [TextNode.name]: FileTextOutlined,
     [AutoTextSlicerNode.name]: GroupOutlined,
-    [HashVectorizerNode.name]: NumberOutlined,
 
     ["Duplicate"]: CopyOutlined,
     ["Delete"]: DeleteOutlined,
 
-    ["Triggers"]: PlayCircleOutlined,
+    ["Basic"]: PlayCircleOutlined,
     ["Content"]: FileTextOutlined,
     ["Modules"]: BuildOutlined,
 };
