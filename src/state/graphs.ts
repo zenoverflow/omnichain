@@ -11,8 +11,6 @@ import { openPath } from "./editor";
 import { optionsAtom, setApiChain, setChatChain } from "./options";
 
 class _DB extends Dexie {
-    // 'friends' is added by dexie when declaring the stores()
-    // We just tell the typing system this is the case
     chains!: Table<SerializedGraph>;
 
     constructor() {
@@ -26,8 +24,10 @@ class _DB extends Dexie {
 export const db = new _DB();
 
 const _graphStorageAtom = atom<Record<string, SerializedGraph>>(
-    // @ts-ignore
-    Object.fromEntries((await db.chains.toArray()).map((c) => [c.graphId, c]))
+    Object.fromEntries(
+        // @ts-ignore
+        (await db.chains.toArray()).map((c) => [c.graphId, c])
+    )
 );
 
 export const graphStorageAtom = atom((get) => ({ ...get(_graphStorageAtom) }));
@@ -51,18 +51,21 @@ export const createGraph = (name?: string, parentId?: string): void => {
         const parent = s[parentId];
         const created = GraphUtils.empty(name ?? "New Module");
         const id = created.graphId;
+
+        const update: SerializedGraph = {
+            ...parent,
+            modules: {
+                ...parent.modules,
+                [id]: created,
+            },
+        };
+
         appStore.set(_graphStorageAtom, {
             ...s,
-
-            [parentId]: {
-                ...parent,
-                modules: {
-                    ...parent.modules,
-                    [id]: created,
-                },
-            },
+            [parentId]: update,
         });
-        db.chains.add(created);
+
+        db.chains.put(update);
         openPath([parentId, id]);
     }
 };
