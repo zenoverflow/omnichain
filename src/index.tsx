@@ -5,6 +5,7 @@ import { Provider as StateProvider } from "jotai";
 import sodium from "libsodium-wrappers";
 
 import { appStore } from "./state";
+import { loadGraphsFromDb } from "./state/graphs";
 
 import { Editor } from "./ui/Editor";
 
@@ -17,6 +18,8 @@ const router = createBrowserRouter([
 
 export const run = async () => {
     await sodium.ready;
+    await loadGraphsFromDb();
+
     ReactDOM.createRoot(document.getElementById("root")!).render(
         <React.StrictMode>
             <StateProvider store={appStore}>

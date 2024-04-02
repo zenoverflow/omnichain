@@ -1,36 +1,26 @@
 import { atom } from "jotai";
 import { NodeEditor } from "rete";
 import { AreaPlugin } from "rete-area-plugin";
-import Dexie, { Table } from "dexie";
 
 import { appStore } from ".";
-
-import { GraphUtils, SerializedGraph } from "../util/GraphUtils";
+import { GraphUtils } from "../util/GraphUtils";
+import { SerializedGraph, db } from "../db";
 import { NodeContextObj } from "../nodes/context";
 import { openPath } from "./editor";
 import { optionsAtom, setApiChain, setChatChain } from "./options";
 
-class _DB extends Dexie {
-    chains!: Table<SerializedGraph>;
-
-    constructor() {
-        super("__db__");
-        this.version(1).stores({
-            chains: "graphId, name",
-        });
-    }
-}
-
-export const db = new _DB();
-
-const _graphStorageAtom = atom<Record<string, SerializedGraph>>(
-    Object.fromEntries(
-        // @ts-ignore
-        (await db.chains.toArray()).map((c) => [c.graphId, c])
-    )
-);
+const _graphStorageAtom = atom<Record<string, SerializedGraph>>({});
 
 export const graphStorageAtom = atom((get) => ({ ...get(_graphStorageAtom) }));
+
+export const loadGraphsFromDb = async () => {
+    appStore.set(
+        _graphStorageAtom,
+        Object.fromEntries(
+            (await db.chains.toArray()).map((c) => [c.graphId, c])
+        )
+    );
+};
 
 export const createGraph = (name?: string, parentId?: string): void => {
     const s = appStore.get(_graphStorageAtom);
