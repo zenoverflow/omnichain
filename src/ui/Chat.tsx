@@ -1,10 +1,13 @@
 import { useRef, useEffect } from "react";
 import { Input, Avatar, Space } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { useAtom } from "jotai";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 // @ts-ignore
 import Markdown from "react-markdown";
+
+import { optionsAtom } from "../state/options";
 
 const { TextArea } = Input;
 
@@ -85,12 +88,54 @@ const RoboMessage: React.FC<{ children: string }> = ({ children }) => {
     );
 };
 
+export const EmptyChat: React.FC = () => {
+    return (
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
+                color: "#f2f2f2",
+            }}
+        >
+            <div
+                className="c__mstyle"
+                style={{
+                    maxWidth: "700px",
+                    fontSize: "32px",
+                    marginBottom: "10px",
+                }}
+            >
+                Welcome!
+            </div>
+
+            <div style={{ maxWidth: "700px" }}>
+                To start chatting here, create a chain (+Chain in the sidebar on
+                the left) and select it from the options menu (the cog icon in
+                the top bar).
+            </div>
+        </div>
+    );
+};
+
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>();
+    const [{ chainChatId }] = useAtom(optionsAtom);
+
+    const mockMessages = [];
 
     useEffect(() => {
-        listRef.current.scrollTop = listRef.current.scrollHeight;
-    }, []);
+        if (listRef.current) {
+            listRef.current.scrollTop = listRef.current.scrollHeight;
+        }
+    }, [listRef.current]);
+
+    if (!chainChatId || !mockMessages.length) {
+        return <EmptyChat />;
+    }
 
     return (
         <div
