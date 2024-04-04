@@ -21,7 +21,6 @@ export const loadAvatarsFromDb = async () => {
 
 export const createAvatar = (name: string = "Anon"): void => {
     const s = appStore.get(_avatarStorageAtom);
-    // main graph
     const created: ChatAvatar = ImgUtils.empty(name);
     const id = created.avatarId;
     appStore.set(_avatarStorageAtom, {
