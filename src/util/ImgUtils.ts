@@ -7,6 +7,7 @@ export class ImgUtils {
             avatarId: uuidv4(),
             name,
             imageBase64: "",
+            created: Date.now(),
         };
     }
 

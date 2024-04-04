@@ -31,6 +31,7 @@ export type ChatAvatar = {
     avatarId: string;
     name: string;
     imageBase64: string;
+    created: number;
 };
 
 class _DB extends Dexie {
