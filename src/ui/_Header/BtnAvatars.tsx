@@ -92,21 +92,17 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                                 marginBottom: "5px",
                             }}
                         >
-                            <div style={{ position: "relative" }}>
-                                <Avatar
-                                    size={42}
-                                    {...(a.imageBase64.length
-                                        ? { src: a.imageBase64 }
-                                        : { icon: <UserOutlined /> })}
-                                    style={{
-                                        backgroundColor: "grey",
-                                        cursor: "pointer",
-                                    }}
-                                    onClick={() =>
-                                        handleAvatarUpdate(a.avatarId)
-                                    }
-                                />
-                            </div>
+                            <Avatar
+                                size={42}
+                                {...(a.imageBase64.length
+                                    ? { src: a.imageBase64 }
+                                    : { icon: <UserOutlined /> })}
+                                style={{
+                                    backgroundColor: "grey",
+                                    cursor: "pointer",
+                                }}
+                                onClick={() => handleAvatarUpdate(a.avatarId)}
+                            />
                             <div style={{ width: "5px" }} />
                             <Input
                                 type="text"

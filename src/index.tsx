@@ -7,6 +7,7 @@ import { appStore } from "./state";
 import { loadGraphsFromDb } from "./state/graphs";
 import { loadAvatarsFromDb } from "./state/avatars";
 import { loadMessagesFromDb } from "./state/messages";
+import { loadApiKeysFromDb } from "./state/apiKeys";
 
 import { Editor } from "./ui/Editor";
 
@@ -21,6 +22,7 @@ export const run = async () => {
     await loadGraphsFromDb();
     await loadAvatarsFromDb();
     await loadMessagesFromDb();
+    await loadApiKeysFromDb();
 
     ReactDOM.createRoot(document.getElementById("root")!).render(
         <React.StrictMode>

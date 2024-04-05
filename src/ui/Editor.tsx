@@ -13,6 +13,7 @@ import { EditorGraph } from "./EditorGraph";
 import { ChatInterface } from "./Chat";
 import { BtnOptions } from "./_Header/BtnOptions";
 import { BtnAvatars } from "./_Header/BtnAvatars";
+import { BtnApiKeys } from "./_Header/BtnApiKeys";
 
 import { executorAtom } from "../state/executor";
 import { closeEditor } from "../state/editor";
@@ -105,6 +106,7 @@ export const Editor: React.FC = () => {
                             }}
                         />
                         <BtnAvatars />
+                        <BtnApiKeys />
                         <BtnOptions />
                     </Space>
                 </Space>

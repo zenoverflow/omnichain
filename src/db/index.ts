@@ -34,10 +34,18 @@ export type ChatAvatar = {
     created: number;
 };
 
+export type ApiKey = {
+    apiKeyId: string;
+    name: string;
+    content: string;
+    created: number;
+};
+
 class _DB extends Dexie {
     chains!: Table<SerializedGraph>;
     chatMessages!: Table<ChatMessage>;
     chatAvatars!: Table<ChatAvatar>;
+    apiKeys!: Table<ApiKey>;
 
     constructor() {
         super("__db__");
@@ -45,6 +53,7 @@ class _DB extends Dexie {
             chains: "graphId, name",
             chatMessages: "messageId, avatarId",
             chatAvatars: "avatarId, name",
+            apiKeys: "apiKeyId, name",
         });
     }
 }
