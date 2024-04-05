@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useAtom } from "jotai";
 import { Button, Input, Modal, Select, Space } from "antd";
 import {
@@ -49,6 +49,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
             title={<h3>Options</h3>}
             open={true}
             onOk={handleApply}
+            afterClose={closeModal}
             onCancel={closeModal}
             okText="Apply"
             // footer={(_, { OkBtn, CancelBtn }) => (

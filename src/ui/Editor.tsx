@@ -4,7 +4,6 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     CommentOutlined,
-    SettingOutlined,
     BellOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Space } from "antd";
@@ -13,6 +12,7 @@ import { Sider } from "./Sider";
 import { EditorGraph } from "./EditorGraph";
 import { ChatInterface } from "./Chat";
 import { BtnOptions } from "./_Header/BtnOptions";
+import { BtnAvatars } from "./_Header/BtnAvatars";
 
 import { executorAtom } from "../state/executor";
 import { closeEditor } from "../state/editor";
@@ -104,6 +104,7 @@ export const Editor: React.FC = () => {
                                 alignItems: "center",
                             }}
                         />
+                        <BtnAvatars />
                         <BtnOptions />
                     </Space>
                 </Space>
