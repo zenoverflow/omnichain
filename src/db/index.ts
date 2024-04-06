@@ -22,6 +22,7 @@ export type SerializedGraph = {
 
 export type ChatMessage = {
     messageId: string;
+    chainId: string;
     avatarId: string;
     content: string;
     created: number;
@@ -51,7 +52,7 @@ class _DB extends Dexie {
         super("__db__");
         this.version(1).stores({
             chains: "graphId, name",
-            chatMessages: "messageId, avatarId",
+            chatMessages: "messageId, chainId, avatarId",
             chatAvatars: "avatarId, name",
             apiKeys: "apiKeyId, name",
         });

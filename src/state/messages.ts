@@ -19,9 +19,13 @@ export const loadMessagesFromDb = async () => {
     );
 };
 
-export const addMessage = (avatarId: string, content: string): void => {
+export const addMessage = (
+    chainId: string,
+    avatarId: string,
+    content: string
+): void => {
     const s = appStore.get(_messageStorageAtom);
-    const created = MsgUtils.fresh(avatarId, content);
+    const created = MsgUtils.fresh(chainId, avatarId, content);
     const id = created.messageId;
     appStore.set(_messageStorageAtom, {
         ...s,
