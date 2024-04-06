@@ -10,11 +10,19 @@ export const messageStorageAtom = atom((get) => ({
     ...get(_messageStorageAtom),
 }));
 
-export const loadMessagesFromDb = async () => {
+export const unloadMessages = () => {
+    appStore.set(_messageStorageAtom, {});
+};
+
+export const loadMessagesFromDb = async (chainId: string) => {
     appStore.set(
         _messageStorageAtom,
         Object.fromEntries(
-            (await db.chatMessages.toArray()).map((c) => [c.avatarId, c])
+            (
+                await db.chatMessages
+                    .filter((c) => c.chainId === chainId)
+                    .toArray()
+            ).map((c) => [c.avatarId, c])
         )
     );
 };

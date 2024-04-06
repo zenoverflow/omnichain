@@ -6,7 +6,7 @@ import {
     CommentOutlined,
     BellOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Space } from "antd";
+import { Button, Layout, Space, Spin } from "antd";
 
 import { Sider } from "./Sider";
 import { EditorGraph } from "./EditorGraph";
@@ -18,6 +18,7 @@ import { BtnApiKeys } from "./_Header/BtnApiKeys";
 import { executorAtom } from "../state/executor";
 import { closeEditor } from "../state/editor";
 import { editorStateAtom } from "../state/editor";
+import { loaderAtom } from "../state/loader";
 
 const { Header, Content } = Layout;
 
@@ -53,71 +54,76 @@ const EditorContent: React.FC = () => {
 export const Editor: React.FC = () => {
     const [siderCollapsed, setSiderCollapsed] = useState(false);
     const [{ path: editorPath }] = useAtom(editorStateAtom);
+    const [loading] = useAtom(loaderAtom);
 
     return (
-        <Layout style={{ height: "100vh", maxHeight: "100vh" }}>
-            <Header
-                style={{
-                    margin: 0,
-                    padding: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingLeft: 10,
-                    paddingRight: 10,
-                    color: "#f2f2f2",
-                }}
-            >
-                <div
+        <>
+            <Layout style={{ height: "100vh", maxHeight: "100vh" }}>
+                <Header
                     style={{
+                        margin: 0,
+                        padding: 0,
                         display: "flex",
                         alignItems: "center",
-                        cursor: "pointer",
+                        justifyContent: "space-between",
+                        paddingLeft: 10,
+                        paddingRight: 10,
+                        color: "#f2f2f2",
                     }}
-                    onClick={() => setSiderCollapsed(!siderCollapsed)}
                 >
-                    {siderCollapsed ? (
-                        <MenuUnfoldOutlined style={{ fontSize: "32px" }} />
-                    ) : (
-                        <MenuFoldOutlined style={{ fontSize: "32px" }} />
-                    )}
-                </div>
-                <Space align="center">
-                    {editorPath.length > 0 ? (
-                        <Button
-                            type="primary"
-                            size="large"
-                            onClick={closeEditor}
-                            icon={<CommentOutlined />}
-                        >
-                            {"Chat"}
-                        </Button>
-                    ) : null}
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: "pointer",
+                        }}
+                        onClick={() => setSiderCollapsed(!siderCollapsed)}
+                    >
+                        {siderCollapsed ? (
+                            <MenuUnfoldOutlined style={{ fontSize: "32px" }} />
+                        ) : (
+                            <MenuFoldOutlined style={{ fontSize: "32px" }} />
+                        )}
+                    </div>
                     <Space align="center">
-                        <Button
-                            type="primary"
-                            shape="circle"
-                            size="large"
-                            icon={<BellOutlined />}
-                            style={{
-                                display: "inline-flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        />
-                        <BtnAvatars />
-                        <BtnApiKeys />
-                        <BtnOptions />
+                        {editorPath.length > 0 ? (
+                            <Button
+                                type="primary"
+                                size="large"
+                                onClick={closeEditor}
+                                icon={<CommentOutlined />}
+                            >
+                                {"Chat"}
+                            </Button>
+                        ) : null}
+                        <Space align="center">
+                            <Button
+                                type="primary"
+                                shape="circle"
+                                size="large"
+                                icon={<BellOutlined />}
+                                style={{
+                                    display: "inline-flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            />
+                            <BtnAvatars />
+                            <BtnApiKeys />
+                            <BtnOptions />
+                        </Space>
                     </Space>
-                </Space>
-            </Header>
-            <Layout style={{ background: "#343541" }} hasSider>
-                <Sider
-                    collapsed={siderCollapsed}
-                    setCollapsed={setSiderCollapsed}
-                />
-                <EditorContent />
+                </Header>
+                <Layout style={{ background: "#343541" }} hasSider>
+                    <Sider
+                        collapsed={siderCollapsed}
+                        setCollapsed={setSiderCollapsed}
+                    />
+                    <EditorContent />
+                </Layout>
             </Layout>
-        </Layout>
+
+            {loading ? <Spin fullscreen /> : null}
+        </>
     );
 };

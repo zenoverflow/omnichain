@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { Input, Avatar, Space } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai";
@@ -7,7 +7,15 @@ import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 // @ts-ignore
 import Markdown from "react-markdown";
 
+import { ChatMessage } from "../db";
 import { optionsAtom } from "../state/options";
+import {
+    messageStorageAtom,
+    loadMessagesFromDb,
+    unloadMessages,
+} from "../state/messages";
+import { avatarStorageAtom } from "../state/avatars";
+import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
 
 const { TextArea } = Input;
 
@@ -56,34 +64,44 @@ const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
     );
 };
 
-const UserMessage: React.FC<{ children: string }> = ({ children }) => {
-    return (
-        <Space direction="vertical" className="c__msg">
-            <div style={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                    size={32}
-                    icon={<UserOutlined />}
-                    style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
-                />
-                <div>{"You"}</div>
-            </div>
-            <CMarkdown>{children}</CMarkdown>
-        </Space>
-    );
-};
+// const UserMessage: React.FC<{ children: string }> = ({ children }) => {
+//     return (
+//         <Space direction="vertical" className="c__msg">
+//             <div style={{ display: "flex", alignItems: "center" }}>
+//                 <Avatar
+//                     size={32}
+//                     icon={<UserOutlined />}
+//                     style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
+//                 />
+//                 <div>{"You"}</div>
+//             </div>
+//             <CMarkdown>{children}</CMarkdown>
+//         </Space>
+//     );
+// };
 
-const RoboMessage: React.FC<{ children: string }> = ({ children }) => {
+const ChatMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
+    const [avatarStorage] = useAtom(avatarStorageAtom);
+
+    const avatar = useMemo(() => {
+        return Object.values(avatarStorage).find(
+            (a) => a.avatarId === message.avatarId
+        );
+    }, [avatarStorage]);
+
     return (
         <Space direction="vertical" className="c__msg">
             <div style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                     size={32}
-                    icon={<UserOutlined />}
+                    {...(avatar.imageBase64.length
+                        ? { src: avatar.imageBase64 }
+                        : { icon: <UserOutlined /> })}
                     style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
                 />
-                <div>{"AI"}</div>
+                <div>{avatar.name}</div>
             </div>
-            <CMarkdown>{children}</CMarkdown>
+            <CMarkdown>{message.content}</CMarkdown>
         </Space>
     );
 };
@@ -124,8 +142,13 @@ export const EmptyChat: React.FC = () => {
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>();
     const [{ chainChatId }] = useAtom(optionsAtom);
+    const [messageStorage] = useAtom(messageStorageAtom);
 
-    const mockMessages = [];
+    const messages = useMemo(() => {
+        return Object.values(messageStorage).sort(
+            (a, b) => b.created - a.created
+        );
+    }, [messageStorage]);
 
     useEffect(() => {
         if (listRef.current) {
@@ -133,9 +156,19 @@ export const ChatInterface: React.FC = () => {
         }
     }, [listRef.current]);
 
-    if (!chainChatId || !mockMessages.length) {
-        return <EmptyChat />;
-    }
+    // Load messages for the selected chat chain
+    useEffect(() => {
+        if (chainChatId) {
+            startGlobalLoading();
+            loadMessagesFromDb(chainChatId).then(() => {
+                finishGlobalLoading();
+            });
+        }
+
+        return () => {
+            unloadMessages();
+        };
+    }, [chainChatId]);
 
     return (
         <div
@@ -149,23 +182,30 @@ export const ChatInterface: React.FC = () => {
                 color: "#f2f2f2",
             }}
         >
-            <div
-                ref={listRef}
-                style={{
-                    flexGrow: 1,
-                    color: "white",
-                    padding: "10px",
-                }}
-            >
-                <UserMessage>{"Example message."}</UserMessage>
-                <RoboMessage>{exampleMarkdown}</RoboMessage>
-            </div>
-            <TextArea
-                // value={value}
-                // onChange={(e) => setValue(e.target.value)}
-                placeholder="Ask me anything..."
-                autoSize={{ minRows: 2, maxRows: 8 }}
-            />
+            {chainChatId ? (
+                <>
+                    <div
+                        ref={listRef}
+                        style={{
+                            flexGrow: 1,
+                            color: "white",
+                            padding: "10px",
+                        }}
+                    >
+                        {messages.map((m) => (
+                            <ChatMessage key={m.messageId} message={m} />
+                        ))}
+                    </div>
+                    <TextArea
+                        // value={value}
+                        // onChange={(e) => setValue(e.target.value)}
+                        placeholder="Type a message..."
+                        autoSize={{ minRows: 2, maxRows: 8 }}
+                    />
+                </>
+            ) : (
+                <EmptyChat />
+            )}
         </div>
     );
 };
