@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { Menu, MenuProps, Input } from "antd";
+import { Menu, MenuProps, Input, Empty } from "antd";
 import { useAtom } from "jotai";
 
 import { hideContextMenu, menuStateAtom } from "../../state/editorContextMenu";
@@ -31,11 +31,13 @@ export const ContextMenu: React.FC = () => {
     useEffect(() => {
         if (!!menu && !active) {
             setActive(true);
+            setFilter("");
         }
         //
         else if (!menu && active) {
             haltTimeout();
             setActive(false);
+            setFilter("");
         }
     }, [menu, active]);
 
@@ -53,10 +55,10 @@ export const ContextMenu: React.FC = () => {
             }
         };
 
-        document.addEventListener("click", listener);
+        window.addEventListener("click", listener);
 
         return () => {
-            document.removeEventListener("click", listener);
+            window.removeEventListener("click", listener);
         };
     }, [menuRef]);
 
@@ -89,6 +91,8 @@ export const ContextMenu: React.FC = () => {
                 top: menu.clientY,
                 left: menu.clientX,
                 borderRadius: "10px",
+                backgroundColor: "#001529",
+                paddingBottom: "5px",
             }}
             onMouseEnter={haltTimeout}
             onMouseLeave={startTimeout}
@@ -102,18 +106,34 @@ export const ContextMenu: React.FC = () => {
                     }
                     placeholder="Search..."
                     onMouseEnter={haltTimeout}
+                    style={{ marginBottom: "10px" }}
                 />
             ) : null}
-            <Menu
-                mode="vertical"
-                theme="dark"
-                items={items}
-                style={{
-                    maxHeight: "420px",
-                    overflowY: "auto",
-                }}
-                onMouseEnter={haltTimeout}
-            />
+            {filter.length && !items.length ? (
+                <span
+                    style={{
+                        display: "block",
+                        padding: "5px 0px",
+                        textAlign: "center",
+                        width: "100$",
+                        color: "#fff",
+                        opacity: 0.6,
+                    }}
+                >
+                    No matches!
+                </span>
+            ) : (
+                <Menu
+                    mode="vertical"
+                    theme="dark"
+                    items={items}
+                    style={{
+                        maxHeight: "420px",
+                        overflowY: "auto",
+                    }}
+                    onMouseEnter={haltTimeout}
+                />
+            )}
         </div>
     );
 };

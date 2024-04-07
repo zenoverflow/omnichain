@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useRete } from "rete-react-plugin";
 import { useAtom } from "jotai";
 
@@ -37,6 +37,20 @@ type DeleteButtonProps = {
 
 const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
     const [targets] = useAtom(nodeSelectionAtom);
+
+    useEffect(() => {
+        const listener = (e: KeyboardEvent) => {
+            if (e.key === "Delete" && targets.length) {
+                deleteSelectedNodes(props.nodeContext);
+            }
+        };
+
+        window.addEventListener("keyup", listener);
+
+        return () => {
+            window.removeEventListener("keyup", listener);
+        };
+    }, [targets, props.nodeContext]);
 
     if (!targets.length) return null;
 
