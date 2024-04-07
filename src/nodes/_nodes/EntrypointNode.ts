@@ -5,13 +5,13 @@ import { NodeContextObj } from "../context";
 import { TriggerSocket } from "../_sockets/TriggerSocket";
 
 export class EntrypointNode extends ClassicPreset.Node<
-    {},
-    { trigger: TriggerSocket },
+    { triggerIn: TriggerSocket },
+    { triggerOut: TriggerSocket },
     {}
 > {
     public static icon = PlayCircleOutlined;
     width: number = 200;
-    height: number = 90;
+    height: number = 120;
 
     constructor(
         private context: NodeContextObj,
@@ -25,14 +25,14 @@ export class EntrypointNode extends ClassicPreset.Node<
         //
         //
         self.context.control.add(self, {
-            inputs: () => [],
-            outputs: () => ["trigger"],
+            inputs: () => ["triggerIn"],
+            outputs: () => ["triggerOut"],
             async execute(_: never, forward) {
                 if (!self.context.getIsActive()) return;
 
                 self.context.onFlowNode(self.id);
 
-                forward("trigger");
+                forward("triggerOut");
             },
         });
         self.context.dataflow.add(self, {
@@ -48,8 +48,12 @@ export class EntrypointNode extends ClassicPreset.Node<
         });
         //
         //
+        self.addInput(
+            "triggerIn",
+            new ClassicPreset.Input(new TriggerSocket(), "trigger-in")
+        );
         self.addOutput(
-            "trigger",
+            "triggerOut",
             new ClassicPreset.Output(new TriggerSocket(), "trigger-out")
         );
     }

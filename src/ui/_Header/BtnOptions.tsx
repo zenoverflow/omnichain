@@ -12,20 +12,36 @@ import {
     setChatChain,
     setApiChain,
     setApiPort,
+    setUserAvatar,
 } from "../../state/options";
 import { graphStorageAtom } from "../../state/graphs";
+import { avatarStorageAtom } from "../../state/avatars";
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
-    const [{ chainChatId, chainApiId, apiPort }] = useAtom(optionsAtom);
+    const [{ chainChatId, chainApiId, apiPort, userAvatarId }] =
+        useAtom(optionsAtom);
     const [graphStorage] = useAtom(graphStorageAtom);
+    const [avatarStorage] = useAtom(avatarStorageAtom);
 
     const [updates, setUpdates] = useState({
+        userAvatarId,
         chainChatId,
         chainApiId,
         apiPort,
     });
 
-    const options = useMemo(
+    const avatarOptions = useMemo(
+        () =>
+            Object.values(avatarStorage)
+                .sort((a, b) => b.created - a.created)
+                .map((c) => ({
+                    label: c.name,
+                    value: c.avatarId,
+                })),
+        [avatarStorage]
+    );
+
+    const chainOptions = useMemo(
         () =>
             Object.values(graphStorage)
                 .sort((a, b) => b.created - a.created)
@@ -37,6 +53,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     );
 
     const handleApply = () => {
+        setUserAvatar(updates.userAvatarId);
         setChatChain(updates.chainChatId);
         setApiChain(updates.chainApiId);
         setApiPort(updates.apiPort);
@@ -78,11 +95,31 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     size="small"
                     style={{ width: "100%" }}
                 >
+                    <span>User chat avatar</span>
+                    <Select
+                        style={{ width: "100%" }}
+                        placeholder="Select an avatar..."
+                        options={avatarOptions}
+                        onChange={(v) =>
+                            setUpdates((u) => ({
+                                ...u,
+                                userAvatarId: v,
+                            }))
+                        }
+                        value={updates.userAvatarId}
+                    />
+                </Space>
+
+                <Space
+                    direction="vertical"
+                    size="small"
+                    style={{ width: "100%" }}
+                >
                     <span>Chat chain</span>
                     <Select
                         style={{ width: "100%" }}
                         placeholder="Select a chain..."
-                        options={options}
+                        options={chainOptions}
                         onChange={(v) =>
                             setUpdates((u) => ({
                                 ...u,
@@ -102,7 +139,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     <Select
                         style={{ width: "100%" }}
                         placeholder="Select a chain..."
-                        options={options}
+                        options={chainOptions}
                         onChange={(v) =>
                             setUpdates((u) => ({
                                 ...u,

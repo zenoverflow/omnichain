@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo } from "react";
-import { Input, Avatar, Space } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Input, Avatar, Space, Button } from "antd";
+import { UserOutlined, SendOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -131,9 +131,12 @@ export const EmptyChat: React.FC = () => {
             </div>
 
             <div style={{ maxWidth: "700px" }}>
-                To start chatting here, create a chain (+Chain in the sidebar on
-                the left) and select it from the options menu (the cog icon in
-                the top bar).
+                To start chatting here, first create avatars for yourself and
+                your AI from the avatars menu in the top bar. Then, create and
+                configure a chain (+Chain in the sidebar on the left) to
+                communicate with your AI. Finally, use the options menu in the
+                top bar to select your own avatar and the chain to use for the
+                chat.
             </div>
         </div>
     );
@@ -141,7 +144,7 @@ export const EmptyChat: React.FC = () => {
 
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>();
-    const [{ chainChatId }] = useAtom(optionsAtom);
+    const [{ chainChatId, userAvatarId }] = useAtom(optionsAtom);
     const [messageStorage] = useAtom(messageStorageAtom);
 
     const messages = useMemo(() => {
@@ -149,6 +152,11 @@ export const ChatInterface: React.FC = () => {
             (a, b) => b.created - a.created
         );
     }, [messageStorage]);
+
+    const initCondSatisfied = useMemo(
+        () => chainChatId && userAvatarId,
+        [chainChatId, userAvatarId]
+    );
 
     useEffect(() => {
         if (listRef.current) {
@@ -158,7 +166,7 @@ export const ChatInterface: React.FC = () => {
 
     // Load messages for the selected chat chain
     useEffect(() => {
-        if (chainChatId) {
+        if (initCondSatisfied) {
             startGlobalLoading();
             loadMessagesFromDb(chainChatId).then(() => {
                 finishGlobalLoading();
@@ -168,7 +176,7 @@ export const ChatInterface: React.FC = () => {
         return () => {
             unloadMessages();
         };
-    }, [chainChatId]);
+    }, [chainChatId, initCondSatisfied]);
 
     return (
         <div
@@ -182,7 +190,7 @@ export const ChatInterface: React.FC = () => {
                 color: "#f2f2f2",
             }}
         >
-            {chainChatId ? (
+            {initCondSatisfied ? (
                 <>
                     <div
                         ref={listRef}
@@ -196,12 +204,31 @@ export const ChatInterface: React.FC = () => {
                             <ChatMessage key={m.messageId} message={m} />
                         ))}
                     </div>
-                    <TextArea
-                        // value={value}
-                        // onChange={(e) => setValue(e.target.value)}
-                        placeholder="Type a message..."
-                        autoSize={{ minRows: 2, maxRows: 8 }}
-                    />
+                    <div
+                        style={{
+                            display: "flex",
+                            width: "100%",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <TextArea
+                            // value={value}
+                            // onChange={(e) => setValue(e.target.value)}
+                            placeholder="Type a message..."
+                            autoSize={{ minRows: 2, maxRows: 8 }}
+                            style={{ flex: "1" }}
+                        />
+                        <div style={{ width: "5px" }} />
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<SendOutlined />}
+                            style={{ height: "100%" }}
+                            // disabled={props.disabled}
+                        />
+                        <div style={{ width: "5px" }} />
+                    </div>
                 </>
             ) : (
                 <EmptyChat />
