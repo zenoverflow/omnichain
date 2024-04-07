@@ -1,9 +1,8 @@
 import { ClassicPreset } from "rete";
+import { HourglassOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
-
 import { StringSocket } from "../_sockets/StringSocket";
-
 import { NumberControl } from "../_controls/NumberControl";
 
 export class DelayOutputNode extends ClassicPreset.Node<
@@ -11,6 +10,7 @@ export class DelayOutputNode extends ClassicPreset.Node<
     { dataOut: StringSocket },
     { millis: NumberControl }
 > {
+    public static icon = HourglassOutlined;
     width: number = 280;
     height: number = 165;
 

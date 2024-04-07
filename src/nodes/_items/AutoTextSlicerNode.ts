@@ -1,7 +1,7 @@
 import { ClassicPreset } from "rete";
+import { GroupOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
-
 import { StringSocket } from "../_sockets/StringSocket";
 import { TextChunkBatchSocket } from "../_sockets/TextChunkBatchSocket";
 import { NumberControl } from "../_controls/NumberControl";
@@ -89,6 +89,7 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
     { dataOut: TextChunkBatchSocket },
     { chunkCharacters: NumberControl }
 > {
+    public static icon = GroupOutlined;
     width: number = 260;
     height: number = 165;
 

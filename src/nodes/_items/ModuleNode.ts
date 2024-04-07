@@ -1,17 +1,13 @@
 import { ClassicPreset, NodeEditor } from "rete";
-
+import { BuildOutlined } from "@ant-design/icons";
 import { ControlFlow, Dataflow } from "rete-engine";
 
 import { NodeContextObj } from "../context";
-
 import { StringSocket } from "../_sockets/StringSocket";
-
 import { SelectControl } from "../_controls/SelectControl";
 
 import { appStore } from "../../state";
-
 import { graphStorageAtom } from "../../state/graphs";
-
 import { GraphUtils } from "../../util/GraphUtils";
 
 import { ModuleInputNode, ModuleOutputNode } from "..";
@@ -21,6 +17,7 @@ export class ModuleNode extends ClassicPreset.Node<
     { dataOut: StringSocket },
     { module: SelectControl }
 > {
+    public static icon = BuildOutlined;
     width: number = 200;
     height: number = 170;
 

@@ -1,7 +1,7 @@
 import { ClassicPreset } from "rete";
+import { CodeOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
-
 import { TriggerSocket } from "../_sockets/TriggerSocket";
 import { GeneralDataSocket } from "../_sockets/GeneralDataSocket";
 
@@ -10,6 +10,7 @@ export class LogOutputNode extends ClassicPreset.Node<
     {},
     {}
 > {
+    public static icon = CodeOutlined;
     width: number = 200;
     height: number = 125;
 

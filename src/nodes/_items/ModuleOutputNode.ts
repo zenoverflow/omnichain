@@ -1,23 +1,17 @@
 import { ClassicPreset } from "rete";
+import { ExportOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
-
 import { StringSocket } from "../_sockets/StringSocket";
 
-/**
- * The value of this node is automatically
- * assigned via the ModuleNode running the module.
- * Multiple ModuleInputNode-s get the same value.
- */
-export class ModuleInputNode extends ClassicPreset.Node<
-    {},
+export class ModuleOutputNode extends ClassicPreset.Node<
     { data: StringSocket },
+    {},
     {}
 > {
+    public static icon = ExportOutlined;
     width: number = 200;
     height: number = 90;
-
-    value: string = "";
 
     constructor(
         private context: NodeContextObj,
@@ -25,9 +19,14 @@ export class ModuleInputNode extends ClassicPreset.Node<
         // @ts-ignore
         controls: Record<string, any> = {}
     ) {
-        super(ModuleInputNode.name);
+        super(ModuleOutputNode.name);
         const self = this;
         self.id = id ?? self.id;
+        //
+        self.addInput(
+            "data",
+            new ClassicPreset.Input(new StringSocket(), "data")
+        );
         //
         //
         // self.context.control.add(self, {
@@ -37,23 +36,21 @@ export class ModuleInputNode extends ClassicPreset.Node<
         //     },
         // });
         self.context.dataflow.add(self, {
-            inputs: () => [],
+            inputs: () => ["data"],
             outputs: () => [],
-            async data() {
+            async data(fetchInputs) {
                 if (!self.context.getIsActive()) return {};
 
                 self.context.onFlowNode(self.id);
 
-                return {
-                    data: self.value,
+                const inputs = (await fetchInputs()) as {
+                    data?: string[];
                 };
+
+                self.context.onFlowNode(self.id);
+
+                return { data: (inputs?.data || [""])[0] };
             },
         });
-        //
-        //
-        self.addOutput(
-            "data",
-            new ClassicPreset.Output(new StringSocket(), "string")
-        );
     }
 }

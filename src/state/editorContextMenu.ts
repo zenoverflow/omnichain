@@ -6,7 +6,6 @@ type MenuItem = {
     key: string;
     label: string;
     handler: () => any;
-    subitems?: MenuItem[];
 };
 
 type MenuState = {
@@ -15,6 +14,7 @@ type MenuState = {
     layerX: number;
     layerY: number;
     items: MenuItem[];
+    isRoot: boolean;
 };
 
 type _MenuStateAtom = MenuState | null;

@@ -2,43 +2,15 @@ import {
     EntrypointNode,
     ModuleInputNode,
     ModuleOutputNode,
-    LogOutputNode,
     ModuleNode,
-    DelayOutputNode,
-    TextNode,
-    AutoTextSlicerNode,
 } from ".";
+
+import * as NODE_MAKERS from ".";
 
 import { NodeContextObj } from "./context";
 import { deleteNode, duplicateNode } from "../state/editor";
 import { showContextMenu } from "../state/editorContextMenu";
 import { isGraphActive } from "../state/executor";
-
-export const NODE_MAKERS = {
-    EntrypointNode,
-    LogOutputNode,
-    TextNode,
-    DelayOutputNode,
-    AutoTextSlicerNode,
-    ModuleNode,
-    ModuleInputNode,
-    ModuleOutputNode,
-};
-
-export type CtxMenuCategory = "Basic" | "Content" | "Modules";
-
-const CATEGORIES = ["Basic", "Content", "Modules"];
-
-const _CATEGORIZER: Record<string, CtxMenuCategory> = {
-    [EntrypointNode.name]: "Basic",
-    [LogOutputNode.name]: "Basic",
-    [TextNode.name]: "Content",
-    [DelayOutputNode.name]: "Content",
-    [AutoTextSlicerNode.name]: "Content",
-    [ModuleNode.name]: "Modules",
-    [ModuleInputNode.name]: "Modules",
-    [ModuleOutputNode.name]: "Modules",
-};
 
 const makeRootMenu = (nodeContext: NodeContextObj) => {
     const { pathToGraph, editor, area } = nodeContext;
@@ -97,17 +69,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
             },
         }));
 
-    const categorized: any[] = CATEGORIES.map((CATEGORY, i) => ({
-        key: `${i}__${CATEGORY}`,
-        label: CATEGORY,
-        handler: () => null,
-        subitems: filtered.filter(({ key }) => _CATEGORIZER[key] === CATEGORY),
-    })).filter((c) => c.subitems.length >= 1);
-    const uncategorized: any[] = filtered.filter(
-        ({ key }) => !_CATEGORIZER[key]
-    );
-
-    return [...categorized, ...uncategorized];
+    return filtered;
 };
 
 const makeNodeMenu = (nodeContext: NodeContextObj, context: any) => {
@@ -159,13 +121,21 @@ export const makeContextMenu = (nodeContext: NodeContextObj) => {
             const target = ctx.data.event.target as HTMLElement;
             let menuCtx = findContextMenu(target);
             if (menuCtx) {
-                if (menuCtx !== "root") {
+                const isRoot = menuCtx === "root";
+                if (!isRoot) {
                     menuCtx = editor.getNode(menuCtx);
                 }
                 const items = _makeMenu(menuCtx, nodeContext);
                 const { clientX, clientY } = ctx.data.event;
                 const { layerX, layerY } = ctx.data.event as any;
-                showContextMenu({ items, clientX, clientY, layerX, layerY });
+                showContextMenu({
+                    items,
+                    clientX,
+                    clientY,
+                    layerX,
+                    layerY,
+                    isRoot,
+                });
             }
         }
         return ctx;

@@ -6,7 +6,7 @@ import { appStore } from ".";
 import { graphStorageAtom, updateNodeControl } from "./graphs";
 import { showNotification } from "./notifications";
 
-import { EntrypointNode } from "../nodes/basic/EntrypointNode";
+import { EntrypointNode } from "../nodes/_items/EntrypointNode";
 import { GraphUtils } from "../util/GraphUtils";
 
 type ExecutorInstance = {

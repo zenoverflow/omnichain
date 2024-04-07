@@ -1,4 +1,5 @@
 import { ClassicPreset } from "rete";
+import { FileTextOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
 import { StringSocket } from "../_sockets/StringSocket";
@@ -9,6 +10,7 @@ export class TextNode extends ClassicPreset.Node<
     { out: StringSocket },
     { val: TextControl }
 > {
+    public static icon = FileTextOutlined;
     width: number = 450;
     height: number = 450;
 

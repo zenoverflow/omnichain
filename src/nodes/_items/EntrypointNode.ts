@@ -1,14 +1,15 @@
 import { ClassicPreset } from "rete";
-
-import { TriggerSocket } from "../_sockets/TriggerSocket";
+import { PlayCircleOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
+import { TriggerSocket } from "../_sockets/TriggerSocket";
 
 export class EntrypointNode extends ClassicPreset.Node<
     {},
     { trigger: TriggerSocket },
     {}
 > {
+    public static icon = PlayCircleOutlined;
     width: number = 200;
     height: number = 90;
 

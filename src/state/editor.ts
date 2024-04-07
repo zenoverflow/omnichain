@@ -11,8 +11,8 @@ import {
 import { runGraph, stopGraph } from "./executor";
 import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
 import { signalEditorUpdate } from "./watcher";
+import * as NODE_MAKERS from "../nodes";
 import { NodeContextObj } from "../nodes/context";
-import { NODE_MAKERS } from "../nodes/contextMenu";
 import { EntrypointNode, ModuleInputNode, ModuleOutputNode } from "../nodes";
 
 type EditorState = {
