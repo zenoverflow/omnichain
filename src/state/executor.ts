@@ -5,9 +5,8 @@ import { ControlFlow, Dataflow } from "rete-engine";
 import { appStore } from ".";
 import { graphStorageAtom, updateNodeControl } from "./graphs";
 import { showNotification } from "./notifications";
-
-import { EntrypointNode } from "../nodes/_items/EntrypointNode";
 import { GraphUtils } from "../util/GraphUtils";
+import { EntrypointNode } from "../nodes/";
 
 type ExecutorInstance = {
     graphId: string;
