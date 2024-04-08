@@ -11,6 +11,8 @@ export class SelectControl extends ClassicPreset.Control {
 
     constructor(
         public options: {
+            name?: string;
+            showSearch?: boolean;
             values: {
                 value: any;
                 label: string;
@@ -43,33 +45,57 @@ export class SelectControl extends ClassicPreset.Control {
                     ref={parentRef}
                     onPointerDown={(e) => e.stopPropagation()}
                 >
-                    <Select
-                        showSearch
-                        placeholder="choose module"
-                        // optionFilterProp="children"
-                        style={{ width: "100%" }}
-                        defaultValue={defaultValue}
-                        onSelect={(_, option) => {
-                            self.value = option.value;
-                            signalEditorUpdate();
-                            if (self.options.onUpdate) {
-                                self.options.onUpdate();
-                            }
-                            setLastUpdate(Date.now());
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "stretch",
+                            width: "100%",
                         }}
-                        onSearch={() => {}}
-                        filterOption={(
-                            input: string,
-                            option?: { label: string; value: string }
-                        ) =>
-                            input.trim().length
-                                ? (option?.label ?? "")
-                                      .toLowerCase()
-                                      .includes(input.toLowerCase())
-                                : true
-                        }
-                        options={self.options.values}
-                    />
+                    >
+                        <span
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                padding: "0 10px",
+                                borderTopLeftRadius: "6px",
+                                borderBottomLeftRadius: "6px",
+                                backgroundColor: "#fafafa",
+                            }}
+                        >
+                            {self.options.name ?? "Option"}
+                        </span>
+                        <Select
+                            showSearch={self.options.showSearch ?? false}
+                            // optionFilterProp="children"
+                            className="c__rmleftrad"
+                            style={{
+                                flex: "1",
+                            }}
+                            defaultValue={defaultValue}
+                            onSelect={(_, option) => {
+                                self.value = option.value;
+                                signalEditorUpdate();
+                                if (self.options.onUpdate) {
+                                    self.options.onUpdate();
+                                }
+                                setLastUpdate(Date.now());
+                            }}
+                            onSearch={() => {}}
+                            filterOption={(
+                                input: string,
+                                option?: { label: string; value: string }
+                            ) =>
+                                input.trim().length
+                                    ? (option?.label ?? "")
+                                          .toLowerCase()
+                                          .includes(input.toLowerCase())
+                                    : true
+                            }
+                            options={self.options.values}
+                        />
+                    </div>
                 </div>
             );
         };

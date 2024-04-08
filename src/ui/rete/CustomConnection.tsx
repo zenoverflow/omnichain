@@ -13,13 +13,13 @@ const Svg = styled.svg`
 
 type PathProps = {
     styles?: (props: any) => any;
-    pathColor: string;
+    stroke: string;
 };
 
 const Path = styled.path<PathProps>`
     fill: none;
     stroke-width: 5px;
-    stroke: ${(props) => props.pathColor};
+    stroke: ${(props) => props.stroke};
     pointer-events: auto;
     ${(props) => props.styles && props.styles(props)}
 `;
@@ -29,7 +29,7 @@ type ConnectionProps = {
     styles?: () => any;
 };
 
-export const makeColoredConnection = (pathColor: string = "#52c41a") => {
+export const makeColoredConnection = (stroke: string = "#52c41a") => {
     const CustomConnection = (props: ConnectionProps) => {
         const { path } = useConnection();
 
@@ -40,7 +40,7 @@ export const makeColoredConnection = (pathColor: string = "#52c41a") => {
                 <Path
                     //
                     styles={props.styles}
-                    pathColor={pathColor}
+                    stroke={stroke}
                     d={path}
                 />
             </Svg>

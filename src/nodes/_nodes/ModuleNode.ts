@@ -18,8 +18,8 @@ export class ModuleNode extends ClassicPreset.Node<
     { module: SelectControl }
 > {
     public static icon = BuildOutlined;
-    width: number = 200;
-    height: number = 170;
+    width: number = 300;
+    height: number = 165;
 
     constructor(
         private context: NodeContextObj,
@@ -43,6 +43,7 @@ export class ModuleNode extends ClassicPreset.Node<
         this.addControl(
             "module",
             new SelectControl({
+                name: "Module",
                 values: moduleOptions,
                 initial: controls.module || null,
             })

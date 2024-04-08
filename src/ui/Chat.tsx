@@ -16,6 +16,7 @@ import {
 } from "../state/messages";
 import { avatarStorageAtom } from "../state/avatars";
 import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
+import { chatBlockAtom } from "../state/chatBlock";
 
 const { TextArea } = Input;
 
@@ -146,6 +147,8 @@ export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>();
     const [{ chainChatId, userAvatarId }] = useAtom(optionsAtom);
     const [messageStorage] = useAtom(messageStorageAtom);
+    const [blocked] = useAtom(chatBlockAtom);
+
     const [message, setMessage] = useState("");
 
     const messages = useMemo(() => {
@@ -160,9 +163,11 @@ export const ChatInterface: React.FC = () => {
     );
 
     const sendMessage = useCallback(() => {
-        console.log(message);
-        // TODO: trigger chain
-        setMessage("");
+        if (!blocked) {
+            console.log(message);
+            // TODO: trigger chain
+            setMessage("");
+        }
     }, [message, setMessage]);
 
     const handleTextboxEnter = useCallback(
@@ -236,6 +241,7 @@ export const ChatInterface: React.FC = () => {
                             placeholder="Type a message..."
                             autoSize={{ minRows: 2, maxRows: 8 }}
                             style={{ flex: "1" }}
+                            disabled={blocked}
                         />
                         <div style={{ width: "5px" }} />
                         <Button
@@ -244,6 +250,7 @@ export const ChatInterface: React.FC = () => {
                             icon={<SendOutlined />}
                             style={{ height: "100%" }}
                             onClick={sendMessage}
+                            disabled={blocked}
                         />
                         <div style={{ width: "5px" }} />
                     </div>
