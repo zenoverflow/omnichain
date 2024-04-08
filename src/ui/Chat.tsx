@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import { Input, Avatar, Space, Button } from "antd";
 import { UserOutlined, SendOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai";
@@ -146,6 +146,7 @@ export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>();
     const [{ chainChatId, userAvatarId }] = useAtom(optionsAtom);
     const [messageStorage] = useAtom(messageStorageAtom);
+    const [message, setMessage] = useState("");
 
     const messages = useMemo(() => {
         return Object.values(messageStorage).sort(
@@ -156,6 +157,21 @@ export const ChatInterface: React.FC = () => {
     const initCondSatisfied = useMemo(
         () => chainChatId && userAvatarId,
         [chainChatId, userAvatarId]
+    );
+
+    const sendMessage = useCallback(() => {
+        console.log(message);
+        // TODO: trigger chain
+        setMessage("");
+    }, [message, setMessage]);
+
+    const handleTextboxEnter = useCallback(
+        (e: any) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                sendMessage();
+            }
+        },
+        [sendMessage]
     );
 
     useEffect(() => {
@@ -212,9 +228,11 @@ export const ChatInterface: React.FC = () => {
                             alignItems: "center",
                         }}
                     >
+                        <div style={{ width: "5px" }} />
                         <TextArea
-                            // value={value}
-                            // onChange={(e) => setValue(e.target.value)}
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            onKeyUp={handleTextboxEnter}
                             placeholder="Type a message..."
                             autoSize={{ minRows: 2, maxRows: 8 }}
                             style={{ flex: "1" }}
@@ -225,7 +243,7 @@ export const ChatInterface: React.FC = () => {
                             size="large"
                             icon={<SendOutlined />}
                             style={{ height: "100%" }}
-                            // disabled={props.disabled}
+                            onClick={sendMessage}
                         />
                         <div style={{ width: "5px" }} />
                     </div>
