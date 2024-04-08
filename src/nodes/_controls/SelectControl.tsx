@@ -82,7 +82,7 @@ export class SelectControl extends ClassicPreset.Control {
                                 }
                                 setLastUpdate(Date.now());
                             }}
-                            onSearch={() => {}}
+                            // onSearch={() => {}}
                             filterOption={(
                                 input: string,
                                 option?: { label: string; value: string }
