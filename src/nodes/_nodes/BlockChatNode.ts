@@ -73,7 +73,7 @@ export class BlockChatNode extends ClassicPreset.Node<
                     { value: "block", label: "Block" },
                     { value: "unblock", label: "Unblock" },
                 ],
-                initial: controls.action,
+                initial: controls.action ?? "block",
             })
         );
     }
