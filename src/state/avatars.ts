@@ -3,7 +3,7 @@ import { atom } from "jotai";
 import { appStore } from ".";
 import { ImgUtils } from "../util/ImgUtils";
 import { ChatAvatar, db } from "../db";
-import { optionsAtom, setUserAvatar } from "./options";
+import { clearRedundantOptions } from "./options";
 
 const _avatarStorageAtom = atom<Record<string, ChatAvatar>>({});
 
@@ -74,9 +74,5 @@ export const deleteAvatar = (avatarId: string) => {
         )
     );
     db.chatAvatars.delete(avatarId);
-
-    const optionsState = appStore.get(optionsAtom);
-    if (optionsState.userAvatarId === avatarId) {
-        setUserAvatar(null);
-    }
+    clearRedundantOptions();
 };

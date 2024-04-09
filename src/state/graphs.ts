@@ -7,7 +7,7 @@ import { GraphUtils } from "../util/GraphUtils";
 import { SerializedGraph, db } from "../db";
 import { NodeContextObj } from "../nodes/context";
 import { openPath } from "./editor";
-import { optionsAtom, setApiChain, setChatChain } from "./options";
+import { clearRedundantOptions } from "./options";
 
 const _graphStorageAtom = atom<Record<string, SerializedGraph>>({});
 
@@ -244,13 +244,7 @@ export const deleteGraph = (path: string[]) => {
             )
         );
         db.chains.delete(targetId);
-        const optionsState = appStore.get(optionsAtom);
-        if (optionsState.chainChatId === targetId) {
-            setChatChain(null);
-        }
-        if (optionsState.chainApiId === targetId) {
-            setApiChain(null);
-        }
+        clearRedundantOptions();
     }
     // module of graph
     else if (path.length === 2) {
