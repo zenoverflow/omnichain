@@ -6,7 +6,7 @@ import { appStore } from ".";
 import { graphStorageAtom, updateNodeControl } from "./graphs";
 import { showNotification } from "./notifications";
 import { GraphUtils } from "../util/GraphUtils";
-import { EntrypointNode } from "../nodes/";
+import { StartNode } from "../nodes/";
 
 type ExecutorInstance = {
     graphId: string;
@@ -124,13 +124,11 @@ export const stopGraph = (id: string) => {
     );
 };
 
-export const runGraph = async (id: string) => {
-    const target = appStore.get(graphStorageAtom)[id];
+export const runGraph = async (graphId: string) => {
+    const target = appStore.get(graphStorageAtom)[graphId];
 
     // Ensure entrypoint presence
-    const triggers = target.nodes.filter(
-        (n) => n.nodeType === EntrypointNode.name
-    );
+    const triggers = target.nodes.filter((n) => n.nodeType === StartNode.name);
 
     if (!triggers.length) {
         showNotification({
@@ -146,8 +144,8 @@ export const runGraph = async (id: string) => {
 
     appStore.set(_executorAtom, {
         ...appStore.get(_executorAtom),
-        [id]: {
-            graphId: id,
+        [graphId]: {
+            graphId,
             startTs: Date.now(),
             step: null,
         },
@@ -161,7 +159,7 @@ export const runGraph = async (id: string) => {
     // Hydrate
     await GraphUtils.hydrate(target, {
         haveGuiControls: true,
-        pathToGraph: [id],
+        pathToGraph: [graphId],
         editor,
         control,
         dataflow,
@@ -191,18 +189,18 @@ export const runGraph = async (id: string) => {
             });
         },
         onAutoExecute(nodeId) {
-            if (!isGraphActive(id)) return;
+            if (!isGraphActive(graphId)) return;
             control.execute(nodeId);
         },
         onFlowNode(execId) {
-            if (!isGraphActive(id)) return;
-            updateActiveNode(id, execId);
+            if (!isGraphActive(graphId)) return;
+            updateActiveNode(graphId, execId);
         },
         onExecControlUpdate(pathToGraph, node, control, value) {
             updateNodeControl(pathToGraph, node, control, value);
         },
         getIsActive() {
-            return isGraphActive(id);
+            return isGraphActive(graphId);
         },
         unselect() {},
     });
@@ -210,7 +208,7 @@ export const runGraph = async (id: string) => {
     try {
         // Work one-time auto triggers
         const targets = Object.keys({
-            EntrypointNode,
+            StartNode,
         });
         const triggerNodes = editor
             .getNodes()

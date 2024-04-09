@@ -13,7 +13,7 @@ import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
 import { signalEditorUpdate } from "./watcher";
 import * as NODE_MAKERS from "../nodes";
 import { NodeContextObj } from "../nodes/context";
-import { EntrypointNode, ModuleInputNode, ModuleOutputNode } from "../nodes";
+import { StartNode, ModuleInputNode, ModuleOutputNode } from "../nodes";
 
 type EditorState = {
     path: string[];
@@ -110,11 +110,9 @@ export const duplicateNode = async (
 
     // Special nodes cannot be duplicated
     if (
-        ![
-            EntrypointNode.name,
-            ModuleOutputNode.name,
-            ModuleInputNode.name,
-        ].includes(original.label)
+        ![StartNode.name, ModuleOutputNode.name, ModuleInputNode.name].includes(
+            original.label
+        )
     ) {
         const nodeView = area.nodeViews.get(id);
         if (!nodeView) return;
@@ -161,9 +159,7 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
     const targetNode = editor.getNode(id);
 
     // Special nodes cannot be deleted
-    if (
-        ![ModuleOutputNode.name, EntrypointNode.name].includes(targetNode.label)
-    ) {
+    if (![ModuleOutputNode.name, StartNode.name].includes(targetNode.label)) {
         // Delete related connections
         for (const conn of editor.getConnections()) {
             if (

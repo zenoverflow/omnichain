@@ -4,7 +4,7 @@ import { PlayCircleOutlined } from "@ant-design/icons";
 import { NodeContextObj } from "../context";
 import { TriggerSocket } from "../_sockets/TriggerSocket";
 
-export class EntrypointNode extends ClassicPreset.Node<
+export class StartNode extends ClassicPreset.Node<
     { triggerIn: TriggerSocket },
     { triggerOut: TriggerSocket },
     {}
@@ -19,7 +19,7 @@ export class EntrypointNode extends ClassicPreset.Node<
         // @ts-ignore
         controls: Record<string, any> = {}
     ) {
-        super(EntrypointNode.name);
+        super(StartNode.name);
         const self = this;
         self.id = id ?? self.id;
         //

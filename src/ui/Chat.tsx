@@ -13,6 +13,7 @@ import {
     messageStorageAtom,
     loadMessagesFromDb,
     unloadMessages,
+    addMessage,
 } from "../state/messages";
 import { avatarStorageAtom } from "../state/avatars";
 import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
@@ -64,22 +65,6 @@ const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
         </Markdown>
     );
 };
-
-// const UserMessage: React.FC<{ children: string }> = ({ children }) => {
-//     return (
-//         <Space direction="vertical" className="c__msg">
-//             <div style={{ display: "flex", alignItems: "center" }}>
-//                 <Avatar
-//                     size={32}
-//                     icon={<UserOutlined />}
-//                     style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
-//                 />
-//                 <div>{"You"}</div>
-//             </div>
-//             <CMarkdown>{children}</CMarkdown>
-//         </Space>
-//     );
-// };
 
 const ChatMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
     const [avatarStorage] = useAtom(avatarStorageAtom);
@@ -164,11 +149,10 @@ export const ChatInterface: React.FC = () => {
 
     const sendMessage = useCallback(() => {
         if (!blocked) {
-            console.log(message);
-            // TODO: trigger chain
+            addMessage(chainChatId, userAvatarId, message);
             setMessage("");
         }
-    }, [message, setMessage]);
+    }, [chainChatId, userAvatarId, message, setMessage]);
 
     const handleTextboxEnter = useCallback(
         (e: any) => {

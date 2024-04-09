@@ -1,4 +1,4 @@
-export { EntrypointNode } from "./_nodes/EntrypointNode";
+export { StartNode } from "./_nodes/StartNode";
 export { LogOutputNode } from "./_nodes/LogOutputNode";
 export { ModuleNode } from "./_nodes/ModuleNode";
 export { ModuleInputNode } from "./_nodes/ModuleInputNode";

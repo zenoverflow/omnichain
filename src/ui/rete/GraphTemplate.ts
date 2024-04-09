@@ -1,4 +1,4 @@
-import { EntrypointNode, ModuleInputNode, ModuleOutputNode } from "../../nodes";
+import { StartNode, ModuleInputNode, ModuleOutputNode } from "../../nodes";
 
 import { NodeContextObj } from "../../nodes/context";
 
@@ -10,7 +10,7 @@ export class GraphTemplate {
 
         // Main graph
         if (pathToGraph.length === 1) {
-            await editor.addNode(new EntrypointNode(nodeContext));
+            await editor.addNode(new StartNode(nodeContext));
         }
         // Module of graph
         else if (pathToGraph.length === 2) {

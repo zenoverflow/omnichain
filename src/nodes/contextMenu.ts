@@ -1,9 +1,4 @@
-import {
-    EntrypointNode,
-    ModuleInputNode,
-    ModuleOutputNode,
-    ModuleNode,
-} from ".";
+import { StartNode, ModuleInputNode, ModuleOutputNode, ModuleNode } from ".";
 
 import * as NODE_MAKERS from ".";
 
@@ -21,7 +16,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
 
     const entrypointsCount = editor
         .getNodes()
-        .filter((n) => n instanceof EntrypointNode).length;
+        .filter((n) => n instanceof StartNode).length;
 
     const moduleInputsCount = editor
         .getNodes()
@@ -36,7 +31,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
     const filtered = Object.entries(NODE_MAKERS)
         .filter(([key]) => {
             if (pathToGraph.length === 1) {
-                if (key === EntrypointNode.name) {
+                if (key === StartNode.name) {
                     // Prevent adding more than 1 entrypoint
                     return entrypointsCount < 1;
                 }
@@ -55,7 +50,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
                     return moduleOutputsCount < 1;
                 }
                 // Main-graph-specific nodes are forbidden inside modules
-                return ![ModuleNode.name, EntrypointNode.name].includes(key);
+                return ![ModuleNode.name, StartNode.name].includes(key);
             }
             return true;
         })
