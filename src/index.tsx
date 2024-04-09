@@ -6,7 +6,7 @@ import { Provider as StateProvider } from "jotai";
 import { appStore } from "./state";
 import { loadGraphsFromDb } from "./state/graphs";
 import { loadAvatarsFromDb } from "./state/avatars";
-// import { loadMessagesFromDb } from "./state/messages";
+import { clearRedundantOptions } from "./state/options";
 import { loadApiKeysFromDb } from "./state/apiKeys";
 
 import { Editor } from "./ui/Editor";
@@ -22,7 +22,7 @@ export const run = async () => {
     await loadGraphsFromDb();
     await loadAvatarsFromDb();
     await loadApiKeysFromDb();
-    // await loadMessagesFromDb();
+    clearRedundantOptions();
 
     ReactDOM.createRoot(document.getElementById("root")!).render(
         <React.StrictMode>

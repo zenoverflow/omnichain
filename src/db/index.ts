@@ -26,6 +26,7 @@ export type ChatMessage = {
     avatarId: string;
     content: string;
     created: number;
+    processed: boolean;
 };
 
 export type ChatAvatar = {

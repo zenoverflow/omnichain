@@ -10,6 +10,7 @@ export class MsgUtils {
         return {
             messageId: uuidv4(),
             created: Date.now(),
+            processed: false,
             chainId,
             avatarId,
             content,

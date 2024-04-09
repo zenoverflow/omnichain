@@ -1,6 +1,8 @@
 import { atom } from "jotai";
 
 import { appStore } from ".";
+import { graphStorageAtom } from "./graphs";
+import { avatarStorageAtom } from "./avatars";
 
 type OptionsState = {
     userAvatarId: string | null;
@@ -68,4 +70,21 @@ export const setApiPort = (apiPort: number) => {
         apiPort,
     });
     localStorage.setItem("apiPort", `${apiPort}`);
+};
+
+export const clearRedundantOptions = () => {
+    const graphs = appStore.get(graphStorageAtom);
+    const avatars = appStore.get(avatarStorageAtom);
+
+    const options = appStore.get(_optionsAtom);
+
+    if (!Object.keys(graphs).includes(options.chainChatId)) {
+        setChatChain(null);
+    }
+    if (!Object.keys(graphs).includes(options.chainApiId)) {
+        setApiChain(null);
+    }
+    if (!Object.keys(avatars).includes(options.userAvatarId)) {
+        setUserAvatar(null);
+    }
 };

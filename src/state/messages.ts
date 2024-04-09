@@ -43,6 +43,20 @@ export const addMessage = (
     db.chatMessages.add(created);
 };
 
+export const setMessageProcessed = (messageId: string) => {
+    const s = appStore.get(_messageStorageAtom);
+    const target = s[messageId];
+    const update: ChatMessage = {
+        ...target,
+        processed: true,
+    };
+    appStore.set(_messageStorageAtom, {
+        ...s,
+        [messageId]: update,
+    });
+    db.chatMessages.put(update);
+};
+
 export const deleteMessage = (messageId: string) => {
     const s = appStore.get(_messageStorageAtom);
 
