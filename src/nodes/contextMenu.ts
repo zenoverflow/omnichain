@@ -62,7 +62,8 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
                 await editor.addNode(n);
                 await area.translate(n.id, { x, y });
             },
-        }));
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
 
     return filtered;
 };

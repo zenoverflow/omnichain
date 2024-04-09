@@ -3,7 +3,7 @@ import { GroupOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
 import { StringSocket } from "../_sockets/StringSocket";
-import { TextChunkBatchSocket } from "../_sockets/TextChunkBatchSocket";
+import { StringArraySocket } from "../_sockets/StringArraySocket";
 import { NumberControl } from "../_controls/NumberControl";
 
 const SEPARATORS = [".", "!", "?", "。", "！", "？", "।", "،", "؛", "؟"];
@@ -86,7 +86,7 @@ const _roughSplit = (
 
 export class AutoTextSlicerNode extends ClassicPreset.Node<
     { dataIn: StringSocket },
-    { dataOut: TextChunkBatchSocket },
+    { dataOut: StringArraySocket },
     { chunkCharacters: NumberControl }
 > {
     public static icon = GroupOutlined;
@@ -108,7 +108,7 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
         );
         self.addOutput(
             "dataOut",
-            new ClassicPreset.Output(new TextChunkBatchSocket(), "chunks")
+            new ClassicPreset.Output(new StringArraySocket(), "chunks")
         );
         self.addControl(
             "chunkCharacters",

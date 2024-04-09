@@ -7,3 +7,4 @@ export { DelayOutputNode } from "./_nodes/DelayOutputNode";
 export { TextNode } from "./_nodes/TextNode";
 export { AutoTextSlicerNode } from "./_nodes/AutoTextSlicerNode";
 export { BlockChatNode } from "./_nodes/BlockChatNode";
+export { OpenAIPrompterNode } from "./_nodes/OpenAIPrompterNode";

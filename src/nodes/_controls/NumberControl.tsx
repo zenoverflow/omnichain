@@ -7,7 +7,7 @@ import { ClassicPreset } from "rete";
 import { signalEditorUpdate } from "../../state/watcher";
 
 export class NumberControl extends ClassicPreset.Control {
-    value: number = 0;
+    value: number = undefined;
 
     constructor(
         public options: {
@@ -20,7 +20,7 @@ export class NumberControl extends ClassicPreset.Control {
         }
     ) {
         super();
-        this.value = options.initial ?? 0;
+        this.value = options.initial ?? undefined;
     }
 
     component() {

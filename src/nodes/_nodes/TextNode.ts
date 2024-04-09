@@ -38,6 +38,7 @@ export class TextNode extends ClassicPreset.Node<
             new TextControl({
                 id: self.controlIds.val,
                 initial: controls.val ?? "",
+                large: true,
             })
         );
         this.addInput(
