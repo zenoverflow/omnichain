@@ -130,7 +130,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     />
                 </Space>
 
-                <Space
+                {/* <Space
                     direction="vertical"
                     size="small"
                     style={{ width: "100%" }}
@@ -167,7 +167,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                             }))
                         }
                     />
-                </Space>
+                </Space> */}
             </Space>
         </Modal>
     );
