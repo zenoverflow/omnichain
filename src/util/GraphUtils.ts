@@ -4,7 +4,7 @@ import { AreaPlugin } from "rete-area-plugin";
 
 import * as NODE_MAKERS from "../nodes";
 import { NodeContextObj } from "../nodes/context";
-import { SerializedGraph, SerializedNode } from "../db";
+import { SerializedGraph, SerializedNode } from "../db/data";
 
 export class GraphUtils {
     public static empty(name: string = "New Chain"): SerializedGraph {

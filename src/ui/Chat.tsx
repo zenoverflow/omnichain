@@ -7,7 +7,7 @@ import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 // @ts-ignore
 import Markdown from "react-markdown";
 
-import { ChatMessage } from "../db";
+import { ChatMessage } from "../db/data";
 import { optionsAtom } from "../state/options";
 import {
     messageStorageAtom,

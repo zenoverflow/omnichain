@@ -2,7 +2,8 @@ import { atom } from "jotai";
 
 import { appStore } from ".";
 import { ApiKeyUtils } from "../util/ApiKeyUtils";
-import { ApiKey, db } from "../db";
+import { db } from "../db";
+import { ApiKey } from "../db/data";
 
 const _apiKeyStorageAtom = atom<Record<string, ApiKey>>({});
 

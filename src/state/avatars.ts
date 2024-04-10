@@ -2,7 +2,8 @@ import { atom } from "jotai";
 
 import { appStore } from ".";
 import { ImgUtils } from "../util/ImgUtils";
-import { ChatAvatar, db } from "../db";
+import { db } from "../db";
+import { ChatAvatar } from "../db/data";
 import { clearRedundantOptions } from "./options";
 
 const _avatarStorageAtom = atom<Record<string, ChatAvatar>>({});

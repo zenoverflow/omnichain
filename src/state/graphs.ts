@@ -4,7 +4,8 @@ import { AreaPlugin } from "rete-area-plugin";
 
 import { appStore } from ".";
 import { GraphUtils } from "../util/GraphUtils";
-import { SerializedGraph, db } from "../db";
+import { db } from "../db";
+import { SerializedGraph } from "../db/data";
 import { NodeContextObj } from "../nodes/context";
 import { openPath } from "./editor";
 import { clearRedundantOptions } from "./options";

@@ -2,7 +2,8 @@ import { atom } from "jotai";
 
 import { appStore } from ".";
 import { MsgUtils } from "../util/MsgUtils";
-import { ChatMessage, db } from "../db";
+import { db } from "../db";
+import { ChatMessage } from "../db/data";
 
 const _messageStorageAtom = atom<Record<string, ChatMessage>>({});
 
