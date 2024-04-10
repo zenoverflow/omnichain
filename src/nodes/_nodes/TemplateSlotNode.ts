@@ -78,7 +78,17 @@ export class TemplateSlotNode extends ClassicPreset.Node<
             async data(fetchInputs) {
                 if (!self.context.getIsActive()) return {};
 
+                const noSlotNameError = () => {
+                    const e = new Error("Missing slot name in TemplateSlot!");
+                    self.context.onError(e);
+                    return e;
+                };
+
                 self.context.onFlowNode(self.id);
+
+                if (!self.controls.slotName.value.length) {
+                    throw noSlotNameError();
+                }
 
                 const inputs = (await fetchInputs()) as {
                     in?: string[];

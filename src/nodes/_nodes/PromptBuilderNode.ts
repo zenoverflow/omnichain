@@ -70,39 +70,20 @@ export class PromptBuilderNode extends ClassicPreset.Node<
 
                 const inputs = (await fetchInputs()) as {
                     parts?: {
-                        name?: string;
-                        value?: string;
+                        name: string;
+                        value: string;
                     }[];
                 };
 
                 self.context.onFlowNode(self.id);
 
-                const valControl = self.controls.val;
+                let prompt = self.controls.val.value;
 
-                // TODO
-                // valControl.value = (inputs?.in || [""])[0] || valControl.value;
+                for (const { name, value } of inputs.parts ?? []) {
+                    prompt = prompt.replaceAll("{" + name + "}", value);
+                }
 
-                // // Update stored graph
-                // self.context.onExecControlUpdate(
-                //     self.context.pathToGraph,
-                //     self.id,
-                //     "val",
-                //     valControl.value
-                // );
-
-                // // Update displayed graph
-                // if (self.context.haveGuiControls) {
-                //     let target: any;
-                //     while (!target) {
-                //         target = document.getElementById(
-                //             `${self.controlIds.val}`
-                //         );
-                //         await new Promise((r) => setTimeout(r, 10));
-                //     }
-                //     target.value = valControl.value;
-                // }
-
-                return { prompt: valControl.value };
+                return { prompt };
             },
         });
     }
