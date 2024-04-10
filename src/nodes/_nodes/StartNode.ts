@@ -11,7 +11,7 @@ export class StartNode extends ClassicPreset.Node<
 > {
     public static icon = PlayCircleOutlined;
     width: number = 200;
-    height: number = 120;
+    // height: number = 120;
 
     constructor(
         private context: NodeContextObj,

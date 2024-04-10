@@ -108,6 +108,7 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
     }
     .control {
         display: block;
+        height: auto;
         padding: ${$socketmargin}px ${$socketsize / 2 + $socketmargin}px;
     }
     ${(props) => props.styles && props.styles(props)}

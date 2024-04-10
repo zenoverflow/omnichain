@@ -12,7 +12,7 @@ export class DelayOutputNode extends ClassicPreset.Node<
 > {
     public static icon = HourglassOutlined;
     width: number = 280;
-    height: number = 170;
+    // height: number = 170;
 
     constructor(
         private context: NodeContextObj,

@@ -11,7 +11,7 @@ export class ModuleOutputNode extends ClassicPreset.Node<
 > {
     public static icon = ExportOutlined;
     width: number = 200;
-    height: number = 90;
+    // height: number = 90;
 
     constructor(
         private context: NodeContextObj,

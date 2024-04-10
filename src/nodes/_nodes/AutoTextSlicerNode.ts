@@ -90,8 +90,8 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
     { chunkCharacters: NumberControl }
 > {
     public static icon = GroupOutlined;
-    width: number = 260;
-    height: number = 165;
+    width: number = 300;
+    // height: number = 165;
 
     constructor(
         private context: NodeContextObj,

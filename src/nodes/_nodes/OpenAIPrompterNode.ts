@@ -25,7 +25,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
 > {
     public static icon = OpenAIOutlined;
     width: number = 380;
-    height: number = 570;
+    // height: number = 570;
 
     constructor(
         private context: NodeContextObj,

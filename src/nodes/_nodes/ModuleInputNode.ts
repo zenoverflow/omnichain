@@ -16,7 +16,7 @@ export class ModuleInputNode extends ClassicPreset.Node<
 > {
     public static icon = ImportOutlined;
     width: number = 200;
-    height: number = 90;
+    // height: number = 90;
 
     value: string = "";
 

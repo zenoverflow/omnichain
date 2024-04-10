@@ -19,7 +19,7 @@ export class ModuleNode extends ClassicPreset.Node<
 > {
     public static icon = BuildOutlined;
     width: number = 300;
-    height: number = 165;
+    // height: number = 165;
 
     constructor(
         private context: NodeContextObj,

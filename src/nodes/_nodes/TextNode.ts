@@ -11,7 +11,7 @@ export class TextNode extends ClassicPreset.Node<
     { val: TextControl }
 > {
     public static icon = FileTextOutlined;
-    width: number = 450;
+    width: number = 580;
     height: number = 450;
 
     controlIds: Record<string, string> = {};

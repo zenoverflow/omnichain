@@ -59,8 +59,8 @@ export class SelectControl extends ClassicPreset.Control {
                                 justifyContent: "center",
                                 alignItems: "center",
                                 padding: "0 10px",
-                                borderTopLeftRadius: "6px",
-                                borderBottomLeftRadius: "6px",
+                                borderTopLeftRadius: "5px",
+                                borderBottomLeftRadius: "5px",
                                 backgroundColor: "#fafafa",
                             }}
                         >

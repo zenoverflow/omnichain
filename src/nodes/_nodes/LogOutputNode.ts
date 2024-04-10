@@ -11,8 +11,8 @@ export class LogOutputNode extends ClassicPreset.Node<
     {}
 > {
     public static icon = CodeOutlined;
-    width: number = 200;
-    height: number = 125;
+    width: number = 300;
+    // height: number = 125;
 
     constructor(
         private context: NodeContextObj,

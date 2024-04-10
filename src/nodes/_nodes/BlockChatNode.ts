@@ -13,8 +13,8 @@ export class BlockChatNode extends ClassicPreset.Node<
     { action: SelectControl }
 > {
     public static icon = PauseCircleOutlined;
-    width: number = 250;
-    height: number = 165;
+    width: number = 300;
+    // height: number = 165;
 
     constructor(
         private context: NodeContextObj,
