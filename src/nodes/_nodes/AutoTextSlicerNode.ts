@@ -91,11 +91,11 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
 > {
     public static icon = GroupOutlined;
     width: number = 300;
-    // height: number = 165;
+    height: number = 165;
 
     constructor(
         private context: NodeContextObj,
-        id: string | null = null,
+        id: string,
         controls: Record<string, any> = {}
     ) {
         super(AutoTextSlicerNode.name);

@@ -3,16 +3,17 @@ import { FileTextOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
 import { StringSocket } from "../_sockets/StringSocket";
+import { TemplateSlotSocket } from "../_sockets/TemplateSlotSocket";
 import { TextControl } from "../_controls/TextControl";
 
-export class TextNode extends ClassicPreset.Node<
+export class TemplateSlotNode extends ClassicPreset.Node<
     { in: StringSocket },
-    { out: StringSocket },
-    { val: TextControl }
+    { templateSlot: TemplateSlotSocket },
+    { slotName: TextControl; val: TextControl }
 > {
     public static icon = FileTextOutlined;
     width: number = 580;
-    height: number = 450;
+    height: number = 490;
 
     controlIds: Record<string, string> = {};
 
@@ -21,7 +22,7 @@ export class TextNode extends ClassicPreset.Node<
         id: string,
         controls: Record<string, any> = {}
     ) {
-        super(TextNode.name);
+        super(TemplateSlotNode.name);
         const self = this;
         self.id = id ?? self.id;
         //
@@ -34,6 +35,15 @@ export class TextNode extends ClassicPreset.Node<
         //
         //
         this.addControl(
+            "slotName",
+            new TextControl({
+                name: "slot name",
+                initial: controls.slotName ?? "",
+                // id: self.controlIds.val,
+                // large: true,
+            })
+        );
+        this.addControl(
             "val",
             new TextControl({
                 id: self.controlIds.val,
@@ -41,13 +51,16 @@ export class TextNode extends ClassicPreset.Node<
                 large: true,
             })
         );
-        this.addInput(
-            "in",
-            new ClassicPreset.Input(new StringSocket(), "write")
-        );
+        //
+        //
+        this.addInput("in", new ClassicPreset.Input(new StringSocket(), "in"));
         this.addOutput(
-            "out",
-            new ClassicPreset.Output(new StringSocket(), "read", true)
+            "templateSlot",
+            new ClassicPreset.Output(
+                new TemplateSlotSocket(),
+                "template slot",
+                true
+            )
         );
         //
         //
@@ -61,7 +74,7 @@ export class TextNode extends ClassicPreset.Node<
         // });
         self.context.dataflow.add(self, {
             inputs: () => ["in"],
-            outputs: () => ["out"],
+            outputs: () => ["templateSlot"],
             async data(fetchInputs) {
                 if (!self.context.getIsActive()) return {};
 
@@ -77,7 +90,7 @@ export class TextNode extends ClassicPreset.Node<
 
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
-                // Update stored graph
+                // Update stored graph (value)
                 self.context.onExecControlUpdate(
                     self.context.pathToGraph,
                     self.id,
@@ -85,7 +98,7 @@ export class TextNode extends ClassicPreset.Node<
                     valControl.value
                 );
 
-                // Update displayed graph
+                // Update displayed graph (value)
                 if (self.context.haveGuiControls) {
                     let target: any;
                     while (!target) {
@@ -97,7 +110,12 @@ export class TextNode extends ClassicPreset.Node<
                     target.value = valControl.value;
                 }
 
-                return { out: valControl.value };
+                return {
+                    templateSlot: {
+                        name: self.controls.slotName,
+                        value: valControl.value,
+                    },
+                };
             },
         });
     }

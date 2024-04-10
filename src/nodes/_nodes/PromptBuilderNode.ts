@@ -3,11 +3,12 @@ import { FileTextOutlined } from "@ant-design/icons";
 
 import { NodeContextObj } from "../context";
 import { StringSocket } from "../_sockets/StringSocket";
+import { TemplateSlotSocket } from "../_sockets/TemplateSlotSocket";
 import { TextControl } from "../_controls/TextControl";
 
-export class TextNode extends ClassicPreset.Node<
-    { in: StringSocket },
-    { out: StringSocket },
+export class PromptBuilderNode extends ClassicPreset.Node<
+    { parts: TemplateSlotSocket },
+    { prompt: StringSocket },
     { val: TextControl }
 > {
     public static icon = FileTextOutlined;
@@ -21,7 +22,7 @@ export class TextNode extends ClassicPreset.Node<
         id: string,
         controls: Record<string, any> = {}
     ) {
-        super(TextNode.name);
+        super(PromptBuilderNode.name);
         const self = this;
         self.id = id ?? self.id;
         //
@@ -42,12 +43,12 @@ export class TextNode extends ClassicPreset.Node<
             })
         );
         this.addInput(
-            "in",
-            new ClassicPreset.Input(new StringSocket(), "write")
+            "parts",
+            new ClassicPreset.Input(new TemplateSlotSocket(), "parts", true)
         );
         this.addOutput(
-            "out",
-            new ClassicPreset.Output(new StringSocket(), "read", true)
+            "prompt",
+            new ClassicPreset.Output(new StringSocket(), "prompt", true)
         );
         //
         //
@@ -60,44 +61,48 @@ export class TextNode extends ClassicPreset.Node<
         //     },
         // });
         self.context.dataflow.add(self, {
-            inputs: () => ["in"],
-            outputs: () => ["out"],
+            inputs: () => ["parts"],
+            outputs: () => ["prompt"],
             async data(fetchInputs) {
                 if (!self.context.getIsActive()) return {};
 
                 self.context.onFlowNode(self.id);
 
                 const inputs = (await fetchInputs()) as {
-                    in?: string[];
+                    parts?: {
+                        name?: string;
+                        value?: string;
+                    }[];
                 };
 
                 self.context.onFlowNode(self.id);
 
                 const valControl = self.controls.val;
 
-                valControl.value = (inputs?.in || [""])[0] || valControl.value;
+                // TODO
+                // valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
-                // Update stored graph
-                self.context.onExecControlUpdate(
-                    self.context.pathToGraph,
-                    self.id,
-                    "val",
-                    valControl.value
-                );
+                // // Update stored graph
+                // self.context.onExecControlUpdate(
+                //     self.context.pathToGraph,
+                //     self.id,
+                //     "val",
+                //     valControl.value
+                // );
 
-                // Update displayed graph
-                if (self.context.haveGuiControls) {
-                    let target: any;
-                    while (!target) {
-                        target = document.getElementById(
-                            `${self.controlIds.val}`
-                        );
-                        await new Promise((r) => setTimeout(r, 10));
-                    }
-                    target.value = valControl.value;
-                }
+                // // Update displayed graph
+                // if (self.context.haveGuiControls) {
+                //     let target: any;
+                //     while (!target) {
+                //         target = document.getElementById(
+                //             `${self.controlIds.val}`
+                //         );
+                //         await new Promise((r) => setTimeout(r, 10));
+                //     }
+                //     target.value = valControl.value;
+                // }
 
-                return { out: valControl.value };
+                return { prompt: valControl.value };
             },
         });
     }

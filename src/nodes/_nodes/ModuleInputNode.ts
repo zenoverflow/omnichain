@@ -16,13 +16,13 @@ export class ModuleInputNode extends ClassicPreset.Node<
 > {
     public static icon = ImportOutlined;
     width: number = 200;
-    // height: number = 90;
+    height: number = 90;
 
     value: string = "";
 
     constructor(
         private context: NodeContextObj,
-        id: string | null = null,
+        id: string,
         // @ts-ignore
         controls: Record<string, any> = {}
     ) {

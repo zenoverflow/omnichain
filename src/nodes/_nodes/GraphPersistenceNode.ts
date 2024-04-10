@@ -16,7 +16,7 @@ export class GraphPersistenceNode extends ClassicPreset.Node<
 
     constructor(
         private context: NodeContextObj,
-        id: string | null = null,
+        id: string,
         controls: Record<string, any> = {}
     ) {
         super(GraphPersistenceNode.name);

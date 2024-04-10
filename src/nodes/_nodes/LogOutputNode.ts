@@ -12,11 +12,11 @@ export class LogOutputNode extends ClassicPreset.Node<
 > {
     public static icon = CodeOutlined;
     width: number = 300;
-    // height: number = 125;
+    height: number = 125;
 
     constructor(
         private context: NodeContextObj,
-        id: string | null = null,
+        id: string,
         // @ts-ignore
         controls: Record<string, any> = {}
     ) {
