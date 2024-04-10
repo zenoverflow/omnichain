@@ -122,7 +122,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
 
                 return {
                     templateSlot: {
-                        name: self.controls.slotName,
+                        name: self.controls.slotName.value,
                         value: valControl.value,
                     },
                 };
