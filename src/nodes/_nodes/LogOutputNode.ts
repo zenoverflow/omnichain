@@ -50,7 +50,7 @@ export class LogOutputNode extends ClassicPreset.Node<
 
                 self.context.onFlowNode(self.id);
 
-                console.log(`LogNode:`, inputs.data[0]);
+                alert(`${inputs.data[0]}`);
             },
         });
         self.context.dataflow.add(self, {
