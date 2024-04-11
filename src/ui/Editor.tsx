@@ -16,8 +16,7 @@ import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
 
 import { executorAtom } from "../state/executor";
-import { closeEditor } from "../state/editor";
-import { editorStateAtom } from "../state/editor";
+import { editorStateAtom, closeEditor } from "../state/editor";
 import { loaderAtom } from "../state/loader";
 
 const { Header, Content } = Layout;

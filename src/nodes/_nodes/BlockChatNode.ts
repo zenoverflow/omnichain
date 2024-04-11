@@ -13,13 +13,13 @@ export class BlockChatNode extends ClassicPreset.Node<
     { action: SelectControl }
 > {
     public static icon = PauseCircleOutlined;
-    width: number = 300;
-    height: number = 165;
+    width = 300;
+    height = 165;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(BlockChatNode.name);
         const self = this;
@@ -73,7 +73,7 @@ export class BlockChatNode extends ClassicPreset.Node<
                     { value: "block", label: "Block" },
                     { value: "unblock", label: "Unblock" },
                 ],
-                initial: controls.action ?? "block",
+                initial: controls?.action ?? "block",
             })
         );
     }

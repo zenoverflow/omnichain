@@ -18,13 +18,13 @@ export class ModuleNode extends ClassicPreset.Node<
     { module: SelectControl }
 > {
     public static icon = BuildOutlined;
-    width: number = 300;
-    height: number = 165;
+    width = 300;
+    height = 165;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(ModuleNode.name);
         const self = this;
@@ -45,7 +45,7 @@ export class ModuleNode extends ClassicPreset.Node<
             new SelectControl({
                 name: "Module",
                 values: moduleOptions,
-                initial: controls.module || null,
+                initial: controls?.module ?? null,
             })
         );
         //
@@ -137,8 +137,13 @@ export class ModuleNode extends ClassicPreset.Node<
                             [self.id, targetId, execId].join("__")
                         );
                     },
-                    onExecControlUpdate(pathToGraph, node, control, value) {
-                        self.context.onExecControlUpdate(
+                    async onExecControlUpdate(
+                        pathToGraph,
+                        node,
+                        control,
+                        value
+                    ) {
+                        await self.context.onExecControlUpdate(
                             pathToGraph,
                             node,
                             control,
@@ -148,7 +153,9 @@ export class ModuleNode extends ClassicPreset.Node<
                     getIsActive() {
                         return self.context.getIsActive();
                     },
-                    unselect() {},
+                    unselect() {
+                        //
+                    },
                 });
 
                 if (!self.context.getIsActive()) return;

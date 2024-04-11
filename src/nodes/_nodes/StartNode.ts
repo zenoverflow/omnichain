@@ -7,17 +7,16 @@ import { TriggerSocket } from "../_sockets/TriggerSocket";
 export class StartNode extends ClassicPreset.Node<
     { triggerIn: TriggerSocket },
     { triggerOut: TriggerSocket },
-    {}
+    never
 > {
     public static icon = PlayCircleOutlined;
-    width: number = 200;
-    height: number = 120;
+    width = 200;
+    height = 120;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        // @ts-ignore
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(StartNode.name);
         const self = this;

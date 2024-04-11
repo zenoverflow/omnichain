@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ChatAvatar } from "../db/data";
 
 export class ImgUtils {
-    public static empty(name: string = "Anon"): ChatAvatar {
+    public static empty(name = "Anon"): ChatAvatar {
         return {
             avatarId: uuidv4(),
             name,
@@ -21,7 +21,7 @@ export class ImgUtils {
 
         return new Promise((res, rej) => {
             reader.onload = function (event) {
-                let img = new Image();
+                const img = new Image();
                 img.onload = function () {
                     const canvas = document.createElement("canvas");
                     const ctx = canvas.getContext("2d");
@@ -43,7 +43,7 @@ export class ImgUtils {
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                     // Get the resized image data
-                    let dataUrl = canvas.toDataURL(file.type);
+                    const dataUrl = canvas.toDataURL(file.type);
 
                     // Call the callback with the result
                     res(dataUrl);

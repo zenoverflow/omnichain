@@ -29,7 +29,7 @@ type ConnectionProps = {
     styles?: () => any;
 };
 
-export const makeColoredConnection = (stroke: string = "#f0f5ff") => {
+export const makeColoredConnection = (stroke = "#f0f5ff") => {
     const CustomConnection = (props: ConnectionProps) => {
         const { path } = useConnection();
 

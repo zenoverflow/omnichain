@@ -12,15 +12,15 @@ export class PromptBuilderNode extends ClassicPreset.Node<
     { val: TextControl }
 > {
     public static icon = FileTextOutlined;
-    width: number = 580;
-    height: number = 450;
+    width = 580;
+    height = 450;
 
     controlIds: Record<string, string> = {};
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(PromptBuilderNode.name);
         const self = this;
@@ -38,7 +38,7 @@ export class PromptBuilderNode extends ClassicPreset.Node<
             "val",
             new TextControl({
                 id: self.controlIds.val,
-                initial: controls.val ?? "",
+                initial: controls?.val ?? "",
                 large: true,
             })
         );

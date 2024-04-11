@@ -2,7 +2,7 @@ import { ClassicPreset } from "rete";
 import { TriggerSocket } from "./TriggerSocket";
 
 export class GeneralDataSocket extends ClassicPreset.Socket {
-    public wireColor = null;
+    public wireColor = "#f0f5ff";
 
     constructor(name = GeneralDataSocket.name) {
         super(name);

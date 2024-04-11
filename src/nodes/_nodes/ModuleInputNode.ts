@@ -10,21 +10,20 @@ import { StringSocket } from "../_sockets/StringSocket";
  * Multiple ModuleInputNode-s get the same value.
  */
 export class ModuleInputNode extends ClassicPreset.Node<
-    {},
+    never,
     { data: StringSocket },
-    {}
+    never
 > {
     public static icon = ImportOutlined;
-    width: number = 200;
-    height: number = 90;
+    width = 200;
+    height = 90;
 
-    value: string = "";
+    value = "";
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        // @ts-ignore
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(ModuleInputNode.name);
         const self = this;

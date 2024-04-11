@@ -5,7 +5,7 @@ import { ClassicPreset } from "rete";
 import { signalEditorUpdate } from "../../state/watcher";
 
 export class TextControl extends ClassicPreset.Control {
-    value: string = "";
+    value = "";
 
     constructor(
         public options: {

@@ -10,10 +10,14 @@ export class FlowWatcher {
             // Nodes might not be added to both flows
             try {
                 control.remove(id);
-            } catch (error) {}
+            } catch (error) {
+                console.error(error);
+            }
             try {
                 dataflow.remove(id);
-            } catch (error) {}
+            } catch (error) {
+                console.error(error);
+            }
         };
 
         editor.addPipe((context) => {

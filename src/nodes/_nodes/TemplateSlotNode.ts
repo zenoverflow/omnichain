@@ -12,15 +12,15 @@ export class TemplateSlotNode extends ClassicPreset.Node<
     { slotName: TextControl; val: TextControl }
 > {
     public static icon = FileTextOutlined;
-    width: number = 580;
-    height: number = 490;
+    width = 580;
+    height = 490;
 
     controlIds: Record<string, string> = {};
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(TemplateSlotNode.name);
         const self = this;
@@ -38,7 +38,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
             "slotName",
             new TextControl({
                 name: "slot name",
-                initial: controls.slotName ?? "",
+                initial: controls?.slotName ?? "",
                 // id: self.controlIds.val,
                 // large: true,
             })
@@ -47,7 +47,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
             "val",
             new TextControl({
                 id: self.controlIds.val,
-                initial: controls.val ?? "",
+                initial: controls?.val ?? "",
                 large: true,
             })
         );
@@ -101,7 +101,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
                 // Update stored graph (value)
-                self.context.onExecControlUpdate(
+                await self.context.onExecControlUpdate(
                     self.context.pathToGraph,
                     self.id,
                     "val",

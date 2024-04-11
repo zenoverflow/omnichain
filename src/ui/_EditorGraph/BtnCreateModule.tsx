@@ -22,8 +22,8 @@ export const BtnCreateModule: React.FC = () => {
         setModalOpen(false);
     };
 
-    const handleCreate = () => {
-        createModule(valOfName);
+    const handleCreate = async () => {
+        await createModule(valOfName);
         setModalOpen(false);
     };
 
@@ -53,9 +53,9 @@ export const BtnCreateModule: React.FC = () => {
                     onChange={(e) => {
                         setValOfName(e.target.value);
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={async (e) => {
                         if (e.key === "Enter") {
-                            handleCreate();
+                            await handleCreate();
                         }
                     }}
                     autoFocus

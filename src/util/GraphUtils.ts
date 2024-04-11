@@ -7,7 +7,7 @@ import { NodeContextObj } from "../nodes/context";
 import { SerializedGraph, SerializedNode } from "../db/data";
 
 export class GraphUtils {
-    public static empty(name: string = "New Chain"): SerializedGraph {
+    public static empty(name = "New Chain"): SerializedGraph {
         return {
             name,
             graphId: uuidv4(),

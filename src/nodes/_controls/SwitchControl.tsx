@@ -7,7 +7,7 @@ import { ClassicPreset } from "rete";
 import { signalEditorUpdate } from "../../state/watcher";
 
 export class SwitchControl extends ClassicPreset.Control {
-    value: boolean = false;
+    value = false;
 
     constructor(
         public options: {

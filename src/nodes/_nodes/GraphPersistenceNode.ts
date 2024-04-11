@@ -5,19 +5,19 @@ import { PersistenceSocket } from "../_sockets/PersistenceSocket";
 import { HiddenControl } from "../_controls/HiddenControl";
 
 export class GraphPersistenceNode extends ClassicPreset.Node<
-    {},
+    never,
     { out: PersistenceSocket },
     { val: HiddenControl }
 > {
-    width: number = 350;
-    height: number = 135;
+    width = 350;
+    height = 135;
 
     controlIds: Record<string, string> = {};
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(GraphPersistenceNode.name);
         const self = this;
@@ -34,7 +34,7 @@ export class GraphPersistenceNode extends ClassicPreset.Node<
         this.addControl(
             "val",
             new HiddenControl({
-                initial: controls.val ?? "",
+                initial: controls?.val ?? "",
             })
         );
         this.addOutput(
@@ -78,7 +78,7 @@ export class GraphPersistenceNode extends ClassicPreset.Node<
                             const valControl = self.controls.val;
                             valControl.value = value;
                             // Update stored graph
-                            self.context.onExecControlUpdate(
+                            await self.context.onExecControlUpdate(
                                 self.context.pathToGraph,
                                 self.id,
                                 "val",

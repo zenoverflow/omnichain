@@ -6,18 +6,17 @@ import { StringSocket } from "../_sockets/StringSocket";
 
 export class ModuleOutputNode extends ClassicPreset.Node<
     { data: StringSocket },
-    {},
-    {}
+    never,
+    never
 > {
     public static icon = ExportOutlined;
-    width: number = 200;
-    height: number = 90;
+    width = 200;
+    height = 90;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        // @ts-ignore
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(ModuleOutputNode.name);
         const self = this;

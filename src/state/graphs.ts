@@ -23,7 +23,7 @@ export const loadGraphsFromDb = async () => {
     );
 };
 
-export const createGraph = (name?: string, parentId?: string): void => {
+export const createGraph = async (name?: string, parentId?: string) => {
     const s = appStore.get(_graphStorageAtom);
     // main graph
     if (!parentId) {
@@ -34,7 +34,7 @@ export const createGraph = (name?: string, parentId?: string): void => {
 
             [id]: created,
         });
-        db.chains.add(created);
+        await db.chains.add(created);
         openPath([id]);
     }
     // module of graph
@@ -56,7 +56,7 @@ export const createGraph = (name?: string, parentId?: string): void => {
             [parentId]: update,
         });
 
-        db.chains.put(update);
+        await db.chains.put(update);
         openPath([parentId, id]);
     }
 };
@@ -79,11 +79,12 @@ export const initGraph = async (context: NodeContextObj) => {
     }
 };
 
-export const updateGraph = (
+export const updateGraph = async (
     editor: NodeEditor<any>,
     area: AreaPlugin<any, any>,
     path: string[]
 ) => {
+    console.log("UPDATE GRAPH");
     const s = appStore.get(_graphStorageAtom);
     // main graph
     if (path.length === 1) {
@@ -101,7 +102,7 @@ export const updateGraph = (
             ...s,
             [id]: update,
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
     // module of graph
     else if (path.length === 2) {
@@ -127,11 +128,12 @@ export const updateGraph = (
 
             [parentId]: update,
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
 };
 
-export const updateGraphName = (path: string[], name: string) => {
+export const updateGraphName = async (path: string[], name: string) => {
+    console.log("UPDATE GRAPH NAME");
     const s = appStore.get(_graphStorageAtom);
     // main graph
     if (path.length === 1) {
@@ -143,7 +145,7 @@ export const updateGraphName = (path: string[], name: string) => {
             ...s,
             [id]: { ...target, name },
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
     // module of graph
     else if (path.length === 2) {
@@ -164,16 +166,17 @@ export const updateGraphName = (path: string[], name: string) => {
 
             [parentId]: update,
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
 };
 
-export const updateNodeControl = (
+export const updateNodeControl = async (
     pathToGraph: string[],
     nodeId: string,
     controlKey: string,
     controlValue: any
 ) => {
+    console.log("UPDATE NODE CONTROL");
     const s = appStore.get(_graphStorageAtom);
     // main graph
     if (pathToGraph.length === 1) {
@@ -193,11 +196,14 @@ export const updateNodeControl = (
                 };
             }),
         };
+
+        console.log("AFTER UPDATE", update);
+
         appStore.set(_graphStorageAtom, {
             ...s,
             [id]: update,
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
     // module of graph
     else if (pathToGraph.length === 2) {
@@ -229,11 +235,11 @@ export const updateNodeControl = (
             ...s,
             [parentId]: update,
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
 };
 
-export const deleteGraph = (path: string[]) => {
+export const deleteGraph = async (path: string[]) => {
     const s = appStore.get(_graphStorageAtom);
     // main graph
     if (path.length === 1) {
@@ -244,7 +250,7 @@ export const deleteGraph = (path: string[]) => {
                 Object.entries(s).filter(([id, _]) => id !== targetId)
             )
         );
-        db.chains.delete(targetId);
+        await db.chains.delete(targetId);
         clearRedundantOptions();
     }
     // module of graph
@@ -265,7 +271,7 @@ export const deleteGraph = (path: string[]) => {
             ...s,
             [parentId]: update,
         });
-        db.chains.put(update);
+        await db.chains.put(update);
     }
 };
 

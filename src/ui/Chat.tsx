@@ -147,17 +147,17 @@ export const ChatInterface: React.FC = () => {
         [chainChatId, userAvatarId]
     );
 
-    const sendMessage = useCallback(() => {
+    const sendMessage = useCallback(async () => {
         if (!blocked) {
-            addMessage(chainChatId, userAvatarId, message);
+            await addMessage(chainChatId, userAvatarId, message);
             setMessage("");
         }
     }, [chainChatId, userAvatarId, message, setMessage]);
 
     const handleTextboxEnter = useCallback(
-        (e: any) => {
+        async (e: any) => {
             if (e.key === "Enter" && !e.shiftKey) {
-                sendMessage();
+                await sendMessage();
             }
         },
         [sendMessage]
@@ -173,7 +173,7 @@ export const ChatInterface: React.FC = () => {
     useEffect(() => {
         if (initCondSatisfied) {
             startGlobalLoading();
-            loadMessagesFromDb(chainChatId).then(() => {
+            void loadMessagesFromDb(chainChatId).then(() => {
                 finishGlobalLoading();
             });
         }

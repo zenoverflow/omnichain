@@ -21,7 +21,7 @@ export const loadAvatarsFromDb = async () => {
     );
 };
 
-export const createAvatar = (name: string = "Anon"): void => {
+export const createAvatar = async (name = "Anon") => {
     const s = appStore.get(_avatarStorageAtom);
     const created: ChatAvatar = ImgUtils.empty(name);
     const id = created.avatarId;
@@ -30,10 +30,10 @@ export const createAvatar = (name: string = "Anon"): void => {
 
         [id]: created,
     });
-    db.chatAvatars.add(created);
+    await db.chatAvatars.add(created);
 };
 
-export const updateAvatarName = (avatarId: string, name: string) => {
+export const updateAvatarName = async (avatarId: string, name: string) => {
     const s = appStore.get(_avatarStorageAtom);
     const target = s[avatarId];
 
@@ -46,7 +46,7 @@ export const updateAvatarName = (avatarId: string, name: string) => {
         ...s,
         [avatarId]: update,
     });
-    db.chatAvatars.put(update);
+    await db.chatAvatars.put(update);
 };
 
 export const updateAvatarImage = async (avatarId: string, image: File) => {
@@ -62,10 +62,10 @@ export const updateAvatarImage = async (avatarId: string, image: File) => {
         ...s,
         [avatarId]: update,
     });
-    db.chatAvatars.put(update);
+    await db.chatAvatars.put(update);
 };
 
-export const deleteAvatar = (avatarId: string) => {
+export const deleteAvatar = async (avatarId: string) => {
     const s = appStore.get(_avatarStorageAtom);
 
     appStore.set(
@@ -74,6 +74,6 @@ export const deleteAvatar = (avatarId: string) => {
             Object.entries(s).filter(([id, _]) => id !== avatarId)
         )
     );
-    db.chatAvatars.delete(avatarId);
+    await db.chatAvatars.delete(avatarId);
     clearRedundantOptions();
 };

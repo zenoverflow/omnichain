@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Button, Input, Modal } from "antd";
+import { Button, Input, Modal, InputRef } from "antd";
 
 import { PlusCircleOutlined } from "@ant-design/icons";
 
@@ -8,7 +8,7 @@ import { createGraph } from "../../state/graphs";
 export const BtnCreateGraph: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [valOfName, setValOfName] = useState<string>("New Chain");
-    const inputRef = useRef<any>();
+    const inputRef = useRef<InputRef>();
 
     const handleOpenModal = () => {
         setModalOpen(true);
@@ -22,8 +22,8 @@ export const BtnCreateGraph: React.FC = () => {
         setModalOpen(false);
     };
 
-    const handleCreate = () => {
-        createGraph(valOfName);
+    const handleCreate = async () => {
+        await createGraph(valOfName);
         setModalOpen(false);
     };
 
@@ -54,9 +54,9 @@ export const BtnCreateGraph: React.FC = () => {
                     onChange={(e) => {
                         setValOfName(e.target.value);
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={async (e) => {
                         if (e.key === "Enter") {
-                            handleCreate();
+                            await handleCreate();
                         }
                     }}
                     autoFocus

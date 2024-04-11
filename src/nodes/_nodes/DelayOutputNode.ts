@@ -11,14 +11,13 @@ export class DelayOutputNode extends ClassicPreset.Node<
     { millis: NumberControl }
 > {
     public static icon = HourglassOutlined;
-    width: number = 280;
-    height: number = 170;
+    width = 280;
+    height = 170;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        // @ts-ignore
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(DelayOutputNode.name);
         const self = this;
@@ -35,7 +34,7 @@ export class DelayOutputNode extends ClassicPreset.Node<
         this.addControl(
             "millis",
             new NumberControl({
-                initial: controls.millis || 1000,
+                initial: controls?.millis ?? 1000,
                 name: "milliseconds",
                 min: 10,
             })

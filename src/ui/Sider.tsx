@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Menu, MenuProps, Button, Space } from "antd";
-import { CommentOutlined } from "@ant-design/icons";
+import { Layout, Menu, MenuProps } from "antd";
 import { useAtom } from "jotai";
 
 import { graphStorageAtom } from "../state/graphs";
-import { editorStateAtom, openPath, closeEditor } from "../state/editor";
+import { editorStateAtom, openPath } from "../state/editor";
 
 import { ItemIcon } from "./_Sider/ItemIcon";
 import { BtnCreateGraph } from "./_Sider/BtnCreateGraph";

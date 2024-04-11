@@ -39,9 +39,9 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
     const [targets] = useAtom(nodeSelectionAtom);
 
     useEffect(() => {
-        const listener = (e: KeyboardEvent) => {
+        const listener = async (e: KeyboardEvent) => {
             if (e.key === "Delete" && targets.length) {
-                deleteSelectedNodes(props.nodeContext);
+                await deleteSelectedNodes(props.nodeContext);
             }
         };
 
@@ -173,7 +173,7 @@ export const EditorGraph: React.FC = () => {
                         />
                         <GraphRunButton />
                     </Space>
-                    {!!editor ? (
+                    {editor ? (
                         <NodeDeleteButton
                             nodeContext={editor.nodeContext}
                             disabled={editingDisabled}
@@ -214,8 +214,8 @@ export const EditorGraph: React.FC = () => {
                     addonBefore="name"
                     value={currentGraph.name}
                     maxLength={120}
-                    onChange={(e) => {
-                        updateCurrentGraphName(e.target.value);
+                    onChange={async (e) => {
+                        await updateCurrentGraphName(e.target.value);
                     }}
                 />
             </Drawer>

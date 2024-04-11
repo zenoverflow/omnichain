@@ -20,7 +20,7 @@ export const loadApiKeysFromDb = async () => {
     );
 };
 
-export const createApiKey = (name: string = "New Key"): void => {
+export const createApiKey = async (name = "New Key") => {
     const s = appStore.get(_apiKeyStorageAtom);
     const created: ApiKey = ApiKeyUtils.empty(name);
     const id = created.apiKeyId;
@@ -29,10 +29,10 @@ export const createApiKey = (name: string = "New Key"): void => {
 
         [id]: created,
     });
-    db.apiKeys.add(created);
+    await db.apiKeys.add(created);
 };
 
-export const updateApiKeyName = (apiKeyId: string, name: string) => {
+export const updateApiKeyName = async (apiKeyId: string, name: string) => {
     const s = appStore.get(_apiKeyStorageAtom);
     const target = s[apiKeyId];
 
@@ -45,7 +45,7 @@ export const updateApiKeyName = (apiKeyId: string, name: string) => {
         ...s,
         [apiKeyId]: update,
     });
-    db.apiKeys.put(update);
+    await db.apiKeys.put(update);
 };
 
 export const updateApiKeyContent = async (
@@ -64,10 +64,10 @@ export const updateApiKeyContent = async (
         ...s,
         [apiKeyId]: update,
     });
-    db.apiKeys.put(update);
+    await db.apiKeys.put(update);
 };
 
-export const deleteApiKey = (apiKeyId: string) => {
+export const deleteApiKey = async (apiKeyId: string) => {
     const s = appStore.get(_apiKeyStorageAtom);
 
     appStore.set(
@@ -76,5 +76,5 @@ export const deleteApiKey = (apiKeyId: string) => {
             Object.entries(s).filter(([id, _]) => id !== apiKeyId)
         )
     );
-    db.apiKeys.delete(apiKeyId);
+    await db.apiKeys.delete(apiKeyId);
 };

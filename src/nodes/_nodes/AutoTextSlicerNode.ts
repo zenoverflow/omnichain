@@ -72,7 +72,7 @@ const _granularSplit = (text: string, chunkLimit: number): string[] => {
 const _roughSplit = (
     text: string,
     chunkLimit: number,
-    sep: string = "\n\n"
+    sep = "\n\n"
 ): string[] | null => {
     const chunks = text.split(sep).map((c) => c.trim());
     // no result if not meeting size restraint conditon
@@ -90,13 +90,13 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
     { chunkCharacters: NumberControl }
 > {
     public static icon = GroupOutlined;
-    width: number = 300;
-    height: number = 165;
+    width = 300;
+    height = 165;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(AutoTextSlicerNode.name);
         const self = this;
@@ -113,7 +113,7 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
         self.addControl(
             "chunkCharacters",
             new NumberControl({
-                initial: controls.chunkCharacters || 1000,
+                initial: controls?.chunkCharacters ?? 1000,
                 name: "chunkCharacters",
                 min: 10,
             })

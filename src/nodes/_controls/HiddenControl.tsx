@@ -4,7 +4,7 @@ import { ClassicPreset } from "rete";
 import { signalEditorUpdate } from "../../state/watcher";
 
 export class HiddenControl extends ClassicPreset.Control {
-    value: string = "";
+    value = "";
 
     constructor(
         public options: {

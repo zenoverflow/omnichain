@@ -28,11 +28,11 @@ export const loadMessagesFromDb = async (chainId: string) => {
     );
 };
 
-export const addMessage = (
+export const addMessage = async (
     chainId: string,
     avatarId: string,
     content: string
-): void => {
+) => {
     const s = appStore.get(_messageStorageAtom);
     const created = MsgUtils.fresh(chainId, avatarId, content);
     const id = created.messageId;
@@ -41,10 +41,10 @@ export const addMessage = (
 
         [id]: created,
     });
-    db.chatMessages.add(created);
+    await db.chatMessages.add(created);
 };
 
-export const setMessageProcessed = (messageId: string) => {
+export const setMessageProcessed = async (messageId: string) => {
     const s = appStore.get(_messageStorageAtom);
     const target = s[messageId];
     const update: ChatMessage = {
@@ -55,10 +55,10 @@ export const setMessageProcessed = (messageId: string) => {
         ...s,
         [messageId]: update,
     });
-    db.chatMessages.put(update);
+    await db.chatMessages.put(update);
 };
 
-export const deleteMessage = (messageId: string) => {
+export const deleteMessage = async (messageId: string) => {
     const s = appStore.get(_messageStorageAtom);
 
     appStore.set(
@@ -67,5 +67,5 @@ export const deleteMessage = (messageId: string) => {
             Object.entries(s).filter(([id, _]) => id !== messageId)
         )
     );
-    db.chatMessages.delete(messageId);
+    await db.chatMessages.delete(messageId);
 };

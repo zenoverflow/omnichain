@@ -8,7 +8,7 @@ export class GraphWatcher {
 
         if (!editor || !area || !pathToGraph.length) return;
 
-        editor.addPipe((context) => {
+        editor.addPipe(async (context) => {
             if (
                 (
                     [
@@ -20,11 +20,14 @@ export class GraphWatcher {
                     ] as (typeof context.type)[]
                 ).includes(context.type)
             ) {
-                updateGraph(editor, area, pathToGraph);
+                await updateGraph(editor, area, pathToGraph);
             }
             return context;
         });
-        area.addPipe((context) => {
+
+        // TODO: debounce fast-firing events
+
+        area.addPipe(async (context) => {
             if (
                 [
                     "nodecreated",
@@ -40,7 +43,7 @@ export class GraphWatcher {
                     "zoomed",
                 ].includes(context.type)
             ) {
-                updateGraph(editor, area, pathToGraph);
+                await updateGraph(editor, area, pathToGraph);
             }
             return context;
         });

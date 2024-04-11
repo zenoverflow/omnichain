@@ -48,7 +48,7 @@ export type NodeContextObj = {
         node: string,
         control: string,
         value: string
-    ) => any;
+    ) => Promise<void>;
 
     /**
      * For visually tracking graph execution

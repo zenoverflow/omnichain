@@ -81,13 +81,15 @@ export async function createEditor(container: HTMLElement) {
         onFlowNode(_) {
             // No exec from visual editor
         },
-        onExecControlUpdate() {
+        async onExecControlUpdate() {
             // No exec from visual editor
         },
         getIsActive() {
             return isGraphActive(pathToGraph[0]);
         },
-        unselect() {},
+        unselect() {
+            //
+        },
     };
 
     // const arrange = new AutoArrangePlugin<any>();
@@ -101,10 +103,10 @@ export async function createEditor(container: HTMLElement) {
     // });
 
     // Listen to value update signals from custom nodes' controls
-    const watcherSubCleanup = appStore.sub(watcherStateAtom, () => {
+    const watcherSubCleanup = appStore.sub(watcherStateAtom, async () => {
         if (isGraphActive(pathToGraph[0])) return;
 
-        updateGraph(editor, area, pathToGraph);
+        await updateGraph(editor, area, pathToGraph);
     });
 
     // Readonly if running
@@ -151,7 +153,7 @@ export async function createEditor(container: HTMLElement) {
         // Default content for new graphs
         if (editor.getNodes().length === 0) {
             await GraphTemplate.empty(nodeContext);
-            AreaExtensions.zoomAt(area, editor.getNodes());
+            await AreaExtensions.zoomAt(area, editor.getNodes());
             // Use of the ordering extension, unused
             // await arrange.layout({ applier });
             // AreaExtensions.simpleNodesOrder(area);

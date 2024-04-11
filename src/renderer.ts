@@ -30,4 +30,4 @@
 // console.log('👋 This message is being logged by "renderer.ts", included via Vite');
 
 import { run } from "./index";
-run();
+void run();

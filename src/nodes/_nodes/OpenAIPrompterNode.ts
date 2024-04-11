@@ -24,13 +24,13 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
     }
 > {
     public static icon = OpenAIOutlined;
-    width: number = 380;
-    height: number = 570;
+    width = 380;
+    height = 570;
 
     constructor(
         private context: NodeContextObj,
-        id: string,
-        controls: Record<string, any> = {}
+        id?: string,
+        controls?: Record<string, any>
     ) {
         super(OpenAIPrompterNode.name);
         const self = this;
@@ -49,14 +49,14 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
             "model",
             new TextControl({
                 name: "model",
-                initial: controls.model ?? "gpt-3.5-turbo-instruct",
+                initial: controls?.model ?? "gpt-3.5-turbo-instruct",
             })
         );
         this.addControl(
             "maxTokens",
             new NumberControl({
                 name: "max_tokens",
-                initial: controls.maxTokens || 120,
+                initial: controls?.maxTokens ?? 120,
                 min: 1,
             })
         );
@@ -64,7 +64,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
             "temperature",
             new NumberControl({
                 name: "temperature",
-                initial: controls.temperature || 1.0,
+                initial: controls?.temperature ?? 1.0,
                 min: 0,
                 max: 2.0,
             })
@@ -73,7 +73,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
             "top_p",
             new NumberControl({
                 name: "top_p",
-                initial: controls.top_p || 1.0,
+                initial: controls?.top_p ?? 1.0,
                 min: 0.01,
                 max: 1.0,
             })
@@ -82,7 +82,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
             "frequencyPenalty",
             new NumberControl({
                 name: "frequency_penalty",
-                initial: controls.frequencyPenalty || 0,
+                initial: controls?.frequencyPenalty ?? 0,
                 min: -2.0,
                 max: 2.0,
             })
@@ -91,7 +91,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
             "presencePenalty",
             new NumberControl({
                 name: "presence_penalty",
-                initial: controls.presencePenalty || 0,
+                initial: controls?.presencePenalty ?? 0,
                 min: -2.0,
                 max: 2.0,
             })
@@ -100,7 +100,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
             "numResponses",
             new NumberControl({
                 name: "num_responses",
-                initial: controls.numResponses || 120,
+                initial: controls?.numResponses ?? 120,
                 min: 1,
             })
         );
@@ -112,14 +112,14 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
                     { value: "true", label: "true" },
                     { value: "false", label: "false" },
                 ],
-                initial: controls.echo ?? "false",
+                initial: controls?.echo ?? "false",
             })
         );
         this.addControl(
             "seed",
             new NumberControl({
                 name: "seed",
-                initial: controls.seed || undefined,
+                initial: controls?.seed ?? undefined,
             })
         );
         //

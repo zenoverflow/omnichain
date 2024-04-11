@@ -32,8 +32,8 @@ export class GraphTemplate {
                     y: outputView?.position?.y ?? 0,
                 };
 
-                area.translate(modInputNode.id, t1);
-                area.translate(modOutputNode.id, t2);
+                await area.translate(modInputNode.id, t1);
+                await area.translate(modOutputNode.id, t2);
             }
         }
     }

@@ -24,11 +24,15 @@ export const run = async () => {
     await loadApiKeysFromDb();
     clearRedundantOptions();
 
-    ReactDOM.createRoot(document.getElementById("root")!).render(
-        <React.StrictMode>
-            <StateProvider store={appStore}>
-                <Editor />
-            </StateProvider>
-        </React.StrictMode>
-    );
+    const root = document.getElementById("root");
+
+    if (root) {
+        ReactDOM.createRoot(root).render(
+            <React.StrictMode>
+                <StateProvider store={appStore}>
+                    <Editor />
+                </StateProvider>
+            </React.StrictMode>
+        );
+    }
 };
