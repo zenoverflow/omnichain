@@ -75,8 +75,8 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                                     style={{ flex: "1" }}
                                     type="text"
                                     value={a.name}
-                                    onChange={async (e) => {
-                                        await updateApiKeyName(
+                                    onChange={(e) => {
+                                        updateApiKeyName(
                                             a.apiKeyId,
                                             e.target.value
                                         );
@@ -93,8 +93,8 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                             </div>
                             <Input.Password
                                 value={a.content}
-                                onChange={async (e) => {
-                                    await updateApiKeyContent(
+                                onChange={(e) => {
+                                    updateApiKeyContent(
                                         a.apiKeyId,
                                         e.target.value
                                     );

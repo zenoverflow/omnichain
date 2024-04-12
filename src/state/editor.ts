@@ -70,28 +70,28 @@ export const stopCurrentGraph = () => {
     }
 };
 
-export const createModule = async (name?: string) => {
+export const createModule = (name?: string) => {
     const { path } = appStore.get(_editorStateAtom);
 
     if (path.length) {
-        await createGraph(name ?? "New Module", path[0]);
+        createGraph(name ?? "New Module", path[0]);
     }
 };
 
-export const deleteCurrentGraph = async () => {
+export const deleteCurrentGraph = () => {
     const { path } = appStore.get(_editorStateAtom);
 
     if (path.length) {
         closeEditor();
-        await deleteGraph(path);
+        deleteGraph(path);
     }
 };
 
-export const updateCurrentGraphName = async (name: string) => {
+export const updateCurrentGraphName = (name: string) => {
     const { path } = appStore.get(_editorStateAtom);
 
     if (path.length) {
-        await updateGraphName(path, name);
+        updateGraphName(path, name);
     }
 };
 

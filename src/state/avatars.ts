@@ -2,8 +2,9 @@ import { atom } from "jotai";
 
 import { appStore } from ".";
 import { ImgUtils } from "../util/ImgUtils";
-import { db } from "../db";
-import { ChatAvatar } from "../db/data";
+import { QueueUtils } from "../util/QueueUtils";
+import { db } from "../data/db";
+import { ChatAvatar } from "../data/types";
 import { clearRedundantOptions } from "./options";
 
 const _avatarStorageAtom = atom<Record<string, ChatAvatar>>({});
@@ -21,59 +22,69 @@ export const loadAvatarsFromDb = async () => {
     );
 };
 
-export const createAvatar = async (name = "Anon") => {
-    const s = appStore.get(_avatarStorageAtom);
-    const created: ChatAvatar = ImgUtils.empty(name);
-    const id = created.avatarId;
-    appStore.set(_avatarStorageAtom, {
-        ...s,
+// ACTIONS //
 
-        [id]: created,
+export const createAvatar = (name = "Anon") => {
+    QueueUtils.addTask(async () => {
+        const s = appStore.get(_avatarStorageAtom);
+        const created: ChatAvatar = ImgUtils.empty(name);
+        const id = created.avatarId;
+        appStore.set(_avatarStorageAtom, {
+            ...s,
+
+            [id]: created,
+        });
+        await db.chatAvatars.add(created);
     });
-    await db.chatAvatars.add(created);
 };
 
-export const updateAvatarName = async (avatarId: string, name: string) => {
-    const s = appStore.get(_avatarStorageAtom);
-    const target = s[avatarId];
+export const updateAvatarName = (avatarId: string, name: string) => {
+    QueueUtils.addTask(async () => {
+        const s = appStore.get(_avatarStorageAtom);
+        const target = s[avatarId];
 
-    const update: ChatAvatar = {
-        ...target,
-        name,
-    };
+        const update: ChatAvatar = {
+            ...target,
+            name,
+        };
 
-    appStore.set(_avatarStorageAtom, {
-        ...s,
-        [avatarId]: update,
+        appStore.set(_avatarStorageAtom, {
+            ...s,
+            [avatarId]: update,
+        });
+        await db.chatAvatars.put(update);
     });
-    await db.chatAvatars.put(update);
 };
 
-export const updateAvatarImage = async (avatarId: string, image: File) => {
-    const s = appStore.get(_avatarStorageAtom);
-    const target = s[avatarId];
+export const updateAvatarImage = (avatarId: string, image: File) => {
+    QueueUtils.addTask(async () => {
+        const s = appStore.get(_avatarStorageAtom);
+        const target = s[avatarId];
 
-    const update: ChatAvatar = {
-        ...target,
-        imageBase64: await ImgUtils.resizeImage(image, 150, 150),
-    };
+        const update: ChatAvatar = {
+            ...target,
+            imageBase64: await ImgUtils.resizeImage(image, 150, 150),
+        };
 
-    appStore.set(_avatarStorageAtom, {
-        ...s,
-        [avatarId]: update,
+        appStore.set(_avatarStorageAtom, {
+            ...s,
+            [avatarId]: update,
+        });
+        await db.chatAvatars.put(update);
     });
-    await db.chatAvatars.put(update);
 };
 
 export const deleteAvatar = async (avatarId: string) => {
-    const s = appStore.get(_avatarStorageAtom);
+    QueueUtils.addTask(async () => {
+        const s = appStore.get(_avatarStorageAtom);
 
-    appStore.set(
-        _avatarStorageAtom,
-        Object.fromEntries(
-            Object.entries(s).filter(([id, _]) => id !== avatarId)
-        )
-    );
-    await db.chatAvatars.delete(avatarId);
-    clearRedundantOptions();
+        appStore.set(
+            _avatarStorageAtom,
+            Object.fromEntries(
+                Object.entries(s).filter(([id, _]) => id !== avatarId)
+            )
+        );
+        await db.chatAvatars.delete(avatarId);
+        clearRedundantOptions();
+    });
 };

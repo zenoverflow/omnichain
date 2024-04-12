@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { ChatMessage } from "../db/data";
+import type { ChatMessage } from "../data/types";
 
 export class MsgUtils {
     public static fresh(

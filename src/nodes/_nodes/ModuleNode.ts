@@ -137,13 +137,8 @@ export class ModuleNode extends ClassicPreset.Node<
                             [self.id, targetId, execId].join("__")
                         );
                     },
-                    async onExecControlUpdate(
-                        pathToGraph,
-                        node,
-                        control,
-                        value
-                    ) {
-                        await self.context.onExecControlUpdate(
+                    onExecControlUpdate(pathToGraph, node, control, value) {
+                        self.context.onExecControlUpdate(
                             pathToGraph,
                             node,
                             control,

@@ -22,9 +22,9 @@ export const BtnCreateGraph: React.FC = () => {
         setModalOpen(false);
     };
 
-    const handleCreate = async () => {
-        await createGraph(valOfName);
+    const handleCreate = () => {
         setModalOpen(false);
+        createGraph(valOfName);
     };
 
     return (

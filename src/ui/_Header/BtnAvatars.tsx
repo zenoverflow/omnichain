@@ -31,11 +31,11 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
 
-        fileInput.onchange = async () => {
+        fileInput.onchange = () => {
             if (fileInput.files.length) {
                 const file = fileInput.files[0];
                 if (file) {
-                    await updateAvatarImage(avatarId, file);
+                    updateAvatarImage(avatarId, file);
                 }
                 console.log(file);
             }
@@ -107,8 +107,8 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                             <Input
                                 type="text"
                                 value={a.name}
-                                onChange={async (e) => {
-                                    await updateAvatarName(
+                                onChange={(e) => {
+                                    updateAvatarName(
                                         a.avatarId,
                                         e.target.value
                                     );

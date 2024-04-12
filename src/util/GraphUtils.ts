@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-import { ClassicPreset, NodeEditor } from "rete";
-import { AreaPlugin } from "rete-area-plugin";
+import { ClassicPreset } from "rete";
+import type { NodeEditor } from "rete";
+import type { AreaPlugin } from "rete-area-plugin";
 
 import * as NODE_MAKERS from "../nodes";
-import { NodeContextObj } from "../nodes/context";
-import { SerializedGraph, SerializedNode } from "../db/data";
+import type { NodeContextObj } from "../nodes/context";
+import type { SerializedGraph, SerializedNode } from "../data/types";
 
 export class GraphUtils {
     public static empty(name = "New Chain"): SerializedGraph {

@@ -78,7 +78,7 @@ export class TextNode extends ClassicPreset.Node<
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
                 // Update stored graph
-                await self.context.onExecControlUpdate(
+                self.context.onExecControlUpdate(
                     self.context.pathToGraph,
                     self.id,
                     "val",

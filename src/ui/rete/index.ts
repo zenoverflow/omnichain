@@ -81,7 +81,7 @@ export async function createEditor(container: HTMLElement) {
         onFlowNode(_) {
             // No exec from visual editor
         },
-        async onExecControlUpdate() {
+        onExecControlUpdate() {
             // No exec from visual editor
         },
         getIsActive() {
@@ -144,11 +144,10 @@ export async function createEditor(container: HTMLElement) {
         FlowWatcher.observe(nodeContext);
     }
 
-    // Always watch translation
-    GraphWatcher.observe(nodeContext);
-
     try {
         await initGraph(nodeContext);
+
+        GraphWatcher.observe(nodeContext);
 
         // Default content for new graphs
         if (editor.getNodes().length === 0) {

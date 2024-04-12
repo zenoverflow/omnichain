@@ -9,6 +9,8 @@ import { loadAvatarsFromDb } from "./state/avatars";
 import { clearRedundantOptions } from "./state/options";
 import { loadApiKeysFromDb } from "./state/apiKeys";
 
+import { QueueUtils } from "./util/QueueUtils";
+
 import { Editor } from "./ui/Editor";
 
 // const router = createBrowserRouter([
@@ -23,6 +25,8 @@ export const run = async () => {
     await loadAvatarsFromDb();
     await loadApiKeysFromDb();
     clearRedundantOptions();
+
+    QueueUtils.runQueue();
 
     const root = document.getElementById("root");
 

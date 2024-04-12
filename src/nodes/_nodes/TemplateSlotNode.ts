@@ -101,7 +101,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
                 // Update stored graph (value)
-                await self.context.onExecControlUpdate(
+                self.context.onExecControlUpdate(
                     self.context.pathToGraph,
                     self.id,
                     "val",

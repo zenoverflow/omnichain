@@ -23,8 +23,8 @@ export const BtnCreateModule: React.FC = () => {
     };
 
     const handleCreate = async () => {
-        await createModule(valOfName);
         setModalOpen(false);
+        createModule(valOfName);
     };
 
     return (

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { ApiKey } from "../db/data";
+import { ApiKey } from "../data/types";
 
 export class ApiKeyUtils {
     public static empty(name: string): ApiKey {

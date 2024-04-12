@@ -78,7 +78,7 @@ export class GraphPersistenceNode extends ClassicPreset.Node<
                             const valControl = self.controls.val;
                             valControl.value = value;
                             // Update stored graph
-                            await self.context.onExecControlUpdate(
+                            self.context.onExecControlUpdate(
                                 self.context.pathToGraph,
                                 self.id,
                                 "val",

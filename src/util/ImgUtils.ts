@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { ChatAvatar } from "../db/data";
+import type { ChatAvatar } from "../data/types";
 
 export class ImgUtils {
     public static empty(name = "Anon"): ChatAvatar {

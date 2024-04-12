@@ -1,5 +1,5 @@
 import Dexie, { Table } from "dexie";
-import { SerializedGraph, ChatMessage, ChatAvatar, ApiKey } from "./data";
+import { SerializedGraph, ChatMessage, ChatAvatar, ApiKey } from "./types";
 
 class _DB extends Dexie {
     chains!: Table<SerializedGraph>;

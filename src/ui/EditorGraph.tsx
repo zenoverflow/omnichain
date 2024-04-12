@@ -214,8 +214,8 @@ export const EditorGraph: React.FC = () => {
                     addonBefore="name"
                     value={currentGraph.name}
                     maxLength={120}
-                    onChange={async (e) => {
-                        await updateCurrentGraphName(e.target.value);
+                    onChange={(e) => {
+                        updateCurrentGraphName(e.target.value);
                     }}
                 />
             </Drawer>

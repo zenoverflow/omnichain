@@ -196,8 +196,8 @@ export const runGraph = async (graphId: string) => {
             if (!isGraphActive(graphId)) return;
             updateActiveNode(graphId, execId);
         },
-        async onExecControlUpdate(pathToGraph, node, control, value) {
-            await updateNodeControl(pathToGraph, node, control, value);
+        onExecControlUpdate(pathToGraph, node, control, value) {
+            updateNodeControl(pathToGraph, node, control, value);
         },
         getIsActive() {
             return isGraphActive(graphId);

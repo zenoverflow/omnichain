@@ -7,7 +7,7 @@ import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 // @ts-ignore
 import Markdown from "react-markdown";
 
-import { ChatMessage } from "../db/data";
+import { ChatMessage } from "../data/types";
 import { optionsAtom } from "../state/options";
 import {
     messageStorageAtom,
@@ -147,17 +147,17 @@ export const ChatInterface: React.FC = () => {
         [chainChatId, userAvatarId]
     );
 
-    const sendMessage = useCallback(async () => {
+    const sendMessage = useCallback(() => {
         if (!blocked) {
-            await addMessage(chainChatId, userAvatarId, message);
+            addMessage(chainChatId, userAvatarId, message);
             setMessage("");
         }
     }, [chainChatId, userAvatarId, message, setMessage]);
 
     const handleTextboxEnter = useCallback(
-        async (e: any) => {
+        (e: any) => {
             if (e.key === "Enter" && !e.shiftKey) {
-                await sendMessage();
+                sendMessage();
             }
         },
         [sendMessage]
