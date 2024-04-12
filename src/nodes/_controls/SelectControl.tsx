@@ -69,7 +69,7 @@ export class SelectControl extends ClassicPreset.Control {
                         <Select
                             showSearch={self.options.showSearch ?? false}
                             // optionFilterProp="children"
-                            className="c__rmleftrad"
+                            className="c__rmleftrad c__nodecontrol"
                             style={{
                                 flex: "1",
                             }}

@@ -24,6 +24,7 @@ import {
 } from "../state/editor";
 
 import { nodeSelectionAtom } from "../state/nodeSelection";
+import { appStore } from "../state";
 import { executorAtom } from "../state/executor";
 
 import { BtnCreateModule } from "./_EditorGraph/BtnCreateModule";
@@ -41,7 +42,15 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
     useEffect(() => {
         const listener = async (e: KeyboardEvent) => {
             if (e.key === "Delete" && targets.length) {
-                await deleteSelectedNodes(props.nodeContext);
+                // Prevent deletions on active graph
+                const editorState = appStore.get(editorStateAtom);
+                const currentGraphPath = editorState?.path;
+                if (currentGraphPath.length) {
+                    const executorState = appStore.get(executorAtom);
+                    if (!executorState[currentGraphPath[0]]) {
+                        await deleteSelectedNodes(props.nodeContext);
+                    }
+                }
             }
         };
 
@@ -127,6 +136,41 @@ export const EditorGraph: React.FC = () => {
         () => !!executor[path[0]],
         [executor, path]
     );
+
+    // Disable/enable controls manually
+    useEffect(() => {
+        if (currentGraph && editor) {
+            if (editingDisabled && !editor.readonly.enabled) {
+                editor.readonly.enable();
+
+                document
+                    .querySelectorAll(".c__nodecontrol")
+                    .forEach((i: any) => {
+                        i.disabled = true;
+                    });
+
+                document
+                    .querySelectorAll(".c__nodecontrol input")
+                    .forEach((i: any) => {
+                        i.disabled = true;
+                    });
+            } else if (!editingDisabled && editor.readonly.enabled) {
+                editor.readonly.disable();
+
+                document
+                    .querySelectorAll(".c__nodecontrol")
+                    .forEach((i: any) => {
+                        i.disabled = false;
+                    });
+
+                document
+                    .querySelectorAll(".c__nodecontrol input")
+                    .forEach((i: any) => {
+                        i.disabled = false;
+                    });
+            }
+        }
+    }, [currentGraph, editor, editingDisabled]);
 
     if (!currentGraph) return null;
 

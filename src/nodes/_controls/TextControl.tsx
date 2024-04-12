@@ -21,21 +21,13 @@ export class TextControl extends ClassicPreset.Control {
         this.value = options.initial ?? "";
     }
 
-    handleUpdate(value: any) {
-        const self = this;
-        self.value = value;
-        signalEditorUpdate();
-        if (self.options.onUpdate) {
-            self.options.onUpdate();
-        }
-    }
-
     component() {
         const self = this;
 
         const _Component: React.FC = () => {
             return self.options.large ?? false ? (
                 <Input.TextArea
+                    className="c__nodecontrol"
                     onPointerDown={(e) => e.stopPropagation()}
                     style={{
                         width: "100%",
@@ -45,12 +37,17 @@ export class TextControl extends ClassicPreset.Control {
                     }}
                     defaultValue={self.value}
                     onChange={(e) => {
-                        self.handleUpdate(e.target.value);
+                        self.value = e.target.value;
+                        signalEditorUpdate();
+                        if (self.options.onUpdate) {
+                            self.options.onUpdate();
+                        }
                     }}
                     {...(self.options.id ? { id: self.options.id } : {})}
                 />
             ) : (
                 <Input
+                    className="c__nodecontrol"
                     addonBefore={self.options.name ?? "text"}
                     styles={{
                         prefix: {
@@ -63,7 +60,11 @@ export class TextControl extends ClassicPreset.Control {
                     }}
                     defaultValue={self.value}
                     onChange={(e) => {
-                        self.handleUpdate(e.target.value);
+                        self.value = e.target.value;
+                        signalEditorUpdate();
+                        if (self.options.onUpdate) {
+                            self.options.onUpdate();
+                        }
                     }}
                     {...(self.options.id ? { id: self.options.id } : {})}
                 />

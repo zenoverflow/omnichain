@@ -109,11 +109,6 @@ const markActiveNode = (force = false) => {
 };
 
 export const stopGraph = (id: string) => {
-    Object.fromEntries(
-        Object.entries(appStore.get(_executorAtom)).filter(
-            ([key]) => key !== id
-        )
-    );
     appStore.set(
         _executorAtom,
         Object.fromEntries(

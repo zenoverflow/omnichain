@@ -2,8 +2,6 @@ import { NodeContextObj } from "../../nodes/context";
 
 import { updateGraph } from "../../state/graphs";
 
-let debouncerNodeDrag: NodeJS.Timeout | null = null;
-
 let debouncerNodeResize: NodeJS.Timeout | null = null;
 
 let debouncerNodeTranslate: NodeJS.Timeout | null = null;
@@ -32,7 +30,7 @@ export class GraphWatcher {
                     ] as (typeof context.type)[]
                 ).includes(context.type)
             ) {
-                updateGraph(editor, area, pathToGraph);
+                updateGraph(editor, area, pathToGraph, "pipe 1");
             }
             return context;
         });
@@ -46,34 +44,22 @@ export class GraphWatcher {
                     "connectioncreated",
                     "connectionremoved",
                     "cleared",
-                    // "nodedragged",
-                    // "noderesized",
-                    // "nodetranslated",
-                    // "reordered",
-                    // "translated",
-                    // "zoomed",
                 ].includes(context.type)
             ) {
-                updateGraph(editor, area, pathToGraph);
+                updateGraph(editor, area, pathToGraph, "pipe 2");
                 return context;
             }
             // DEBOUNCED EVENTS
             switch (context.type) {
-                case "nodedragged":
-                    if (debouncerNodeDrag) {
-                        clearTimeout(debouncerNodeDrag);
-                    }
-                    debouncerNodeDrag = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph);
-                    }, 50);
-                    break;
+                // DO NOT USE, CAUSES FALSE UPDATE ON SELECT
+                // case "nodedragged":
 
                 case "noderesized":
                     if (debouncerNodeResize) {
                         clearTimeout(debouncerNodeResize);
                     }
                     debouncerNodeResize = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph);
+                        updateGraph(editor, area, pathToGraph, "pipe 4");
                     }, 50);
                     break;
 
@@ -82,7 +68,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerNodeTranslate);
                     }
                     debouncerNodeTranslate = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph);
+                        updateGraph(editor, area, pathToGraph, "pipe 5");
                     }, 50);
                     break;
 
@@ -91,7 +77,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerAreaReorder);
                     }
                     debouncerAreaReorder = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph);
+                        updateGraph(editor, area, pathToGraph, "pipe 6");
                     }, 50);
                     break;
 
@@ -100,7 +86,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerAreaTranslate);
                     }
                     debouncerAreaTranslate = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph);
+                        updateGraph(editor, area, pathToGraph, "pipe 7");
                     }, 50);
                     break;
 
@@ -109,7 +95,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerAreaZoom);
                     }
                     debouncerAreaZoom = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph);
+                        updateGraph(editor, area, pathToGraph, "pipe 8");
                     }, 50);
                     break;
             }

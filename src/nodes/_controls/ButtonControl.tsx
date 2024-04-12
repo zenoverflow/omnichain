@@ -20,6 +20,7 @@ export class ButtonControl extends ClassicPreset.Control {
         const ButtonControlComponent: React.FC = () => {
             return (
                 <Button
+                    className="c__nodecontrol"
                     onPointerDown={(e) => e.stopPropagation()}
                     type="primary"
                     size="large"

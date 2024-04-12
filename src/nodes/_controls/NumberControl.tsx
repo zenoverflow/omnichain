@@ -35,6 +35,7 @@ export class NumberControl extends ClassicPreset.Control {
                     }}
                 >
                     <InputNumber
+                        className="c__nodecontrol"
                         onPointerDown={(e) => e.stopPropagation()}
                         addonBefore={self.options.name ?? undefined}
                         min={self.options.min ?? undefined}

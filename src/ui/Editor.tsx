@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useAtom } from "jotai";
 import {
     MenuUnfoldOutlined,
@@ -15,7 +15,6 @@ import { BtnOptions } from "./_Header/BtnOptions";
 import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
 
-import { executorAtom } from "../state/executor";
 import { editorStateAtom, closeEditor } from "../state/editor";
 import { loaderAtom } from "../state/loader";
 
@@ -24,18 +23,19 @@ const { Header, Content } = Layout;
 const EditorContent: React.FC = () => {
     const [{ path: editorPath }] = useAtom(editorStateAtom);
 
-    const [executor] = useAtom(executorAtom);
-
-    const key = useMemo(() => {
-        const k1 = editorPath.join("__");
-        const k2 = Object.keys(executor).join("__");
-        return `${k1}__${k2}`;
-    }, [editorPath, executor]);
+    // EDIT: prevent graph refresh on exec
+    // replaced with manual readonly plugin control
+    // const [executor] = useAtom(executorAtom);
+    // const key = useMemo(() => {
+    //     const k1 = editorPath.join("__");
+    //     const k2 = Object.keys(executor).join("__");
+    //     return `${k1}__${k2}`;
+    // }, [editorPath, executor]);
 
     return (
         <Content
             id="TheEditor"
-            key={key}
+            // key={key}
             style={{
                 margin: 0,
                 padding: 0,

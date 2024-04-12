@@ -96,10 +96,11 @@ export const initGraph = async (context: NodeContextObj) => {
 export const updateGraph = (
     editor: NodeEditor<any>,
     area: AreaPlugin<any, any>,
-    path: string[]
+    path: string[],
+    callSource?: string // for debug only
 ) => {
     QueueUtils.addTask(async () => {
-        console.log("UPDATE GRAPH");
+        console.log("UPDATE GRAPH", callSource ?? "somewhere");
         const s = appStore.get(_graphStorageAtom);
         // main graph
         if (path.length === 1) {
