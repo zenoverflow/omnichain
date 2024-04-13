@@ -8,17 +8,16 @@ import { NodeContextObj } from "../../nodes/context";
 import { ModuleNode } from "../../nodes";
 import { getMenuIcon } from "../../nodes/icons";
 
-const $nodewidth = 200;
-const $socketmargin = 6;
-const $socketsize = 25;
+const SOCKET_MARGIN = 6;
+const SOCKET_SIZE = 25;
 
 const { RefSocket, RefControl } = Presets.classic;
 
 export const StyledSocket = styled.div`
     display: inline-block;
     cursor: pointer;
-    width: ${$socketsize}px;
-    height: ${$socketsize}px;
+    width: ${SOCKET_SIZE}px;
+    height: ${SOCKET_SIZE}px;
     border-radius: 25px;
     margin: 0;
     vertical-align: middle;
@@ -49,7 +48,7 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
     border: 3px solid #91caff;
     border-radius: 10px;
     width: ${(props) =>
-        Number.isFinite(props.width) ? `${props.width}px` : `${$nodewidth}px`};
+        Number.isFinite(props.width) ? `${props.width}px` : `${200}px`};
     height: ${(props) =>
         Number.isFinite(props.height) ? `${props.height}px` : "auto"};
     position: relative;
@@ -58,11 +57,6 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
         props.selected &&
         css`
             border-color: #ffc53d;
-        `}
-    ${(props) =>
-        props.disabled &&
-        css`
-            pointer-events: none;
         `}
     .title {
         color: white;
@@ -97,19 +91,19 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
         display: inline-block;
         font-family: sans-serif;
         font-size: 14px;
-        margin: ${$socketmargin}px;
-        line-height: ${$socketsize}px;
+        margin: ${SOCKET_MARGIN}px;
+        line-height: ${SOCKET_SIZE}px;
     }
     .input-control {
         z-index: 1;
-        width: calc(100% - ${$socketsize + 2 * $socketmargin}px);
+        width: calc(100% - ${SOCKET_SIZE + 2 * SOCKET_MARGIN}px);
         vertical-align: middle;
         display: inline-block;
     }
     .control {
         display: block;
         height: auto;
-        padding: ${$socketmargin}px ${$socketsize / 2 + $socketmargin}px;
+        padding: ${SOCKET_MARGIN}px ${SOCKET_SIZE / 2 + SOCKET_MARGIN}px;
     }
     ${(props) => props.styles && props.styles(props)}
 `;
@@ -117,12 +111,14 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
 function sortByIndex<T extends [string, undefined | { index?: number }][]>(
     entries: T
 ) {
-    entries.sort((a, b) => {
+    const sorted = [...entries];
+    sorted.sort((a, b) => {
         const ai = a[1]?.index || 0;
         const bi = b[1]?.index || 0;
 
         return ai - bi;
     });
+    return sorted;
 }
 
 type Props<S extends ClassicScheme> = {
@@ -133,13 +129,11 @@ type Props<S extends ClassicScheme> = {
 
 const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
     const { pathToGraph }: NodeContextObj = props.node.context;
-    const nodeId: string = props.node.id;
-
     return (
         <div
             data-exec-graph={pathToGraph[0]}
             data-exec-module={pathToGraph[1]}
-            data-exec-node={nodeId}
+            data-exec-node={props.node.id}
             data-exec-is-module-node={
                 props.node instanceof ModuleNode ? "1" : "0"
             }
@@ -159,7 +153,6 @@ const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
                 borderRadius: "10px",
                 pointerEvents: "none",
                 boxSizing: "border-box",
-                // boxShadow: "0 0 30px #ffe58f",
                 animation: "glow 1.2s ease-in infinite",
             }}
         ></div>
@@ -167,35 +160,36 @@ const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
 };
 
 export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
-    const inputs = Object.entries(props.data.inputs);
-    const outputs = Object.entries(props.data.outputs);
-    const controls = Object.entries(props.data.controls);
-    const selected = props.data.selected || false;
+    const inputs = useMemo(
+        () => sortByIndex(Object.entries(props.data.inputs)),
+        [props.data.inputs]
+    );
 
-    const readOnly = (props.data as any).context.getIsActive() === true;
+    const outputs = useMemo(
+        () => sortByIndex(Object.entries(props.data.outputs)),
+        []
+    );
 
-    sortByIndex(inputs);
-    sortByIndex(outputs);
-    sortByIndex(controls);
-
-    const { id, label, width: _w, height: _h } = props.data;
+    const controls = useMemo(
+        () => sortByIndex(Object.entries(props.data.controls)),
+        [props.data.controls]
+    );
 
     const cleanLabel = useMemo(() => {
-        return label.replace("Node", "").trim();
-    }, [label]);
+        return props.data.label.replace("Node", "").trim();
+    }, [props.data.label]);
 
     const icon = useMemo(() => {
-        return getMenuIcon(label);
-    }, [label]);
+        return getMenuIcon(props.data.label);
+    }, [props.data.label]);
 
     return (
         <StyledWrapper
-            data-context-menu={`${id}`}
-            selected={selected}
-            width={_w}
-            height={_h}
+            data-context-menu={`${props.data.id}`}
+            selected={props.data.selected || false}
+            width={props.data.width}
+            height={props.data.height}
             styles={props.styles}
-            disabled={readOnly}
         >
             <ExecutionIndicator node={props.data} />
             <div className="title" data-testid="title">
@@ -222,7 +216,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                                 side="output"
                                 emit={props.emit}
                                 socketKey={key}
-                                nodeId={id}
+                                nodeId={props.data.id}
                                 payload={output.socket}
                                 data-testid="output-socket"
                             />
@@ -243,7 +237,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                                 emit={props.emit}
                                 side="input"
                                 socketKey={key}
-                                nodeId={id}
+                                nodeId={props.data.id}
                                 payload={input.socket}
                                 data-testid="input-socket"
                             />

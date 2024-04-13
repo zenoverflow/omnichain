@@ -76,7 +76,7 @@ export class LogOutputNode extends ClassicPreset.Node<
                 console.log("EXEC DIS");
 
                 // Update stored graph
-                await self.context.onExecControlUpdate(
+                self.context.onControlChange(
                     self.context.pathToGraph,
                     self.id,
                     "val",
@@ -84,7 +84,7 @@ export class LogOutputNode extends ClassicPreset.Node<
                 );
 
                 // Update displayed graph
-                if (self.context.haveGuiControls) {
+                if (!self.context.headless) {
                     let target: any;
                     while (!target) {
                         target = document.getElementById(

@@ -101,7 +101,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
                 // Update stored graph (value)
-                self.context.onExecControlUpdate(
+                self.context.onControlChange(
                     self.context.pathToGraph,
                     self.id,
                     "val",
@@ -109,7 +109,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 );
 
                 // Update displayed graph (value)
-                if (self.context.haveGuiControls) {
+                if (!self.context.headless) {
                     let target: any;
                     while (!target) {
                         target = document.getElementById(

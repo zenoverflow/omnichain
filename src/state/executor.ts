@@ -153,7 +153,7 @@ export const runGraph = async (graphId: string) => {
 
     // Hydrate
     await GraphUtils.hydrate(target, {
-        haveGuiControls: true,
+        headless: false,
         pathToGraph: [graphId],
         editor,
         control,
@@ -191,7 +191,7 @@ export const runGraph = async (graphId: string) => {
             if (!isGraphActive(graphId)) return;
             updateActiveNode(graphId, execId);
         },
-        onExecControlUpdate(pathToGraph, node, control, value) {
+        onControlChange(pathToGraph, node, control, value) {
             updateNodeControl(pathToGraph, node, control, value);
         },
         getIsActive() {

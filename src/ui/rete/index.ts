@@ -53,7 +53,7 @@ export async function createEditor(container: HTMLElement) {
     });
 
     const nodeContext: NodeContextObj = {
-        haveGuiControls: true,
+        headless: false,
         pathToGraph,
         editor,
         control,
@@ -87,7 +87,7 @@ export async function createEditor(container: HTMLElement) {
         onFlowNode(_) {
             // No exec from visual editor
         },
-        onExecControlUpdate() {
+        onControlChange() {
             // No exec from visual editor
         },
         getIsActive() {

@@ -1,4 +1,3 @@
-import React from "react";
 import { Input } from "antd";
 import { ClassicPreset } from "rete";
 
@@ -13,8 +12,6 @@ export class TextControl extends ClassicPreset.Control {
             large?: boolean;
             name?: string;
             initial?: string;
-            readonly?: boolean;
-            onUpdate?: () => void;
         }
     ) {
         super();
@@ -39,9 +36,6 @@ export class TextControl extends ClassicPreset.Control {
                     onChange={(e) => {
                         self.value = e.target.value;
                         signalEditorUpdate();
-                        if (self.options.onUpdate) {
-                            self.options.onUpdate();
-                        }
                     }}
                     {...(self.options.id ? { id: self.options.id } : {})}
                 />
@@ -62,9 +56,6 @@ export class TextControl extends ClassicPreset.Control {
                     onChange={(e) => {
                         self.value = e.target.value;
                         signalEditorUpdate();
-                        if (self.options.onUpdate) {
-                            self.options.onUpdate();
-                        }
                     }}
                     {...(self.options.id ? { id: self.options.id } : {})}
                 />

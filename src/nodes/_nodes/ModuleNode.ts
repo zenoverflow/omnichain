@@ -110,7 +110,7 @@ export class ModuleNode extends ClassicPreset.Node<
 
                 // Hydrate
                 await GraphUtils.hydrate(graph, {
-                    haveGuiControls: true,
+                    headless: true,
                     pathToGraph: [parentId, targetId],
                     editor,
                     control,
@@ -137,8 +137,8 @@ export class ModuleNode extends ClassicPreset.Node<
                             [self.id, targetId, execId].join("__")
                         );
                     },
-                    onExecControlUpdate(pathToGraph, node, control, value) {
-                        self.context.onExecControlUpdate(
+                    onControlChange(pathToGraph, node, control, value) {
+                        self.context.onControlChange(
                             pathToGraph,
                             node,
                             control,

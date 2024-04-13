@@ -78,7 +78,7 @@ export class TextNode extends ClassicPreset.Node<
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
                 // Update stored graph
-                self.context.onExecControlUpdate(
+                self.context.onControlChange(
                     self.context.pathToGraph,
                     self.id,
                     "val",
@@ -86,7 +86,7 @@ export class TextNode extends ClassicPreset.Node<
                 );
 
                 // Update displayed graph
-                if (self.context.haveGuiControls) {
+                if (!self.context.headless) {
                     let target: any;
                     while (!target) {
                         target = document.getElementById(

@@ -13,7 +13,7 @@ type ExecutionEvent = {
 export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
 export type NodeContextObj = {
-    haveGuiControls: boolean;
+    headless: boolean;
     pathToGraph: string[];
     editor: NodeEditor<any>;
     control: ControlFlow<any>;
@@ -43,7 +43,7 @@ export type NodeContextObj = {
     /**
      * For saving node updates during execution
      */
-    onExecControlUpdate: (
+    onControlChange: (
         pathToGraph: string[],
         node: string,
         control: string,
