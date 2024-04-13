@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { InputNumber } from "antd";
 import { ClassicPreset } from "rete";
 
@@ -39,6 +40,26 @@ export class NumberControl extends ClassicPreset.Control {
         const self = this;
 
         const _Component: React.FC = () => {
+            const [value, setValue] = useState(self.value);
+
+            useEffect(() => {
+                const unsub = self.context
+                    .getControlObservable()
+                    ?.subscribe(({ pathToGraph, node, control, value }) => {
+                        if (
+                            pathToGraph[0] === self.context.pathToGraph[0] &&
+                            pathToGraph[1] === self.context.pathToGraph[1] &&
+                            node === self.nodeId &&
+                            control === self.nodeControl
+                        ) {
+                            setValue(value as number);
+                        }
+                    });
+                return () => {
+                    if (unsub) unsub();
+                };
+            }, [setValue]);
+
             return (
                 <div
                     style={{
@@ -48,9 +69,11 @@ export class NumberControl extends ClassicPreset.Control {
                     onPointerDown={(e) => e.stopPropagation()}
                 >
                     <InputNumber
-                        defaultValue={self.value}
+                        value={value}
                         onChange={(val) => {
-                            self.handleChange(val ?? self.config.min ?? 0);
+                            const v = val ?? self.config.min ?? 0;
+                            setValue(v);
+                            self.handleChange(v);
                             // self.value = val ?? self.config.min ?? 0;
                             // signalEditorUpdate();
                         }}

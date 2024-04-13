@@ -15,8 +15,6 @@ export class LogOutputNode extends ClassicPreset.Node<
     width = 580;
     height = 480;
 
-    controlIds: Record<string, string> = {};
-
     constructor(
         private context: NodeContextObj,
         id?: string,
@@ -27,26 +25,20 @@ export class LogOutputNode extends ClassicPreset.Node<
         self.id = id ?? self.id;
         //
         //
-        self.controlIds.val = [
-            ...self.context.pathToGraph,
-            self.id,
-            "val",
-        ].join("__");
-        //
-        //
         this.addControl(
             "val",
             new TextControl(
                 self.id,
                 "val",
                 {
-                    // id: self.controlIds.val,
                     initial: controls?.val ?? "",
                     large: true,
                 },
                 context
             )
         );
+        //
+        //
         this.addInput(
             "trigger",
             new ClassicPreset.Input(new TriggerSocket(), "trigger-in")
@@ -78,27 +70,13 @@ export class LogOutputNode extends ClassicPreset.Node<
                 valControl.value =
                     (inputs?.data || [""])[0] || valControl.value;
 
-                console.log("EXEC DIS");
-
-                // Update stored graph
+                // Update graph
                 self.context.onControlChange(
                     self.context.pathToGraph,
                     self.id,
                     "val",
                     valControl.value
                 );
-
-                // Update displayed graph
-                if (!self.context.headless) {
-                    let target: any;
-                    while (!target) {
-                        target = document.getElementById(
-                            `${self.controlIds.val}`
-                        );
-                        await new Promise((r) => setTimeout(r, 10));
-                    }
-                    target.value = valControl.value;
-                }
             },
         });
         self.context.dataflow.add(self, {

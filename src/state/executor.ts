@@ -4,6 +4,7 @@ import { ControlFlow, Dataflow } from "rete-engine";
 
 import { appStore } from ".";
 import { graphStorageAtom, updateNodeControl } from "./graphs";
+import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { GraphUtils } from "../util/GraphUtils";
 import { StartNode } from "../nodes/";
@@ -193,6 +194,10 @@ export const runGraph = async (graphId: string) => {
         },
         onControlChange(pathToGraph, node, control, value) {
             updateNodeControl(pathToGraph, node, control, value);
+            controlObservable.next({ pathToGraph, node, control, value });
+        },
+        getControlObservable() {
+            return controlObservable;
         },
         getIsActive() {
             return isGraphActive(graphId);

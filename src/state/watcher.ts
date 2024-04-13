@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 
 import { appStore } from ".";
+import { SimpleObservable } from "../util/ObservableUtils";
 
 type WatcherState = {
     lastEditorUpdate: number | null;
@@ -18,3 +19,5 @@ export const signalEditorUpdate = () => {
         lastEditorUpdate: Date.now(),
     });
 };
+
+export const controlObservable = new SimpleObservable<any>();

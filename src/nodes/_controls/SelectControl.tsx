@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Select } from "antd";
 import { ClassicPreset } from "rete";
 
@@ -44,16 +44,29 @@ export class SelectControl extends ClassicPreset.Control {
     component() {
         const self = this;
 
+        const findValueMatch = (v: string) =>
+            self.config.values.find(({ value }) => value === v) ?? null;
+
         const _Component: React.FC = () => {
-            const defaultValue = useMemo(
-                () =>
-                    self.value
-                        ? self.config.values.find(
-                              ({ value }) => value === self.value
-                          )
-                        : null,
-                [self.config.values, self.value]
-            );
+            const [value, setValue] = useState(findValueMatch(self.value));
+
+            useEffect(() => {
+                const unsub = self.context
+                    .getControlObservable()
+                    ?.subscribe(({ pathToGraph, node, control, value }) => {
+                        if (
+                            pathToGraph[0] === self.context.pathToGraph[0] &&
+                            pathToGraph[1] === self.context.pathToGraph[1] &&
+                            node === self.nodeId &&
+                            control === self.nodeControl
+                        ) {
+                            setValue(findValueMatch(value as string));
+                        }
+                    });
+                return () => {
+                    if (unsub) unsub();
+                };
+            }, [setValue]);
             // const parentRef = useRef<any>();
             // const [lastUpdate, setLastUpdate] = useState(0);
             return (
@@ -84,8 +97,9 @@ export class SelectControl extends ClassicPreset.Control {
                             {self.config.name ?? "Option"}
                         </span>
                         <Select
-                            defaultValue={defaultValue}
+                            value={value}
                             onSelect={(_, option) => {
+                                setValue(option);
                                 self.handleChange(option.value);
                                 // setLastUpdate(Date.now());
                             }}

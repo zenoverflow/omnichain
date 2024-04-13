@@ -1,8 +1,10 @@
-import { NodeEditor } from "rete";
-import { ControlFlow, Dataflow } from "rete-engine";
-import { AreaPlugin } from "rete-area-plugin";
-import { ReactArea2D } from "rete-react-plugin";
-import { ContextMenuExtra } from "rete-context-menu-plugin";
+import type { NodeEditor } from "rete";
+import type { ControlFlow, Dataflow } from "rete-engine";
+import type { AreaPlugin } from "rete-area-plugin";
+import type { ReactArea2D } from "rete-react-plugin";
+import type { ContextMenuExtra } from "rete-context-menu-plugin";
+
+import type { SimpleObservable } from "../util/ObservableUtils";
 
 type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
@@ -49,6 +51,13 @@ export type NodeContextObj = {
         control: string,
         value: string | number
     ) => void;
+
+    getControlObservable: () => SimpleObservable<{
+        pathToGraph: string[];
+        node: string;
+        control: string;
+        value: string | number;
+    }> | null;
 
     /**
      * For visually tracking graph execution

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Input } from "antd";
 import { ClassicPreset } from "rete";
 
@@ -38,11 +39,33 @@ export class TextControl extends ClassicPreset.Control {
         const self = this;
 
         const _Component: React.FC = () => {
+            const [value, setValue] = useState(self.value);
+
+            useEffect(() => {
+                const unsub = self.context
+                    .getControlObservable()
+                    ?.subscribe(({ pathToGraph, node, control, value }) => {
+                        if (
+                            pathToGraph[0] === self.context.pathToGraph[0] &&
+                            pathToGraph[1] === self.context.pathToGraph[1] &&
+                            node === self.nodeId &&
+                            control === self.nodeControl
+                        ) {
+                            setValue(value as string);
+                        }
+                    });
+                return () => {
+                    if (unsub) unsub();
+                };
+            }, [setValue]);
+
             return self.config.large ?? false ? (
                 <Input.TextArea
-                    defaultValue={self.value}
+                    value={value}
                     onChange={(e) => {
-                        self.handleChange(e.target.value);
+                        const v = e.target.value;
+                        setValue(v);
+                        self.handleChange(v);
                     }}
                     className="c__nodecontrol"
                     onPointerDown={(e) => e.stopPropagation()}
@@ -54,9 +77,11 @@ export class TextControl extends ClassicPreset.Control {
                 />
             ) : (
                 <Input
-                    defaultValue={self.value}
+                    value={value}
                     onChange={(e) => {
-                        self.handleChange(e.target.value);
+                        const v = e.target.value;
+                        setValue(v);
+                        self.handleChange(v);
                     }}
                     className="c__nodecontrol"
                     onPointerDown={(e) => e.stopPropagation()}

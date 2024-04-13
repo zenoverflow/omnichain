@@ -15,8 +15,6 @@ export class TemplateSlotNode extends ClassicPreset.Node<
     width = 580;
     height = 490;
 
-    // controlIds: Record<string, string> = {};
-
     constructor(
         private context: NodeContextObj,
         id?: string,
@@ -27,13 +25,6 @@ export class TemplateSlotNode extends ClassicPreset.Node<
         self.id = id ?? self.id;
         //
         //
-        // self.controlIds.val = [
-        //     ...self.context.pathToGraph,
-        //     self.id,
-        //     "val",
-        // ].join("__");
-        //
-        //
         this.addControl(
             "slotName",
             new TextControl(
@@ -42,8 +33,6 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 {
                     name: "slot name",
                     initial: controls?.slotName ?? "",
-                    // id: self.controlIds.val,
-                    // large: true,
                 },
                 context
             )
@@ -54,7 +43,6 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 self.id,
                 "val",
                 {
-                    // id: self.controlIds.val,
                     initial: controls?.val ?? "",
                     large: true,
                 },
@@ -110,25 +98,13 @@ export class TemplateSlotNode extends ClassicPreset.Node<
 
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
-                // Update stored graph
+                // Update graph
                 self.context.onControlChange(
                     self.context.pathToGraph,
                     self.id,
                     "val",
                     valControl.value
                 );
-
-                // Update displayed graph (value)
-                // if (!self.context.headless) {
-                //     let target: any;
-                //     while (!target) {
-                //         target = document.getElementById(
-                //             `${self.controlIds.val}`
-                //         );
-                //         await new Promise((r) => setTimeout(r, 10));
-                //     }
-                //     target.value = valControl.value;
-                // }
 
                 return {
                     templateSlot: {

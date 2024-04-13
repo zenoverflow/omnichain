@@ -216,8 +216,6 @@ export const updateNodeControl = (
                 }),
             };
 
-            console.log("AFTER UPDATE", update);
-
             appStore.set(_graphStorageAtom, {
                 ...s,
                 [id]: update,

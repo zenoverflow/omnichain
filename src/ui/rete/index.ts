@@ -19,9 +19,9 @@ import {
     updateGraph,
     updateNodeControl,
 } from "../../state/graphs";
-import { watcherStateAtom } from "../../state/watcher";
+import { controlObservable, watcherStateAtom } from "../../state/watcher";
 import { showNotification } from "../../state/notifications";
-import { isGraphActive, updateActiveNode } from "../../state/executor";
+import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
 
 import { makeContextMenu } from "../../nodes/contextMenu";
@@ -87,8 +87,12 @@ export async function createEditor(container: HTMLElement) {
         onFlowNode(_) {
             // No exec from visual editor
         },
-        onControlChange() {
-            // No exec from visual editor
+        onControlChange(pathToGraph, node, control, value) {
+            updateNodeControl(pathToGraph, node, control, value);
+            controlObservable.next({ pathToGraph, node, control, value });
+        },
+        getControlObservable() {
+            return controlObservable;
         },
         getIsActive() {
             return isGraphActive(graphId);

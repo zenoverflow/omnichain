@@ -15,8 +15,6 @@ export class PromptBuilderNode extends ClassicPreset.Node<
     width = 580;
     height = 450;
 
-    controlIds: Record<string, string> = {};
-
     constructor(
         private context: NodeContextObj,
         id?: string,
@@ -27,13 +25,6 @@ export class PromptBuilderNode extends ClassicPreset.Node<
         self.id = id ?? self.id;
         //
         //
-        self.controlIds.val = [
-            ...self.context.pathToGraph,
-            self.id,
-            "val",
-        ].join("__");
-        //
-        //
         this.addControl(
             "val",
             new TextControl(
@@ -42,7 +33,6 @@ export class PromptBuilderNode extends ClassicPreset.Node<
                 {
                     initial: controls?.val ?? "",
                     large: true,
-                    // id: self.controlIds.val,
                 },
                 context
             )
