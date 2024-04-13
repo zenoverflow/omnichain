@@ -23,7 +23,7 @@ export type NodeContextObj = {
     /**
      * Get module options for the current graph.
      */
-    getModuleOptions: () => { label: string; value: string[] }[];
+    getModuleOptions: () => { label: string; value: string }[];
 
     /**
      * Use for logging.
@@ -47,7 +47,7 @@ export type NodeContextObj = {
         pathToGraph: string[],
         node: string,
         control: string,
-        value: string
+        value: string | number
     ) => void;
 
     /**

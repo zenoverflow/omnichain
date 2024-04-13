@@ -36,11 +36,16 @@ export class LogOutputNode extends ClassicPreset.Node<
         //
         this.addControl(
             "val",
-            new TextControl({
-                id: self.controlIds.val,
-                initial: controls?.val ?? "",
-                large: true,
-            })
+            new TextControl(
+                self.id,
+                "val",
+                {
+                    // id: self.controlIds.val,
+                    initial: controls?.val ?? "",
+                    large: true,
+                },
+                context
+            )
         );
         this.addInput(
             "trigger",

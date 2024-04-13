@@ -15,7 +15,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
     width = 580;
     height = 490;
 
-    controlIds: Record<string, string> = {};
+    // controlIds: Record<string, string> = {};
 
     constructor(
         private context: NodeContextObj,
@@ -27,29 +27,39 @@ export class TemplateSlotNode extends ClassicPreset.Node<
         self.id = id ?? self.id;
         //
         //
-        self.controlIds.val = [
-            ...self.context.pathToGraph,
-            self.id,
-            "val",
-        ].join("__");
+        // self.controlIds.val = [
+        //     ...self.context.pathToGraph,
+        //     self.id,
+        //     "val",
+        // ].join("__");
         //
         //
         this.addControl(
             "slotName",
-            new TextControl({
-                name: "slot name",
-                initial: controls?.slotName ?? "",
-                // id: self.controlIds.val,
-                // large: true,
-            })
+            new TextControl(
+                self.id,
+                "slotName",
+                {
+                    name: "slot name",
+                    initial: controls?.slotName ?? "",
+                    // id: self.controlIds.val,
+                    // large: true,
+                },
+                context
+            )
         );
         this.addControl(
             "val",
-            new TextControl({
-                id: self.controlIds.val,
-                initial: controls?.val ?? "",
-                large: true,
-            })
+            new TextControl(
+                self.id,
+                "val",
+                {
+                    // id: self.controlIds.val,
+                    initial: controls?.val ?? "",
+                    large: true,
+                },
+                context
+            )
         );
         //
         //
@@ -100,7 +110,7 @@ export class TemplateSlotNode extends ClassicPreset.Node<
 
                 valControl.value = (inputs?.in || [""])[0] || valControl.value;
 
-                // Update stored graph (value)
+                // Update stored graph
                 self.context.onControlChange(
                     self.context.pathToGraph,
                     self.id,
@@ -109,16 +119,16 @@ export class TemplateSlotNode extends ClassicPreset.Node<
                 );
 
                 // Update displayed graph (value)
-                if (!self.context.headless) {
-                    let target: any;
-                    while (!target) {
-                        target = document.getElementById(
-                            `${self.controlIds.val}`
-                        );
-                        await new Promise((r) => setTimeout(r, 10));
-                    }
-                    target.value = valControl.value;
-                }
+                // if (!self.context.headless) {
+                //     let target: any;
+                //     while (!target) {
+                //         target = document.getElementById(
+                //             `${self.controlIds.val}`
+                //         );
+                //         await new Promise((r) => setTimeout(r, 10));
+                //     }
+                //     target.value = valControl.value;
+                // }
 
                 return {
                     templateSlot: {

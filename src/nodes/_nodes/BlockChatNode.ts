@@ -34,7 +34,9 @@ export class BlockChatNode extends ClassicPreset.Node<
 
                 self.context.onFlowNode(self.id);
 
-                const action: "block" | "unblock" = self.controls.action.value;
+                const action = self.controls.action.value as
+                    | "block"
+                    | "unblock";
 
                 if (action === "block") {
                     blockChat();
@@ -68,13 +70,18 @@ export class BlockChatNode extends ClassicPreset.Node<
         );
         this.addControl(
             "action",
-            new SelectControl({
-                values: [
-                    { value: "block", label: "Block" },
-                    { value: "unblock", label: "Unblock" },
-                ],
-                initial: controls?.action ?? "block",
-            })
+            new SelectControl(
+                self.id,
+                "action",
+                {
+                    values: [
+                        { value: "block", label: "Block" },
+                        { value: "unblock", label: "Unblock" },
+                    ],
+                    initial: controls?.action ?? "block",
+                },
+                context
+            )
         );
     }
 }

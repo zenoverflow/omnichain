@@ -112,11 +112,16 @@ export class AutoTextSlicerNode extends ClassicPreset.Node<
         );
         self.addControl(
             "chunkCharacters",
-            new NumberControl({
-                initial: controls?.chunkCharacters ?? 1000,
-                name: "chunkCharacters",
-                min: 10,
-            })
+            new NumberControl(
+                self.id,
+                "chunkCharacters",
+                {
+                    initial: controls?.chunkCharacters ?? 1000,
+                    name: "chunkCharacters",
+                    min: 10,
+                },
+                context
+            )
         );
         //
         //

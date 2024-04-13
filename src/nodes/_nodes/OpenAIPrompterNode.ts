@@ -15,7 +15,7 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
         model: TextControl;
         maxTokens: NumberControl;
         temperature: NumberControl;
-        top_p: NumberControl;
+        topP: NumberControl;
         frequencyPenalty: NumberControl;
         presencePenalty: NumberControl;
         numResponses: NumberControl;
@@ -47,80 +47,125 @@ export class OpenAIPrompterNode extends ClassicPreset.Node<
         //
         this.addControl(
             "model",
-            new TextControl({
-                name: "model",
-                initial: controls?.model ?? "gpt-3.5-turbo-instruct",
-            })
+            new TextControl(
+                self.id,
+                "model",
+                {
+                    name: "model",
+                    initial: controls?.model ?? "gpt-3.5-turbo-instruct",
+                },
+                context
+            )
         );
         this.addControl(
             "maxTokens",
-            new NumberControl({
-                name: "max_tokens",
-                initial: controls?.maxTokens ?? 120,
-                min: 1,
-            })
+            new NumberControl(
+                self.id,
+                "maxTokens",
+                {
+                    name: "max_tokens",
+                    initial: controls?.maxTokens ?? 120,
+                    min: 1,
+                },
+                context
+            )
         );
         this.addControl(
             "temperature",
-            new NumberControl({
-                name: "temperature",
-                initial: controls?.temperature ?? 1.0,
-                min: 0,
-                max: 2.0,
-            })
+            new NumberControl(
+                self.id,
+                "temperature",
+                {
+                    name: "temperature",
+                    initial: controls?.temperature ?? 1.0,
+                    min: 0,
+                    max: 2.0,
+                },
+                context
+            )
         );
         this.addControl(
-            "top_p",
-            new NumberControl({
-                name: "top_p",
-                initial: controls?.top_p ?? 1.0,
-                min: 0.01,
-                max: 1.0,
-            })
+            "topP",
+            new NumberControl(
+                self.id,
+                "topP",
+                {
+                    name: "top_p",
+                    initial: controls?.topP ?? 1.0,
+                    min: 0.01,
+                    max: 1.0,
+                },
+                context
+            )
         );
         this.addControl(
             "frequencyPenalty",
-            new NumberControl({
-                name: "frequency_penalty",
-                initial: controls?.frequencyPenalty ?? 0,
-                min: -2.0,
-                max: 2.0,
-            })
+            new NumberControl(
+                self.id,
+                "frequencyPenalty",
+                {
+                    name: "frequency_penalty",
+                    initial: controls?.frequencyPenalty ?? 0,
+                    min: -2.0,
+                    max: 2.0,
+                },
+                context
+            )
         );
         this.addControl(
             "presencePenalty",
-            new NumberControl({
-                name: "presence_penalty",
-                initial: controls?.presencePenalty ?? 0,
-                min: -2.0,
-                max: 2.0,
-            })
+            new NumberControl(
+                self.id,
+                "presencePenalty",
+                {
+                    name: "presence_penalty",
+                    initial: controls?.presencePenalty ?? 0,
+                    min: -2.0,
+                    max: 2.0,
+                },
+                context
+            )
         );
         this.addControl(
             "numResponses",
-            new NumberControl({
-                name: "num_responses",
-                initial: controls?.numResponses ?? 120,
-                min: 1,
-            })
+            new NumberControl(
+                self.id,
+                "numResponses",
+                {
+                    name: "num_responses",
+                    initial: controls?.numResponses ?? 120,
+                    min: 1,
+                },
+                context
+            )
         );
         this.addControl(
             "echo",
-            new SelectControl({
-                name: "echo",
-                values: [
-                    { value: "true", label: "true" },
-                    { value: "false", label: "false" },
-                ],
-                initial: controls?.echo ?? "false",
-            })
+            new SelectControl(
+                self.id,
+                "echo",
+                {
+                    name: "echo",
+                    initial: controls?.echo ?? "false",
+                    values: [
+                        { value: "true", label: "true" },
+                        { value: "false", label: "false" },
+                    ],
+                },
+                context
+            )
         );
         this.addControl(
             "seed",
-            new NumberControl({
-                name: "seed",
-                initial: controls?.seed ?? undefined,
-            })
+            new NumberControl(
+                self.id,
+                "seed",
+                {
+                    name: "seed",
+                    initial: controls?.seed ?? undefined,
+                },
+                context
+            )
         );
         //
         // self.context.control.add(self, {

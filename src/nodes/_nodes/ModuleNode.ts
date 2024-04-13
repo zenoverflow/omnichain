@@ -42,11 +42,16 @@ export class ModuleNode extends ClassicPreset.Node<
         );
         this.addControl(
             "module",
-            new SelectControl({
-                name: "Module",
-                values: moduleOptions,
-                initial: controls?.module ?? null,
-            })
+            new SelectControl(
+                self.id,
+                "module",
+                {
+                    name: "Module",
+                    values: moduleOptions,
+                    initial: controls?.module ?? null,
+                },
+                context
+            )
         );
         //
         //
@@ -85,10 +90,12 @@ export class ModuleNode extends ClassicPreset.Node<
                     throw noInputError();
                 }
 
-                const [parentId, targetId] = self.controls.module.value ?? [
-                    null,
-                    null,
-                ];
+                if (!self.controls.module.value) {
+                    throw invaidModuleError();
+                }
+
+                const [parentId, targetId] =
+                    self.controls.module.value.split("__");
 
                 if (!parentId || !targetId) {
                     throw invaidModuleError();

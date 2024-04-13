@@ -68,6 +68,7 @@
         "rete-react-plugin": "^2.0.5",
         "rete-readonly-plugin": "^2.0.1",
         "rete-render-utils": "^2.0.2",
+        "rxjs": "^7.8.1",
         "styled-components": "^6.1.8",
         "three": "^0.156.1",
         "uuid": "^9.0.1",

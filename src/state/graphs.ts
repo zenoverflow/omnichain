@@ -29,7 +29,7 @@ export const listGraphModules = (graphId: string) => {
     if (!g) return [];
     return Object.values(g.modules).map((m) => ({
         label: m.name,
-        value: [graphId, m.graphId],
+        value: `${graphId}__${m.graphId}`,
     }));
 };
 

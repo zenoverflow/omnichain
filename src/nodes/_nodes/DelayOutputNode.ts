@@ -33,11 +33,16 @@ export class DelayOutputNode extends ClassicPreset.Node<
         );
         this.addControl(
             "millis",
-            new NumberControl({
-                initial: controls?.millis ?? 1000,
-                name: "milliseconds",
-                min: 10,
-            })
+            new NumberControl(
+                self.id,
+                "millis",
+                {
+                    initial: controls?.millis ?? 1000,
+                    name: "milliseconds",
+                    min: 10,
+                },
+                context
+            )
         );
         //
         //

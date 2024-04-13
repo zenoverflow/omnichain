@@ -138,6 +138,8 @@ export const duplicateNode = async (
         }
     }
 
+    // TODO: replace with editor pipe??
+
     signalEditorUpdate();
 };
 
@@ -174,6 +176,8 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
 
         await editor.removeNode(id);
     }
+
+    // TODO: replace with editor pipe??
 
     signalEditorUpdate();
 };

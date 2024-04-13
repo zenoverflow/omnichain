@@ -36,11 +36,16 @@ export class PromptBuilderNode extends ClassicPreset.Node<
         //
         this.addControl(
             "val",
-            new TextControl({
-                id: self.controlIds.val,
-                initial: controls?.val ?? "",
-                large: true,
-            })
+            new TextControl(
+                self.id,
+                "val",
+                {
+                    initial: controls?.val ?? "",
+                    large: true,
+                    // id: self.controlIds.val,
+                },
+                context
+            )
         );
         this.addInput(
             "parts",

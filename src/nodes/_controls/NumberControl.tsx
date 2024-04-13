@@ -1,59 +1,69 @@
-import React from "react";
-
 import { InputNumber } from "antd";
-
 import { ClassicPreset } from "rete";
 
-import { signalEditorUpdate } from "../../state/watcher";
+import type { NodeContextObj } from "../context";
 
 export class NumberControl extends ClassicPreset.Control {
-    value: number = undefined;
+    value: number | null = null;
 
     constructor(
-        public options: {
+        public nodeId: string,
+        public nodeControl: string,
+        public config: {
             name?: string;
             initial?: number;
-            readonly?: boolean;
             min?: number;
             max?: number;
-            onUpdate?: () => void;
-        }
+        },
+        private context: NodeContextObj
     ) {
         super();
-        this.value = options.initial ?? undefined;
+        this.value = config.initial ?? undefined;
+    }
+
+    private handleChange(value: number) {
+        this.value = value;
+        // Allow user to change the value
+        // But prevent dual updates during exec
+        if (!this.context.getIsActive()) {
+            this.context.onControlChange(
+                this.context.pathToGraph,
+                this.nodeId,
+                this.nodeControl,
+                value
+            );
+        }
     }
 
     component() {
         const self = this;
 
-        const NumberControlComponent: React.FC = () => {
+        const _Component: React.FC = () => {
             return (
                 <div
                     style={{
                         backgroundColor: "#fff",
                         borderRadius: "6px",
                     }}
+                    onPointerDown={(e) => e.stopPropagation()}
                 >
                     <InputNumber
-                        className="c__nodecontrol"
-                        onPointerDown={(e) => e.stopPropagation()}
-                        addonBefore={self.options.name ?? undefined}
-                        min={self.options.min ?? undefined}
-                        max={self.options.max ?? undefined}
                         defaultValue={self.value}
-                        style={{ width: "100%" }}
                         onChange={(val) => {
-                            self.value = val ?? self.options.min ?? 0;
-                            signalEditorUpdate();
-                            if (self.options.onUpdate) {
-                                self.options.onUpdate();
-                            }
+                            self.handleChange(val ?? self.config.min ?? 0);
+                            // self.value = val ?? self.config.min ?? 0;
+                            // signalEditorUpdate();
                         }}
+                        min={self.config.min ?? undefined}
+                        max={self.config.max ?? undefined}
+                        className="c__nodecontrol"
+                        addonBefore={self.config.name ?? undefined}
+                        style={{ width: "100%" }}
                     />
                 </div>
             );
         };
 
-        return NumberControlComponent;
+        return _Component;
     }
 }

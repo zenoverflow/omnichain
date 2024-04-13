@@ -1,48 +1,65 @@
-import React, { useRef, useState } from "react";
-
+import { useMemo } from "react";
 import { Select } from "antd";
-
 import { ClassicPreset } from "rete";
 
-import { signalEditorUpdate } from "../../state/watcher";
+import type { NodeContextObj } from "../context";
+
+type SelectValue = {
+    value: string;
+    label: string;
+};
 
 export class SelectControl extends ClassicPreset.Control {
-    value: any | null = null;
+    value: string | null = null;
 
     constructor(
-        public options: {
+        public nodeId: string,
+        public nodeControl: string,
+        public config: {
             name?: string;
             showSearch?: boolean;
-            values: {
-                value: any;
-                label: string;
-            }[];
+            values: SelectValue[];
             initial?: string | null;
-            readonly?: boolean;
-            onUpdate?: () => void;
-        }
+        },
+        private context: NodeContextObj
     ) {
         super();
-        this.value = options.initial ?? null;
+        this.value = config.initial ?? null;
+    }
+
+    private handleChange(value: string) {
+        this.value = value;
+        // Allow user to change the value
+        // But prevent dual updates during exec
+        if (!this.context.getIsActive()) {
+            this.context.onControlChange(
+                this.context.pathToGraph,
+                this.nodeId,
+                this.nodeControl,
+                value
+            );
+        }
     }
 
     component() {
         const self = this;
 
-        const TextControlComponent: React.FC = () => {
-            const defaultValue = self.value
-                ? self.options.values.find(
-                      ({ value }) =>
-                          value[0] === self.value[0] &&
-                          value[1] === self.value[1]
-                  )
-                : null;
-            const parentRef = useRef<any>();
-            const [lastUpdate, setLastUpdate] = useState(0);
+        const _Component: React.FC = () => {
+            const defaultValue = useMemo(
+                () =>
+                    self.value
+                        ? self.config.values.find(
+                              ({ value }) => value === self.value
+                          )
+                        : null,
+                [self.config.values, self.value]
+            );
+            // const parentRef = useRef<any>();
+            // const [lastUpdate, setLastUpdate] = useState(0);
             return (
                 <div
-                    key={lastUpdate}
-                    ref={parentRef}
+                    // key={lastUpdate}
+                    // ref={parentRef}
                     onPointerDown={(e) => e.stopPropagation()}
                 >
                     <div
@@ -64,42 +81,33 @@ export class SelectControl extends ClassicPreset.Control {
                                 backgroundColor: "#fafafa",
                             }}
                         >
-                            {self.options.name ?? "Option"}
+                            {self.config.name ?? "Option"}
                         </span>
                         <Select
-                            showSearch={self.options.showSearch ?? false}
-                            // optionFilterProp="children"
-                            className="c__rmleftrad c__nodecontrol"
-                            style={{
-                                flex: "1",
-                            }}
                             defaultValue={defaultValue}
                             onSelect={(_, option) => {
-                                self.value = option.value;
-                                signalEditorUpdate();
-                                if (self.options.onUpdate) {
-                                    self.options.onUpdate();
-                                }
-                                setLastUpdate(Date.now());
+                                self.handleChange(option.value);
+                                // setLastUpdate(Date.now());
                             }}
+                            options={self.config.values}
+                            className="c__rmleftrad c__nodecontrol"
+                            style={{ flex: "1" }}
+                            showSearch={self.config.showSearch ?? false}
                             // onSearch={() => {}}
-                            filterOption={(
-                                input: string,
-                                option?: { label: string; value: string }
-                            ) =>
-                                input.trim().length
-                                    ? (option?.label ?? "")
-                                          .toLowerCase()
-                                          .includes(input.toLowerCase())
-                                    : true
-                            }
-                            options={self.options.values}
+                            // optionFilterProp="children"
+                            // filterOption={(input, option) =>
+                            //     input.trim().length
+                            //         ? option.label
+                            //               .toLowerCase()
+                            //               .includes(input.toLowerCase())
+                            //         : true
+                            // }
                         />
                     </div>
                 </div>
             );
         };
 
-        return TextControlComponent;
+        return _Component;
     }
 }
