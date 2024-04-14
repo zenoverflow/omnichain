@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAtom } from "jotai";
 import {
     MenuUnfoldOutlined,
@@ -22,20 +22,10 @@ const { Header, Content } = Layout;
 
 const EditorContent: React.FC = () => {
     const [{ path: editorPath }] = useAtom(editorStateAtom);
-
-    // EDIT: prevent graph refresh on exec
-    // replaced with manual readonly plugin control
-    // const [executor] = useAtom(executorAtom);
-    // const key = useMemo(() => {
-    //     const k1 = editorPath.join("__");
-    //     const k2 = Object.keys(executor).join("__");
-    //     return `${k1}__${k2}`;
-    // }, [editorPath, executor]);
-
     return (
         <Content
             id="TheEditor"
-            // key={key}
+            key={editorPath.join("__")}
             style={{
                 margin: 0,
                 padding: 0,

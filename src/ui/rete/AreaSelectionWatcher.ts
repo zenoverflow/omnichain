@@ -2,14 +2,14 @@ import { NodeContextObj } from "../../nodes/context";
 
 import { updateNodeSelection } from "../../state/nodeSelection";
 
-export class AreaSelection {
+export class AreaSelectionWatcher {
     /**
      * Activate area selection.
      * Plugin must be configured beforehand.
      *
      * @param nodeContext
      */
-    public static activate(nodeContext: NodeContextObj): void {
+    public static observe(nodeContext: NodeContextObj): void {
         const { editor, area } = nodeContext;
 
         if (!editor || !area) return;

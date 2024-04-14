@@ -154,7 +154,7 @@ export const runGraph = async (graphId: string) => {
 
     // Hydrate
     await GraphUtils.hydrate(target, {
-        headless: false,
+        headless: true,
         pathToGraph: [graphId],
         editor,
         control,
@@ -203,7 +203,7 @@ export const runGraph = async (graphId: string) => {
             return isGraphActive(graphId);
         },
         unselect() {
-            //
+            // No selection in headless
         },
     });
 

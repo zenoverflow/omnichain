@@ -8,6 +8,7 @@ import { SelectControl } from "../_controls/SelectControl";
 
 import { appStore } from "../../state";
 import { graphStorageAtom } from "../../state/graphs";
+import { controlObservable } from "../../state/watcher";
 import { GraphUtils } from "../../util/GraphUtils";
 
 import { ModuleInputNode, ModuleOutputNode } from "..";
@@ -152,11 +153,14 @@ export class ModuleNode extends ClassicPreset.Node<
                             value
                         );
                     },
+                    getControlObservable() {
+                        return controlObservable;
+                    },
                     getIsActive() {
                         return self.context.getIsActive();
                     },
                     unselect() {
-                        //
+                        // No selection in headless
                     },
                 });
 

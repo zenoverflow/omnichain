@@ -1,7 +1,6 @@
 import { atom } from "jotai";
 
 import { appStore } from ".";
-
 import {
     createGraph,
     deleteGraph,
@@ -10,7 +9,6 @@ import {
 } from "./graphs";
 import { runGraph, stopGraph } from "./executor";
 import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
-import { signalEditorUpdate } from "./watcher";
 import * as NODE_MAKERS from "../nodes";
 import { NodeContextObj } from "../nodes/context";
 import { StartNode, ModuleInputNode, ModuleOutputNode } from "../nodes";
@@ -137,10 +135,6 @@ export const duplicateNode = async (
             );
         }
     }
-
-    // TODO: replace with editor pipe??
-
-    signalEditorUpdate();
 };
 
 /**
@@ -176,10 +170,6 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
 
         await editor.removeNode(id);
     }
-
-    // TODO: replace with editor pipe??
-
-    signalEditorUpdate();
 };
 
 /**

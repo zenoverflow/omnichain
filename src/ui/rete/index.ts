@@ -16,10 +16,9 @@ import { editorStateAtom } from "../../state/editor";
 import {
     initGraph,
     listGraphModules,
-    updateGraph,
     updateNodeControl,
 } from "../../state/graphs";
-import { controlObservable, watcherStateAtom } from "../../state/watcher";
+import { controlObservable } from "../../state/watcher";
 import { showNotification } from "../../state/notifications";
 import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
@@ -28,7 +27,7 @@ import { makeContextMenu } from "../../nodes/contextMenu";
 import { AreaExtra, NodeContextObj } from "../../nodes/context";
 
 import { GraphWatcher } from "./GraphWatcher";
-import { AreaSelection } from "./AreaSelection";
+import { AreaSelectionWatcher } from "./AreaSelectionWatcher";
 import { FlowWatcher } from "./FlowWatcher";
 import { NodeCustomizer } from "./NodeCustomizer";
 import { FlowCustomizer } from "./FlowCustomizer";
@@ -40,7 +39,6 @@ import { integrateMagneticConnection } from "./magconnection";
 export async function createEditor(container: HTMLElement) {
     const pathToGraph = appStore.get(editorStateAtom).path;
     const graphId = pathToGraph[0];
-    // const activeOnInit = isGraphActive(graphId);
 
     const editor = new NodeEditor<any>();
     const control = new ControlFlow(editor);
@@ -51,6 +49,16 @@ export async function createEditor(container: HTMLElement) {
     const render = new ReactPlugin<any, AreaExtra>({
         createRoot,
     });
+
+    const nodeSelector = AreaExtensions.selector();
+    const nodeSelectorPlugin = AreaExtensions.selectableNodes(
+        area,
+        nodeSelector,
+        {
+            accumulating: AreaExtensions.accumulateOnCtrl(),
+        }
+    );
+    // nodeContext.unselect = nodeSelectorPlugin.unselect;
 
     const nodeContext: NodeContextObj = {
         headless: false,
@@ -97,9 +105,7 @@ export async function createEditor(container: HTMLElement) {
         getIsActive() {
             return isGraphActive(graphId);
         },
-        unselect() {
-            //
-        },
+        unselect: nodeSelectorPlugin.unselect,
     };
 
     // const arrange = new AutoArrangePlugin<any>();
@@ -112,42 +118,14 @@ export async function createEditor(container: HTMLElement) {
     //     },
     // });
 
-    // Listen to value update signals from custom nodes' controls
-    const watcherSubCleanup = appStore.sub(watcherStateAtom, () => {
-        if (isGraphActive(graphId)) return;
-        updateGraph(editor, area, pathToGraph, "subclean");
-    });
-
-    // // Readonly if running
-    // if (activeOnInit) {
-    //     editor.use(readonly.root);
-    //     area.use(readonly.area);
-    // }
-    //
-    // else {
-    // EDIT: always use readonly plugin
     editor.use(readonly.root);
     area.use(readonly.area);
-    // @ts-ignore
-    connection.use(readonly.connection);
-
-    const nodeSelector = AreaExtensions.selector();
-    const nodeSelectorPlugin = AreaExtensions.selectableNodes(
-        area,
-        nodeSelector,
-        {
-            accumulating: AreaExtensions.accumulateOnCtrl(),
-        }
-    );
-    nodeContext.unselect = nodeSelectorPlugin.unselect;
-    // }
+    connection.use(readonly.connection as any);
 
     editor.use(area);
     area.use(render);
     render.addPreset(NodeCustomizer.presetForNodes(nodeContext));
 
-    // // Readonly if running
-    // if (!activeOnInit) {
     area.use(connection);
     integrateMagneticConnection(nodeContext, connection);
     // area.use(arrange);
@@ -155,13 +133,11 @@ export async function createEditor(container: HTMLElement) {
     connection.addPreset(FlowCustomizer.getFlowBuilder(connection));
     // arrange.addPreset(ArrangePresets.classic.setup());
 
-    AreaSelection.activate(nodeContext);
-    FlowWatcher.observe(nodeContext);
-    // }
-
     try {
         await initGraph(nodeContext);
 
+        AreaSelectionWatcher.observe(nodeContext);
+        FlowWatcher.observe(nodeContext);
         GraphWatcher.observe(nodeContext);
 
         // Default content for new graphs
@@ -189,8 +165,7 @@ export async function createEditor(container: HTMLElement) {
                 nodeContext.unselect(id);
             }
             updateNodeSelection([]);
-
-            watcherSubCleanup();
+            // Cleanup area
             area.destroy();
         },
     };

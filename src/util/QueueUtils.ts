@@ -7,7 +7,7 @@ export class QueueUtils {
                 await _queue.shift()();
                 setTimeout(runner, 1);
             } else {
-                setTimeout(runner, 120);
+                setTimeout(runner, 30);
             }
         };
         void runner();
