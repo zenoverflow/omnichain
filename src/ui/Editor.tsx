@@ -21,11 +21,11 @@ import { loaderAtom } from "../state/loader";
 const { Header, Content } = Layout;
 
 const EditorContent: React.FC = () => {
-    const [{ path: editorPath }] = useAtom(editorStateAtom);
+    const [{ graphId }] = useAtom(editorStateAtom);
     return (
         <Content
             id="TheEditor"
-            key={editorPath.join("__")}
+            key={graphId}
             style={{
                 margin: 0,
                 padding: 0,
@@ -35,14 +35,14 @@ const EditorContent: React.FC = () => {
                 animation: "fadeIn .5s",
             }}
         >
-            {editorPath.length > 0 ? <EditorGraph /> : <ChatInterface />}
+            {graphId ? <EditorGraph /> : <ChatInterface />}
         </Content>
     );
 };
 
 export const Editor: React.FC = () => {
     const [siderCollapsed, setSiderCollapsed] = useState(false);
-    const [{ path: editorPath }] = useAtom(editorStateAtom);
+    const [{ graphId }] = useAtom(editorStateAtom);
     const [loading] = useAtom(loaderAtom);
 
     return (
@@ -75,7 +75,7 @@ export const Editor: React.FC = () => {
                         )}
                     </div>
                     <Space align="center">
-                        {editorPath.length > 0 ? (
+                        {graphId ? (
                             <Button
                                 type="primary"
                                 size="large"

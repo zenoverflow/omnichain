@@ -11,7 +11,6 @@ export type SerializedGraph = {
     graphId: string;
     nodes: SerializedNode[];
     connections: any[];
-    modules: Record<string, SerializedGraph>;
     zoom: number;
     areaX: number;
     areaY: number;

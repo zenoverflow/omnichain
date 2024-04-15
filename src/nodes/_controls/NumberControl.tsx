@@ -4,22 +4,24 @@ import { ClassicPreset } from "rete";
 
 import type { NodeContextObj } from "../context";
 
+export type NumberControlConfig = {
+    label?: string;
+    min?: number;
+    max?: number;
+};
+
 export class NumberControl extends ClassicPreset.Control {
     value: number | null = null;
 
     constructor(
         public nodeId: string,
         public nodeControl: string,
-        public config: {
-            name?: string;
-            initial?: number;
-            min?: number;
-            max?: number;
-        },
+        public defaultValue: number,
+        public config: NumberControlConfig,
         private context: NodeContextObj
     ) {
         super();
-        this.value = config.initial ?? undefined;
+        this.value = defaultValue;
     }
 
     private handleChange(value: number) {
@@ -28,7 +30,7 @@ export class NumberControl extends ClassicPreset.Control {
         // But prevent dual updates during exec
         if (!this.context.getIsActive()) {
             this.context.onControlChange(
-                this.context.pathToGraph,
+                this.context.graphId,
                 this.nodeId,
                 this.nodeControl,
                 value
@@ -45,10 +47,9 @@ export class NumberControl extends ClassicPreset.Control {
             useEffect(() => {
                 const unsub = self.context
                     .getControlObservable()
-                    ?.subscribe(({ pathToGraph, node, control, value }) => {
+                    ?.subscribe(({ graphId, node, control, value }) => {
                         if (
-                            pathToGraph[0] === self.context.pathToGraph[0] &&
-                            pathToGraph[1] === self.context.pathToGraph[1] &&
+                            graphId === self.context.graphId &&
                             node === self.nodeId &&
                             control === self.nodeControl
                         ) {
@@ -80,7 +81,7 @@ export class NumberControl extends ClassicPreset.Control {
                         min={self.config.min ?? undefined}
                         max={self.config.max ?? undefined}
                         className="c__nodecontrol"
-                        addonBefore={self.config.name ?? undefined}
+                        addonBefore={self.config.label ?? undefined}
                         style={{ width: "100%" }}
                     />
                 </div>

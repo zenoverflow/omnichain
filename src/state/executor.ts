@@ -7,7 +7,6 @@ import { graphStorageAtom, updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { GraphUtils } from "../util/GraphUtils";
-import { StartNode } from "../nodes/";
 
 type ExecutorInstance = {
     graphId: string;
@@ -62,38 +61,12 @@ const markActiveNode = (force = false) => {
         for (const inst of execInstances) {
             if (!inst.step) continue;
 
-            const execPieces = inst.step.split("__");
-
-            // Node in main graph
-            if (execPieces.length === 1) {
-                targets.push(
-                    `${[
-                        `[data-exec-graph="${inst.graphId}"]`,
-                        `[data-exec-node="${execPieces[0]}"]`,
-                    ].join("")}`
-                );
-            }
-            // Node in module
-            else if (execPieces.length === 3) {
-                const [moduleNodeId, moduleId, nodeId] = execPieces;
-                // Module node in main graph
-                targets.push(
-                    `${[
-                        `[data-exec-graph="${inst.graphId}"]`,
-                        `[data-exec-node="${moduleNodeId}"]`,
-                        `[data-exec-is-module-node="1"]`,
-                        `[data-exec-is-module-node-val="${moduleId}"]`,
-                    ].join("")}`
-                );
-                // Node in module
-                targets.push(
-                    `${[
-                        `[data-exec-graph="${inst.graphId}"]`,
-                        `[data-exec-module="${moduleId}"]`,
-                        `[data-exec-node="${nodeId}"]`,
-                    ].join("")}`
-                );
-            }
+            targets.push(
+                `${[
+                    `[data-exec-graph="${inst.graphId}"]`,
+                    `[data-exec-node="${inst.step}"]`,
+                ].join("")}`
+            );
         }
         for (const query of targets) {
             const tNode: HTMLElement | null = document.querySelector(query);
@@ -109,12 +82,12 @@ const markActiveNode = (force = false) => {
     setTimeout(() => markActiveNode(true), 250);
 };
 
-export const stopGraph = (id: string) => {
+export const stopGraph = (graphId: string) => {
     appStore.set(
         _executorAtom,
         Object.fromEntries(
             Object.entries(appStore.get(_executorAtom)).filter(
-                ([key]) => key !== id
+                ([key]) => key !== graphId
             )
         )
     );
@@ -124,7 +97,7 @@ export const runGraph = async (graphId: string) => {
     const target = appStore.get(graphStorageAtom)[graphId];
 
     // Ensure entrypoint presence
-    const triggers = target.nodes.filter((n) => n.nodeType === StartNode.name);
+    const triggers = target.nodes.filter((n) => n.nodeType === "StartNode");
 
     if (!triggers.length) {
         showNotification({
@@ -155,18 +128,10 @@ export const runGraph = async (graphId: string) => {
     // Hydrate
     await GraphUtils.hydrate(target, {
         headless: true,
-        pathToGraph: [graphId],
+        graphId,
         editor,
         control,
         dataflow,
-        getModuleOptions() {
-            /*
-            No graphical inputs in headless mode
-            Also value is set programmatically
-            on a higher-level object.
-            */
-            return [];
-        },
         onEvent(event) {
             const { type, text } = event;
             showNotification({
@@ -188,13 +153,13 @@ export const runGraph = async (graphId: string) => {
             if (!isGraphActive(graphId)) return;
             control.execute(nodeId);
         },
-        onFlowNode(execId) {
+        onFlowNode(nodeId) {
             if (!isGraphActive(graphId)) return;
-            updateActiveNode(graphId, execId);
+            updateActiveNode(graphId, nodeId);
         },
-        onControlChange(pathToGraph, node, control, value) {
-            updateNodeControl(pathToGraph, node, control, value);
-            controlObservable.next({ pathToGraph, node, control, value });
+        onControlChange(graphId, node, control, value) {
+            updateNodeControl(graphId, node, control, value);
+            controlObservable.next({ graphId, node, control, value });
         },
         getControlObservable() {
             return controlObservable;
@@ -209,9 +174,7 @@ export const runGraph = async (graphId: string) => {
 
     try {
         // Work one-time auto triggers
-        const targets = Object.keys({
-            StartNode,
-        });
+        const targets = ["StartNode"];
         const triggerNodes = editor
             .getNodes()
             .filter((n) => targets.includes(n.label));

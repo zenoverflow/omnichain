@@ -14,7 +14,6 @@ export class GraphUtils {
             graphId: uuidv4(),
             nodes: [],
             connections: [],
-            modules: {},
             zoom: 1,
             areaX: 0,
             areaY: 0,

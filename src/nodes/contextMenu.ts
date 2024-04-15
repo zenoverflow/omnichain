@@ -1,5 +1,3 @@
-import { StartNode, ModuleInputNode, ModuleOutputNode, ModuleNode } from ".";
-
 import * as NODE_MAKERS from ".";
 
 import { NodeContextObj } from "./context";
@@ -8,7 +6,7 @@ import { showContextMenu } from "../state/editorContextMenu";
 import { isGraphActive } from "../state/executor";
 
 const makeRootMenu = (nodeContext: NodeContextObj) => {
-    const { pathToGraph, editor, area } = nodeContext;
+    const { editor, area } = nodeContext;
 
     if (!editor || !area) {
         throw new Error("Context menu: editor/area missing!");
@@ -16,41 +14,15 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
 
     const entrypointsCount = editor
         .getNodes()
-        .filter((n) => n instanceof StartNode).length;
-
-    const moduleInputsCount = editor
-        .getNodes()
-        .filter((n) => n instanceof ModuleInputNode).length;
-
-    const moduleOutputsCount = editor
-        .getNodes()
-        .filter((n) => n instanceof ModuleOutputNode).length;
+        .filter((n) => n.label === "StartNode").length;
 
     const { x, y } = area.area.pointer;
 
     const filtered = Object.entries(NODE_MAKERS)
         .filter(([key]) => {
-            if (pathToGraph.length === 1) {
-                if (key === StartNode.name) {
-                    // Prevent adding more than 1 entrypoint
-                    return entrypointsCount < 1;
-                }
-                // Block module-specific nodes in main graph
-                return ![ModuleInputNode.name, ModuleOutputNode.name].includes(
-                    key
-                );
-            }
-            if (pathToGraph.length === 2) {
-                // Prevent adding more than one module input
-                if (key === ModuleInputNode.name) {
-                    return moduleInputsCount < 1;
-                }
-                // Prevent adding more than one module output
-                if (key === ModuleOutputNode.name) {
-                    return moduleOutputsCount < 1;
-                }
-                // Main-graph-specific nodes are forbidden inside modules
-                return ![ModuleNode.name, StartNode.name].includes(key);
+            if (key === "StartNode") {
+                // Prevent adding more than 1 entrypoint
+                return entrypointsCount < 1;
             }
             return true;
         })
@@ -112,7 +84,7 @@ export const makeContextMenu = (nodeContext: NodeContextObj) => {
     area.addPipe((ctx) => {
         if (ctx.type === "contextmenu") {
             ctx.data.event.preventDefault();
-            if (isGraphActive(nodeContext.pathToGraph[0])) return;
+            if (isGraphActive(nodeContext.graphId[0])) return;
 
             const target = ctx.data.event.target as HTMLElement;
             let menuCtx = findContextMenu(target);

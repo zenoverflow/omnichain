@@ -4,21 +4,23 @@ import { ClassicPreset } from "rete";
 
 import type { NodeContextObj } from "../context";
 
+export type TextControlConfig = {
+    large?: boolean;
+    label?: string;
+};
+
 export class TextControl extends ClassicPreset.Control {
-    public value = "";
+    public value: string;
 
     constructor(
         public nodeId: string,
         public nodeControl: string,
-        private config: {
-            large?: boolean;
-            name?: string;
-            initial?: string;
-        },
+        public defaultValue: string,
+        private config: TextControlConfig,
         private context: NodeContextObj
     ) {
         super();
-        this.value = config.initial ?? "";
+        this.value = defaultValue;
     }
 
     private handleChange(value: string) {
@@ -27,7 +29,7 @@ export class TextControl extends ClassicPreset.Control {
         // But prevent dual updates during exec
         if (!this.context.getIsActive()) {
             this.context.onControlChange(
-                this.context.pathToGraph,
+                this.context.graphId,
                 this.nodeId,
                 this.nodeControl,
                 value
@@ -44,10 +46,9 @@ export class TextControl extends ClassicPreset.Control {
             useEffect(() => {
                 const unsub = self.context
                     .getControlObservable()
-                    ?.subscribe(({ pathToGraph, node, control, value }) => {
+                    ?.subscribe(({ graphId, node, control, value }) => {
                         if (
-                            pathToGraph[0] === self.context.pathToGraph[0] &&
-                            pathToGraph[1] === self.context.pathToGraph[1] &&
+                            graphId === self.context.graphId &&
                             node === self.nodeId &&
                             control === self.nodeControl
                         ) {
@@ -85,7 +86,7 @@ export class TextControl extends ClassicPreset.Control {
                     }}
                     className="c__nodecontrol"
                     onPointerDown={(e) => e.stopPropagation()}
-                    addonBefore={self.config.name ?? "text"}
+                    addonBefore={self.config.label ?? "text"}
                     styles={{
                         prefix: {
                             backgroundColor: "#fafafa",

@@ -9,22 +9,24 @@ type SelectValue = {
     label: string;
 };
 
+export type SelectControlConfig = {
+    label?: string;
+    showSearch?: boolean;
+    values: SelectValue[];
+};
+
 export class SelectControl extends ClassicPreset.Control {
     value: string | null = null;
 
     constructor(
         public nodeId: string,
         public nodeControl: string,
-        public config: {
-            name?: string;
-            showSearch?: boolean;
-            values: SelectValue[];
-            initial?: string | null;
-        },
+        public defaultValue: string,
+        public config: SelectControlConfig,
         private context: NodeContextObj
     ) {
         super();
-        this.value = config.initial ?? null;
+        this.value = defaultValue;
     }
 
     private handleChange(value: string) {
@@ -33,7 +35,7 @@ export class SelectControl extends ClassicPreset.Control {
         // But prevent dual updates during exec
         if (!this.context.getIsActive()) {
             this.context.onControlChange(
-                this.context.pathToGraph,
+                this.context.graphId,
                 this.nodeId,
                 this.nodeControl,
                 value
@@ -53,10 +55,9 @@ export class SelectControl extends ClassicPreset.Control {
             useEffect(() => {
                 const unsub = self.context
                     .getControlObservable()
-                    ?.subscribe(({ pathToGraph, node, control, value }) => {
+                    ?.subscribe(({ graphId, node, control, value }) => {
                         if (
-                            pathToGraph[0] === self.context.pathToGraph[0] &&
-                            pathToGraph[1] === self.context.pathToGraph[1] &&
+                            graphId === self.context.graphId &&
                             node === self.nodeId &&
                             control === self.nodeControl
                         ) {
@@ -94,7 +95,7 @@ export class SelectControl extends ClassicPreset.Control {
                                 backgroundColor: "#fafafa",
                             }}
                         >
-                            {self.config.name ?? "Option"}
+                            {self.config.label ?? "Option"}
                         </span>
                         <Select
                             value={value}

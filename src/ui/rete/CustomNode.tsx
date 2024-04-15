@@ -1,11 +1,7 @@
 import React, { useMemo } from "react";
-
 import styled, { css } from "styled-components";
-
 import { ClassicScheme, RenderEmit, Presets } from "rete-react-plugin";
 
-import { NodeContextObj } from "../../nodes/context";
-import { ModuleNode } from "../../nodes";
 import { getMenuIcon } from "../../nodes/icons";
 
 const SOCKET_MARGIN = 6;
@@ -128,20 +124,10 @@ type Props<S extends ClassicScheme> = {
 };
 
 const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
-    const { pathToGraph }: NodeContextObj = props.node.context;
     return (
         <div
-            data-exec-graph={pathToGraph[0]}
-            data-exec-module={pathToGraph[1]}
+            data-exec-graph={props.node.context.graphId}
             data-exec-node={props.node.id}
-            data-exec-is-module-node={
-                props.node instanceof ModuleNode ? "1" : "0"
-            }
-            data-exec-is-module-node-val={
-                props.node instanceof ModuleNode
-                    ? (props.node.controls.module?.value ?? [])[1] || ""
-                    : ""
-            }
             style={{
                 display: "none",
                 position: "absolute",

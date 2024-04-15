@@ -14,9 +14,9 @@ let debouncerAreaZoom: NodeJS.Timeout | null = null;
 
 export class GraphWatcher {
     public static observe(nodeContext: NodeContextObj) {
-        const { editor, area, pathToGraph } = nodeContext;
+        const { editor, area, graphId } = nodeContext;
 
-        if (!editor || !area || !pathToGraph.length) return;
+        if (!editor || !area || !graphId) return;
 
         editor.addPipe((context) => {
             if (
@@ -30,7 +30,7 @@ export class GraphWatcher {
                     ] as (typeof context.type)[]
                 ).includes(context.type)
             ) {
-                updateGraph(editor, area, pathToGraph, "pipe 1");
+                updateGraph(editor, area, graphId, "pipe 1");
             }
             return context;
         });
@@ -46,7 +46,7 @@ export class GraphWatcher {
                     "cleared",
                 ].includes(context.type)
             ) {
-                updateGraph(editor, area, pathToGraph, "pipe 2");
+                updateGraph(editor, area, graphId, "pipe 2");
                 return context;
             }
             // DEBOUNCED EVENTS
@@ -59,7 +59,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerNodeResize);
                     }
                     debouncerNodeResize = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph, "pipe 4");
+                        updateGraph(editor, area, graphId, "pipe 4");
                     }, 50);
                     break;
 
@@ -68,7 +68,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerNodeTranslate);
                     }
                     debouncerNodeTranslate = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph, "pipe 5");
+                        updateGraph(editor, area, graphId, "pipe 5");
                     }, 50);
                     break;
 
@@ -77,7 +77,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerAreaReorder);
                     }
                     debouncerAreaReorder = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph, "pipe 6");
+                        updateGraph(editor, area, graphId, "pipe 6");
                     }, 50);
                     break;
 
@@ -86,7 +86,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerAreaTranslate);
                     }
                     debouncerAreaTranslate = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph, "pipe 7");
+                        updateGraph(editor, area, graphId, "pipe 7");
                     }, 50);
                     break;
 
@@ -95,7 +95,7 @@ export class GraphWatcher {
                         clearTimeout(debouncerAreaZoom);
                     }
                     debouncerAreaZoom = setTimeout(() => {
-                        updateGraph(editor, area, pathToGraph, "pipe 8");
+                        updateGraph(editor, area, graphId, "pipe 8");
                     }, 50);
                     break;
             }

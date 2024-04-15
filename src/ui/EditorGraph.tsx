@@ -27,7 +27,6 @@ import { nodeSelectionAtom } from "../state/nodeSelection";
 import { appStore } from "../state";
 import { executorAtom } from "../state/executor";
 
-import { BtnCreateModule } from "./_EditorGraph/BtnCreateModule";
 import { NodeContextObj } from "../nodes/context";
 import { ContextMenu } from "./_EditorGraph/ContextMenu";
 
@@ -44,10 +43,10 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
             if (e.key === "Delete" && targets.length) {
                 // Prevent deletions on active graph
                 const editorState = appStore.get(editorStateAtom);
-                const currentGraphPath = editorState?.path;
-                if (currentGraphPath.length) {
+                const currentGraph = editorState?.graphId;
+                if (currentGraph.length) {
                     const executorState = appStore.get(executorAtom);
-                    if (!executorState[currentGraphPath[0]]) {
+                    if (!executorState[currentGraph[0]]) {
                         await deleteSelectedNodes(props.nodeContext);
                     }
                 }
@@ -88,13 +87,13 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
 };
 
 const GraphRunButton: React.FC = () => {
-    const [{ path }] = useAtom(editorStateAtom);
+    const [{ graphId }] = useAtom(editorStateAtom);
     const [executor] = useAtom(executorAtom);
 
-    const graphIsActive = useMemo(() => !!executor[path[0]], [path, executor]);
-
-    // Can't run modules
-    if (path.length > 1) return null;
+    const graphIsActive = useMemo(
+        () => !!executor[graphId],
+        [graphId, executor]
+    );
 
     if (graphIsActive) {
         return (
@@ -127,14 +126,14 @@ export const EditorGraph: React.FC = () => {
 
     const [currentGraph] = useAtom(currentGraphAtom);
 
-    const [{ path }] = useAtom(editorStateAtom);
+    const [{ graphId }] = useAtom(editorStateAtom);
 
     const [executor] = useAtom(executorAtom);
 
     // Disable editing if graph is active
     const editingDisabled = useMemo(
-        () => !!executor[path[0]],
-        [executor, path]
+        () => !!executor[graphId],
+        [executor, graphId]
     );
 
     // Disable/enable controls manually
@@ -207,7 +206,6 @@ export const EditorGraph: React.FC = () => {
                     }}
                 >
                     <Space align="center" style={{ pointerEvents: "all" }}>
-                        <BtnCreateModule />
                         <Button
                             type="primary"
                             size="large"

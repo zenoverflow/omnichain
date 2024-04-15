@@ -9,23 +9,17 @@ import type { SimpleObservable } from "../util/ObservableUtils";
 type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
     text: string;
-    pathToGraph: string[];
 };
 
 export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
 export type NodeContextObj = {
     headless: boolean;
-    pathToGraph: string[];
+    graphId: string;
     editor: NodeEditor<any>;
     control: ControlFlow<any>;
     dataflow: Dataflow<any>;
     area?: AreaPlugin<any, AreaExtra>;
-
-    /**
-     * Get module options for the current graph.
-     */
-    getModuleOptions: () => { label: string; value: string }[];
 
     /**
      * Use for logging.
@@ -46,14 +40,14 @@ export type NodeContextObj = {
      * For saving node updates during execution
      */
     onControlChange: (
-        pathToGraph: string[],
+        graphId: string,
         node: string,
         control: string,
         value: string | number
     ) => void;
 
     getControlObservable: () => SimpleObservable<{
-        pathToGraph: string[];
+        graphId: string;
         node: string;
         control: string;
         value: string | number;
@@ -62,7 +56,7 @@ export type NodeContextObj = {
     /**
      * For visually tracking graph execution
      */
-    onFlowNode: (execId: string) => any;
+    onFlowNode: (nodeId: string) => any;
 
     /**
      * For tracking and stopping graph execution.

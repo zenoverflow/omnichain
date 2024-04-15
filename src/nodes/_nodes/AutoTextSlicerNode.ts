@@ -1,10 +1,11 @@
-import { ClassicPreset } from "rete";
-import { GroupOutlined } from "@ant-design/icons";
+// import { ClassicPreset } from "rete";
+// import { GroupOutlined } from "@ant-design/icons";
 
-import { NodeContextObj } from "../context";
-import { StringSocket } from "../_sockets/StringSocket";
-import { StringArraySocket } from "../_sockets/StringArraySocket";
-import { NumberControl } from "../_controls/NumberControl";
+// import { NodeContextObj } from "../context";
+// import { StringSocket } from "../_sockets/StringSocket";
+// import { StringArraySocket } from "../_sockets/StringArraySocket";
+// import { NumberControl } from "../_controls/NumberControl";
+import { makeNode } from "./_Base";
 
 const SEPARATORS = [".", "!", "?", "。", "！", "？", "।", "،", "؛", "؟"];
 
@@ -84,92 +85,144 @@ const _roughSplit = (
     return chunks;
 };
 
-export class AutoTextSlicerNode extends ClassicPreset.Node<
-    { dataIn: StringSocket },
-    { dataOut: StringArraySocket },
-    { chunkCharacters: NumberControl }
-> {
-    public static icon = GroupOutlined;
-    width = 300;
-    height = 165;
-
-    constructor(
-        private context: NodeContextObj,
-        id?: string,
-        controls?: Record<string, any>
-    ) {
-        super(AutoTextSlicerNode.name);
-        const self = this;
-        self.id = id ?? self.id;
-        //
-        self.addInput(
-            "dataIn",
-            new ClassicPreset.Input(new StringSocket(), "text")
-        );
-        self.addOutput(
-            "dataOut",
-            new ClassicPreset.Output(new StringArraySocket(), "chunks")
-        );
-        self.addControl(
-            "chunkCharacters",
-            new NumberControl(
-                self.id,
-                "chunkCharacters",
-                {
-                    initial: controls?.chunkCharacters ?? 1000,
-                    name: "chunkCharacters",
-                    min: 10,
+export const AutoTextSlicerNode = makeNode(
+    {
+        nodeName: "AutoTextSlicerNode",
+        nodeIcon: "GroupOutlined",
+        dimensions: [300, 165],
+    },
+    {
+        inputs: [{ name: "dataIn", type: "string", label: "text" }],
+        outputs: [{ name: "dataOut", type: "stringArray", label: "chunks" }],
+        controls: [
+            {
+                name: "chunkCharacters",
+                control: {
+                    type: "number",
+                    defaultValue: 1000,
+                    config: {
+                        label: "chunk characters",
+                        min: 1,
+                    },
                 },
-                context
-            )
-        );
-        //
-        //
-        // self.context.control.add(self, {
-        //     inputs: () => [],
-        //     outputs: () => ["trigger"],
-        //     async execute(_: never, forward) {
-        //     },
-        // });
-        self.context.dataflow.add(self, {
-            inputs: () => ["dataIn"],
-            outputs: () => ["dataOut"],
-            async data(fetchInputs) {
-                if (!self.context.getIsActive()) return {};
-
-                self.context.onFlowNode(self.id);
-
+            },
+        ],
+    },
+    {
+        dataFlow: {
+            inputs: ["dataIn"],
+            outputs: ["dataOut"],
+            async logic(node, context, controls, fetchInputs) {
                 const inputs = (await fetchInputs()) as {
                     dataIn?: string[];
                 };
-
                 const text = (inputs.dataIn ?? [""])[0];
-                const chunkLimit = self.controls.chunkCharacters.value;
-
-                self.context.onFlowNode(self.id);
+                const chunkLimit = controls["chunkCharacters"] as number;
 
                 let output: string[] | null = [];
 
-                try {
-                    // try roughest split by \n\n
-                    output = _roughSplit(text, chunkLimit);
-                    // if it fails, try a finer split by \n
-                    if (!output) {
-                        output = _roughSplit(text, chunkLimit, "\n");
-                    }
-                    // if that also fails, do granular splitting (always gives results)
-                    output = _granularSplit(text, chunkLimit);
-                } catch (error) {
-                    console.error(error);
-
-                    const e = new Error("AutoTextSlicer failed!");
-                    self.context.onError(e);
-
-                    throw e;
+                // try roughest split by \n\n
+                output = _roughSplit(text, chunkLimit);
+                // if it fails, try a finer split by \n
+                if (!output) {
+                    output = _roughSplit(text, chunkLimit, "\n");
                 }
+                // if that also fails, do granular splitting (always gives results)
+                output = _granularSplit(text, chunkLimit);
 
                 return { dataOut: output ?? [] };
             },
-        });
+        },
     }
-}
+);
+
+// export class _AutoTextSlicerNode extends ClassicPreset.Node<
+//     { dataIn: StringSocket },
+//     { dataOut: StringArraySocket },
+//     { chunkCharacters: NumberControl }
+// > {
+//     public static icon = GroupOutlined;
+//     width = 300;
+//     height = 165;
+
+//     constructor(
+//         private context: NodeContextObj,
+//         id?: string,
+//         controls?: Record<string, any>
+//     ) {
+//         super(_AutoTextSlicerNode.name);
+//         const self = this;
+//         self.id = id ?? self.id;
+//         //
+//         self.addInput(
+//             "dataIn",
+//             new ClassicPreset.Input(new StringSocket(), "text")
+//         );
+//         self.addOutput(
+//             "dataOut",
+//             new ClassicPreset.Output(new StringArraySocket(), "chunks")
+//         );
+//         self.addControl(
+//             "chunkCharacters",
+//             new NumberControl(
+//                 self.id,
+//                 "chunkCharacters",
+//                 1000,
+//                 {
+//                     // initial: controls?.chunkCharacters ?? 1000,
+//                     label: "chunkCharacters",
+//                     min: 10,
+//                 },
+//                 context
+//             )
+//         );
+//         //
+//         //
+//         // self.context.control.add(self, {
+//         //     inputs: () => [],
+//         //     outputs: () => ["trigger"],
+//         //     async execute(_: never, forward) {
+//         //     },
+//         // });
+//         self.context.dataflow.add(self, {
+//             inputs: () => ["dataIn"],
+//             outputs: () => ["dataOut"],
+//             async data(fetchInputs) {
+//                 if (!self.context.getIsActive()) return {};
+
+//                 self.context.onFlowNode(self.id);
+
+//                 const inputs = (await fetchInputs()) as {
+//                     dataIn?: string[];
+//                 };
+
+//                 const text = (inputs.dataIn ?? [""])[0];
+//                 const chunkLimit = self.controls.chunkCharacters.value;
+
+//                 self.context.onFlowNode(self.id);
+
+//                 let output: string[] | null = [];
+
+//                 try {
+//                     // try roughest split by \n\n
+//                     output = _roughSplit(text, chunkLimit);
+//                     // if it fails, try a finer split by \n
+//                     if (!output) {
+//                         output = _roughSplit(text, chunkLimit, "\n");
+//                     }
+//                     // if that also fails, do granular splitting (always gives results)
+//                     output = _granularSplit(text, chunkLimit);
+//                 } catch (error) {
+//                     console.error(error);
+
+//                     const e = new Error("AutoTextSlicer failed!");
+//                     self.context.onError(e);
+
+//                     throw e;
+//                 }
+
+//                 return { dataOut: output ?? [] };
+//             },
+//         });
+//     }
+// }

@@ -1,96 +1,64 @@
 import { atom } from "jotai";
 
 import { appStore } from ".";
-import {
-    createGraph,
-    deleteGraph,
-    graphStorageAtom,
-    updateGraphName,
-} from "./graphs";
+import { deleteGraph, graphStorageAtom, updateGraphName } from "./graphs";
 import { runGraph, stopGraph } from "./executor";
 import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
 import * as NODE_MAKERS from "../nodes";
 import { NodeContextObj } from "../nodes/context";
-import { StartNode, ModuleInputNode, ModuleOutputNode } from "../nodes";
 
 type EditorState = {
-    path: string[];
+    graphId: string | null;
 };
 
 const _editorStateAtom = atom<EditorState>({
-    path: [],
+    graphId: null,
 });
 
 export const editorStateAtom = atom((get) => ({ ...get(_editorStateAtom) }));
 
 export const currentGraphAtom = atom((get) => {
-    const gStore = () => get(graphStorageAtom);
-    const gPath = get(_editorStateAtom).path;
-    //
-    if (gPath.length === 1) {
-        return gStore()[gPath[0]];
-    }
-    //
-    else if (gPath.length === 2) {
-        return gStore()[gPath[0]].modules[gPath[1]];
-    }
+    const s = () => get(graphStorageAtom);
+    const { graphId } = get(_editorStateAtom);
+    if (graphId) return s()[graphId];
     return null;
 });
 
-export const openPath = (path: string[]) => {
-    if (!path.length || path.length > 2) return;
+export const openGraph = (graphId: string) => {
     appStore.set(_editorStateAtom, {
         ...appStore.get(_editorStateAtom),
-        path,
+        graphId,
     });
 };
 
 export const closeEditor = () => {
     appStore.set(_editorStateAtom, {
         ...appStore.get(_editorStateAtom),
-        path: [],
+        graphId: null,
     });
 };
 
 export const runCurrentGraph = async () => {
-    const { path } = appStore.get(_editorStateAtom);
-
-    if (path.length) {
-        await runGraph(path[0]);
-    }
+    const { graphId } = appStore.get(_editorStateAtom);
+    if (graphId) await runGraph(graphId);
 };
 
 export const stopCurrentGraph = () => {
-    const { path } = appStore.get(_editorStateAtom);
-
-    if (path.length) {
-        stopGraph(path[0]);
-    }
-};
-
-export const createModule = (name?: string) => {
-    const { path } = appStore.get(_editorStateAtom);
-
-    if (path.length) {
-        createGraph(name ?? "New Module", path[0]);
-    }
+    const { graphId } = appStore.get(_editorStateAtom);
+    if (graphId) stopGraph(graphId);
 };
 
 export const deleteCurrentGraph = () => {
-    const { path } = appStore.get(_editorStateAtom);
-
-    if (path.length) {
+    const { graphId } = appStore.get(_editorStateAtom);
+    if (graphId) {
         closeEditor();
-        deleteGraph(path);
+        deleteGraph(graphId);
     }
 };
 
 export const updateCurrentGraphName = (name: string) => {
-    const { path } = appStore.get(_editorStateAtom);
-
-    if (path.length) {
-        updateGraphName(path, name);
-    }
+    const { graphId } = appStore.get(_editorStateAtom);
+    if (graphId) updateGraphName(graphId, name);
 };
 
 /**
@@ -107,11 +75,7 @@ export const duplicateNode = async (
     if (!original) return;
 
     // Special nodes cannot be duplicated
-    if (
-        ![StartNode.name, ModuleOutputNode.name, ModuleInputNode.name].includes(
-            original.label
-        )
-    ) {
+    if (!["StartNode"].includes(original.label)) {
         const nodeView = area.nodeViews.get(id);
         if (!nodeView) return;
 
@@ -155,7 +119,7 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
     const targetNode = editor.getNode(id);
 
     // Special nodes cannot be deleted
-    if (![ModuleOutputNode.name, StartNode.name].includes(targetNode.label)) {
+    if (!["StartNode"].includes(targetNode.label)) {
         // Delete related connections
         for (const conn of editor.getConnections()) {
             if (

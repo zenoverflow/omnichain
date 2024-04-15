@@ -13,11 +13,7 @@ import { ControlFlow, Dataflow } from "rete-engine";
 
 import { appStore } from "../../state";
 import { editorStateAtom } from "../../state/editor";
-import {
-    initGraph,
-    listGraphModules,
-    updateNodeControl,
-} from "../../state/graphs";
+import { initGraph, updateNodeControl } from "../../state/graphs";
 import { controlObservable } from "../../state/watcher";
 import { showNotification } from "../../state/notifications";
 import { isGraphActive } from "../../state/executor";
@@ -37,8 +33,7 @@ import { integrateMagneticConnection } from "./magconnection";
 // const { TransitionApplier } = ArrangeAppliers;
 
 export async function createEditor(container: HTMLElement) {
-    const pathToGraph = appStore.get(editorStateAtom).path;
-    const graphId = pathToGraph[0];
+    const { graphId } = appStore.get(editorStateAtom);
 
     const editor = new NodeEditor<any>();
     const control = new ControlFlow(editor);
@@ -62,16 +57,11 @@ export async function createEditor(container: HTMLElement) {
 
     const nodeContext: NodeContextObj = {
         headless: false,
-        pathToGraph,
+        graphId,
         editor,
         control,
         dataflow,
         area,
-        getModuleOptions() {
-            const editorPath = appStore.get(editorStateAtom).path;
-            if (editorPath.length < 1) return [];
-            return listGraphModules(editorPath[0]);
-        },
         onEvent(event) {
             const { type, text } = event;
             showNotification({
@@ -95,9 +85,9 @@ export async function createEditor(container: HTMLElement) {
         onFlowNode(_) {
             // No exec from visual editor
         },
-        onControlChange(pathToGraph, node, control, value) {
-            updateNodeControl(pathToGraph, node, control, value);
-            controlObservable.next({ pathToGraph, node, control, value });
+        onControlChange(graphId, node, control, value) {
+            updateNodeControl(graphId, node, control, value);
+            controlObservable.next({ graphId, node, control, value });
         },
         getControlObservable() {
             return controlObservable;
