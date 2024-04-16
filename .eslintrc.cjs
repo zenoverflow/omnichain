@@ -30,4 +30,5 @@ module.exports = {
         "@typescript-eslint/no-this-alias": "off",
         "react/prop-types": "off",
     },
+    ignores: ["server.js"],
 };
