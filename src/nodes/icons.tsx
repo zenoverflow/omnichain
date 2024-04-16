@@ -19,8 +19,6 @@ const ICONS: Record<string, any> = {
     ["Delete"]: DeleteOutlined,
 };
 
-console.log(ICONS);
-
 export const getMenuIcon = (itemName: string) => {
     const Icon = ICONS[itemName] || ICONS[`${itemName}Node`] || BorderOutlined;
     return <Icon />;
