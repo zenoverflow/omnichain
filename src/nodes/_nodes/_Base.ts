@@ -131,6 +131,7 @@ export const makeNode = (
 
     return class CustomNode extends ClassicPreset.Node<any, any, any> {
         //
+        public static customNodeName = nodeName;
         public static icon = (ICONS as any)[nodeIcon] ?? ICONS.BorderOutlined;
         width = dimensions[0];
         height = dimensions[1];
