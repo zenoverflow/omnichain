@@ -1,5 +1,11 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
-import { Menu, MenuProps, Input, Empty } from "antd";
+import React, {
+    useEffect,
+    useState,
+    useRef,
+    useMemo,
+    useCallback,
+} from "react";
+import { Menu, MenuProps, Input } from "antd";
 import { useAtom } from "jotai";
 
 import { hideContextMenu, menuStateAtom } from "../../state/editorContextMenu";
@@ -16,9 +22,9 @@ export const ContextMenu: React.FC = () => {
         NodeJS.Timeout | undefined
     >();
 
-    const haltTimeout = () => {
+    const haltTimeout = useCallback(() => {
         if (hideTimeout) clearTimeout(hideTimeout);
-    };
+    }, [hideTimeout]);
 
     const startTimeout = () => {
         setHideTimeout(
@@ -39,7 +45,7 @@ export const ContextMenu: React.FC = () => {
             setActive(false);
             setFilter("");
         }
-    }, [menu, active]);
+    }, [menu, active, haltTimeout]);
 
     useEffect(() => {
         if (active) startTimeout();
@@ -60,7 +66,7 @@ export const ContextMenu: React.FC = () => {
         return () => {
             window.removeEventListener("click", listener);
         };
-    }, [menuRef]);
+    }, [haltTimeout, menuRef]);
 
     const items: MenuProps["items"] = useMemo(() => {
         if (!menu || !active) return [];

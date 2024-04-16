@@ -30,9 +30,17 @@ type CustomIO = {
 };
 
 type CustomControlConfig =
-    | { type: "text"; defaultValue: string; config: TextControlConfig }
-    | { type: "number"; defaultValue: number; config: NumberControlConfig }
-    | { type: "select"; defaultValue: string; config: SelectControlConfig };
+    | { type: "text"; defaultValue: string | null; config: TextControlConfig }
+    | {
+          type: "number";
+          defaultValue: number | null;
+          config: NumberControlConfig;
+      }
+    | {
+          type: "select";
+          defaultValue: string | null;
+          config: SelectControlConfig;
+      };
 
 type CustomNodeControl = {
     name: string;
@@ -121,7 +129,7 @@ const mkControl = (
 export const makeNode = (
     baseConfig: CustomNodeBaseConfig,
     ioConfig: CustomNodeIOConfig,
-    flowConfig: CustomFlowConfig = null
+    flowConfig: CustomFlowConfig | null = null
 ) => {
     const { nodeName, nodeIcon, dimensions } = baseConfig;
     const { inputs, outputs, controls } = ioConfig;
@@ -213,7 +221,7 @@ export const makeNode = (
                                 _fetchInputs,
                                 forward
                             );
-                        } catch (error) {
+                        } catch (error: any) {
                             context.onError(error);
                             // Rethrow to stop exec
                             throw error;
@@ -251,7 +259,7 @@ export const makeNode = (
                                 _controls,
                                 _fetchInputs
                             );
-                        } catch (error) {
+                        } catch (error: any) {
                             context.onError(error);
                             // Rethrow to stop exec
                             throw error;

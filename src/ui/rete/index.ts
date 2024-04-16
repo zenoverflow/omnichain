@@ -28,12 +28,16 @@ import { FlowWatcher } from "./FlowWatcher";
 import { NodeCustomizer } from "./NodeCustomizer";
 import { FlowCustomizer } from "./FlowCustomizer";
 import { GraphTemplate } from "./GraphTemplate";
-import { integrateMagneticConnection } from "./magconnection";
+import { integrateMagCon } from "./magconnection";
 
 // const { TransitionApplier } = ArrangeAppliers;
 
 export async function createEditor(container: HTMLElement) {
     const { graphId } = appStore.get(editorStateAtom);
+
+    if (!graphId) {
+        throw new Error("Tried to create editor without graph!");
+    }
 
     const editor = new NodeEditor<any>();
     const control = new ControlFlow(editor);
@@ -117,7 +121,7 @@ export async function createEditor(container: HTMLElement) {
     render.addPreset(NodeCustomizer.presetForNodes(nodeContext));
 
     area.use(connection);
-    integrateMagneticConnection(nodeContext, connection);
+    integrateMagCon(nodeContext, connection);
     // area.use(arrange);
 
     connection.addPreset(FlowCustomizer.getFlowBuilder(connection));

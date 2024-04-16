@@ -32,7 +32,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         fileInput.type = "file";
 
         fileInput.onchange = () => {
-            if (fileInput.files.length) {
+            if (fileInput.files?.length) {
                 const file = fileInput.files[0];
                 if (file) {
                     updateAvatarImage(avatarId, file);
@@ -58,12 +58,13 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
             afterClose={closeModal}
             // onOk={handleApply}
             onCancel={closeModal}
-            footer={(_, { OkBtn, CancelBtn }) => (
-                <>
-                    {/* <CancelBtn />
-                    <OkBtn /> */}
-                </>
-            )}
+            footer={() => <></>}
+            // footer={(_, { OkBtn, CancelBtn }) => (
+            //     <>
+            //         {/* <CancelBtn />
+            //         <OkBtn /> */}
+            //     </>
+            // )}
         >
             <Space
                 direction="vertical"

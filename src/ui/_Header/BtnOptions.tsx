@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useAtom } from "jotai";
-import { Button, Input, Modal, Select, Space } from "antd";
+import { Button, Modal, Select, Space } from "antd";
 import {
     SettingOutlined,
     UploadOutlined,

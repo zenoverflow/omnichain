@@ -19,11 +19,4 @@ export const ItemIcon: React.FC<{ graphId: string }> = (props) => {
     }
 
     return <PartitionOutlined />;
-
-    // if (props.graphId.length === 1) {
-    // }
-    // if (props.graphId.length === 2) {
-    //     return <DatabaseOutlined />;
-    // }
-    // return <BorderOutlined />;
 };

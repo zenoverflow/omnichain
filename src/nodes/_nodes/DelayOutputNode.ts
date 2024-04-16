@@ -27,7 +27,7 @@ export const DelayOutputNode = makeNode(
         dataFlow: {
             inputs: ["dataIn"],
             outputs: ["dataOut"],
-            async logic(node, context, controls, fetchInputs) {
+            async logic(_node, _context, controls, fetchInputs) {
                 const inputs = (await fetchInputs()) as {
                     dataIn?: string[];
                 };

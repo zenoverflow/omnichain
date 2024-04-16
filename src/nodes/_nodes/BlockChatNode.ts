@@ -30,7 +30,7 @@ export const BlockChatNode = makeNode(
         controlFlow: {
             inputs: ["triggerIn"],
             outputs: ["triggerOut"],
-            async logic(node, context, controls, fetchInputs, forward) {
+            async logic(_node, _context, controls, _fetchInputs, forward) {
                 const action = controls["value"] as "block" | "unblock";
 
                 if (action === "block") {

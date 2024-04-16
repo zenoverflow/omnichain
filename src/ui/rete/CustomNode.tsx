@@ -153,7 +153,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
 
     const outputs = useMemo(
         () => sortByIndex(Object.entries(props.data.outputs)),
-        []
+        [props.data.outputs]
     );
 
     const controls = useMemo(

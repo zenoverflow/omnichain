@@ -46,8 +46,10 @@ export class SelectControl extends ClassicPreset.Control {
     component() {
         const self = this;
 
-        const findValueMatch = (v: string) =>
-            self.config.values.find(({ value }) => value === v) ?? null;
+        const findValueMatch = (v: string | null) =>
+            v
+                ? self.config.values.find(({ value }) => value === v) ?? null
+                : null;
 
         const _Component: React.FC = () => {
             const [value, setValue] = useState(findValueMatch(self.value));

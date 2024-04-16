@@ -1,10 +1,16 @@
-import { useRef, useEffect, useMemo, useState, useCallback } from "react";
+import {
+    useRef,
+    useEffect,
+    useMemo,
+    useState,
+    useCallback,
+    KeyboardEvent,
+} from "react";
 import { Input, Avatar, Space, Button } from "antd";
 import { UserOutlined, SendOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-// @ts-ignore
 import Markdown from "react-markdown";
 
 import { ChatMessage } from "../data/types";
@@ -48,11 +54,12 @@ const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
                     return match ? (
                         <SyntaxHighlighter
                             {...(rest as any)}
-                            children={String(children).replace(/\n$/, "")}
                             language={match[1]}
                             style={atomDark}
                             PreTag="div"
-                        />
+                        >
+                            {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
                     ) : (
                         <code {...rest} className={className}>
                             {children}
@@ -66,26 +73,26 @@ const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
     );
 };
 
-const ChatMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
+const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
     const [avatarStorage] = useAtom(avatarStorageAtom);
 
     const avatar = useMemo(() => {
         return Object.values(avatarStorage).find(
             (a) => a.avatarId === message.avatarId
         );
-    }, [avatarStorage]);
+    }, [avatarStorage, message.avatarId]);
 
     return (
         <Space direction="vertical" className="c__msg">
             <div style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                     size={32}
-                    {...(avatar.imageBase64.length
+                    {...(avatar?.imageBase64.length
                         ? { src: avatar.imageBase64 }
                         : { icon: <UserOutlined /> })}
                     style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
                 />
-                <div>{avatar.name}</div>
+                <div>{avatar?.name ?? "Anon"}</div>
             </div>
             <CMarkdown>{message.content}</CMarkdown>
         </Space>
@@ -129,7 +136,7 @@ export const EmptyChat: React.FC = () => {
 };
 
 export const ChatInterface: React.FC = () => {
-    const listRef = useRef<HTMLDivElement>();
+    const listRef = useRef<HTMLDivElement>(null);
     const [{ chainChatId, userAvatarId }] = useAtom(optionsAtom);
     const [messageStorage] = useAtom(messageStorageAtom);
     const [blocked] = useAtom(chatBlockAtom);
@@ -148,14 +155,14 @@ export const ChatInterface: React.FC = () => {
     );
 
     const sendMessage = useCallback(() => {
-        if (!blocked) {
+        if (!blocked && chainChatId && userAvatarId) {
             addMessage(chainChatId, userAvatarId, message);
             setMessage("");
         }
-    }, [chainChatId, userAvatarId, message, setMessage]);
+    }, [chainChatId, userAvatarId, message, setMessage, blocked]);
 
     const handleTextboxEnter = useCallback(
-        (e: any) => {
+        (e: KeyboardEvent) => {
             if (e.key === "Enter" && !e.shiftKey) {
                 sendMessage();
             }
@@ -167,11 +174,11 @@ export const ChatInterface: React.FC = () => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [listRef.current]);
+    }, [listRef]);
 
     // Load messages for the selected chat chain
     useEffect(() => {
-        if (initCondSatisfied) {
+        if (initCondSatisfied && chainChatId) {
             startGlobalLoading();
             void loadMessagesFromDb(chainChatId).then(() => {
                 finishGlobalLoading();
@@ -206,7 +213,7 @@ export const ChatInterface: React.FC = () => {
                         }}
                     >
                         {messages.map((m) => (
-                            <ChatMessage key={m.messageId} message={m} />
+                            <SingleMessage key={m.messageId} message={m} />
                         ))}
                     </div>
                     <div
@@ -220,7 +227,9 @@ export const ChatInterface: React.FC = () => {
                         <div style={{ width: "5px" }} />
                         <TextArea
                             value={message}
-                            onChange={(e) => setMessage(e.target.value)}
+                            onChange={(e) => {
+                                setMessage(e.target.value);
+                            }}
                             onKeyUp={handleTextboxEnter}
                             placeholder="Type a message..."
                             autoSize={{ minRows: 2, maxRows: 8 }}

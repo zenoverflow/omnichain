@@ -26,7 +26,7 @@ export const TextNode = makeNode(
         dataFlow: {
             inputs: ["in"],
             outputs: ["out"],
-            async logic(node, context, controls, fetchInputs) {
+            async logic(node, context, _controls, fetchInputs) {
                 const inputs = (await fetchInputs()) as {
                     in?: string[];
                 };

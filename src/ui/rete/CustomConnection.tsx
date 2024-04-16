@@ -16,7 +16,7 @@ type PathProps = {
     stroke: string;
 };
 
-const Path = styled.path<PathProps>`
+export const Path = styled.path<PathProps>`
     fill: none;
     stroke-width: 5px;
     stroke: ${(props) => props.stroke};
@@ -29,6 +29,7 @@ type ConnectionProps = {
     styles?: () => any;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const makeColoredConnection = (stroke = "#f0f5ff") => {
     const CustomConnection = (props: ConnectionProps) => {
         const { path } = useConnection();

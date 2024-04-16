@@ -24,7 +24,7 @@ export const PromptBuilderNode = makeNode(
         dataFlow: {
             inputs: ["parts"],
             outputs: ["prompt"],
-            async logic(node, context, controls, fetchInputs) {
+            async logic(_node, _context, controls, fetchInputs) {
                 const inputs = (await fetchInputs()) as {
                     parts?: {
                         name: string;
@@ -35,7 +35,7 @@ export const PromptBuilderNode = makeNode(
                 let prompt = controls["val"] as string;
 
                 for (const { name, value } of inputs.parts ?? []) {
-                    prompt = prompt.replaceAll("{" + name + "}", value);
+                    prompt = prompt.replace("{" + name + "}", value);
                 }
 
                 return { prompt };

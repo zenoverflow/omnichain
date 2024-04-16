@@ -19,15 +19,19 @@ export class ImgUtils {
         // const file = fileInput.files[0];
         const reader = new FileReader();
 
-        return new Promise((res, rej) => {
+        return new Promise((res, _rej) => {
             reader.onload = function (event) {
                 const img = new Image();
                 img.onload = function () {
                     const canvas = document.createElement("canvas");
                     const ctx = canvas.getContext("2d");
 
+                    if (!ctx) {
+                        return res("");
+                    }
+
                     // Set the image smoothing quality
-                    ctx.imageSmoothingQuality = "high";
+                    // ctx.imageSmoothingQuality = "high";
 
                     // Calculate the scaling factor to keep aspect ratio
                     const scale = Math.min(
@@ -48,7 +52,7 @@ export class ImgUtils {
                     // Call the callback with the result
                     res(dataUrl);
                 };
-                img.src = event.target.result as string;
+                img.src = (event.target?.result as string) ?? "";
             };
             reader.readAsDataURL(file);
         });

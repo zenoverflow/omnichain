@@ -27,7 +27,7 @@ export const LogOutputNode = makeNode(
         controlFlow: {
             inputs: ["trigger"],
             outputs: [],
-            async logic(node, context, controls, fetchInputs, forward) {
+            async logic(node, context, _controls, fetchInputs, _forward) {
                 const inputs = (await fetchInputs()) as {
                     data?: any[];
                 };
@@ -48,7 +48,7 @@ export const LogOutputNode = makeNode(
         dataFlow: {
             inputs: ["data"],
             outputs: [],
-            async logic(node, context, controls, fetchInputs) {
+            async logic(_node, _context, _controls, _fetchInputs) {
                 return {};
             },
         },

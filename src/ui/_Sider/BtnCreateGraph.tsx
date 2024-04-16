@@ -8,7 +8,7 @@ import { createGraph } from "../../state/graphs";
 export const BtnCreateGraph: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [valOfName, setValOfName] = useState<string>("New Chain");
-    const inputRef = useRef<InputRef>();
+    const inputRef = useRef<InputRef>(null);
 
     const handleOpenModal = () => {
         setModalOpen(true);

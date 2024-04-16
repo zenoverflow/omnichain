@@ -6,7 +6,7 @@ import {
 
 import * as MAKERS from ".";
 
-const ICONS: Record<string, any> = {
+export const ICONS: Record<string, any> = {
     // Node makers (root menu) icons
     ...Object.fromEntries(
         Object.values(MAKERS).map((M) => [

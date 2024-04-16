@@ -66,7 +66,9 @@ export const Editor: React.FC = () => {
                             alignItems: "center",
                             cursor: "pointer",
                         }}
-                        onClick={() => setSiderCollapsed(!siderCollapsed)}
+                        onClick={() => {
+                            setSiderCollapsed(!siderCollapsed);
+                        }}
                     >
                         {siderCollapsed ? (
                             <MenuUnfoldOutlined style={{ fontSize: "32px" }} />

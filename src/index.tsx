@@ -40,3 +40,5 @@ export const run = async () => {
         );
     }
 };
+
+void run();

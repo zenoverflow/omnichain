@@ -21,7 +21,7 @@ type Props = {
     distance?: number;
 };
 
-export const useMagneticConnection = (
+export const configureMagCon = (
     nodeContext: NodeContextObj,
     connection: ConnectionPlugin<any, any>,
     props: Props
@@ -123,13 +123,13 @@ export const useMagneticConnection = (
     });
 };
 
-export const integrateMagneticConnection = (
+export const integrateMagCon = (
     nodeContext: NodeContextObj,
     connection: ConnectionPlugin<any, any>
 ) => {
     const { editor } = nodeContext;
 
-    useMagneticConnection(nodeContext, connection, {
+    configureMagCon(nodeContext, connection, {
         async createConnection(from, to) {
             if (from.side === to.side) return;
             const [source, target] =

@@ -43,10 +43,9 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
             if (e.key === "Delete" && targets.length) {
                 // Prevent deletions on active graph
                 const editorState = appStore.get(editorStateAtom);
-                const currentGraph = editorState?.graphId;
-                if (currentGraph.length) {
+                if (editorState?.graphId) {
                     const executorState = appStore.get(executorAtom);
-                    if (!executorState[currentGraph[0]]) {
+                    if (!executorState[editorState?.graphId]) {
                         await deleteSelectedNodes(props.nodeContext);
                     }
                 }
@@ -91,7 +90,7 @@ const GraphRunButton: React.FC = () => {
     const [executor] = useAtom(executorAtom);
 
     const graphIsActive = useMemo(
-        () => !!executor[graphId],
+        () => (graphId ? !!executor[graphId] : false),
         [graphId, executor]
     );
 
@@ -132,7 +131,7 @@ export const EditorGraph: React.FC = () => {
 
     // Disable editing if graph is active
     const editingDisabled = useMemo(
-        () => !!executor[graphId],
+        () => (graphId ? !!executor[graphId] : false),
         [executor, graphId]
     );
 

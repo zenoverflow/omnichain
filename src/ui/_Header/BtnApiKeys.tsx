@@ -33,12 +33,13 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
             afterClose={closeModal}
             // onOk={handleApply}
             onCancel={closeModal}
-            footer={(_, { OkBtn, CancelBtn }) => (
-                <>
-                    {/* <CancelBtn />
-                    <OkBtn /> */}
-                </>
-            )}
+            footer={() => <></>}
+            // footer={(_, { OkBtn, CancelBtn }) => (
+            //     <>
+            //         {/* <CancelBtn />
+            //         <OkBtn /> */}
+            //     </>
+            // )}
         >
             <Space
                 direction="vertical"

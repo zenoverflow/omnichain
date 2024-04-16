@@ -50,7 +50,7 @@ export const setChatChain = (chainChatId: string | null) => {
     }
 };
 
-export const setApiChain = (chainApiId: string) => {
+export const setApiChain = (chainApiId: string | null) => {
     const s = appStore.get(_optionsAtom);
     appStore.set(_optionsAtom, {
         ...s,
@@ -78,13 +78,22 @@ export const clearRedundantOptions = () => {
 
     const options = appStore.get(_optionsAtom);
 
-    if (!Object.keys(graphs).includes(options.chainChatId)) {
+    if (
+        !options.chainChatId ||
+        !Object.keys(graphs).includes(options.chainChatId)
+    ) {
         setChatChain(null);
     }
-    if (!Object.keys(graphs).includes(options.chainApiId)) {
+    if (
+        !options.chainApiId ||
+        !Object.keys(graphs).includes(options.chainApiId)
+    ) {
         setApiChain(null);
     }
-    if (!Object.keys(avatars).includes(options.userAvatarId)) {
+    if (
+        !options.userAvatarId ||
+        !Object.keys(avatars).includes(options.userAvatarId)
+    ) {
         setUserAvatar(null);
     }
 };

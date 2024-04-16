@@ -4,7 +4,8 @@ export class QueueUtils {
     public static runQueue() {
         const runner = async () => {
             if (_queue.length) {
-                await _queue.shift()();
+                const next = _queue.shift();
+                if (next) await next();
                 setTimeout(runner, 1);
             } else {
                 setTimeout(runner, 30);

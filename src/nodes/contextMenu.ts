@@ -84,7 +84,7 @@ export const makeContextMenu = (nodeContext: NodeContextObj) => {
     area.addPipe((ctx) => {
         if (ctx.type === "contextmenu") {
             ctx.data.event.preventDefault();
-            if (isGraphActive(nodeContext.graphId[0])) return;
+            if (isGraphActive(nodeContext.graphId)) return;
 
             const target = ctx.data.event.target as HTMLElement;
             let menuCtx = findContextMenu(target);

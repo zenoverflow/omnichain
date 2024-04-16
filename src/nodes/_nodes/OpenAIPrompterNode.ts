@@ -120,7 +120,7 @@ export const OpenAIPrompterNode = makeNode(
         dataFlow: {
             inputs: ["prompt"],
             outputs: ["results"],
-            async logic(node, context, controls, fetchInputs) {
+            async logic(_node, _context, _controls, _fetchInputs) {
                 return {};
             },
         },
