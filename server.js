@@ -1,26 +1,38 @@
 import { IncomingMessage, ServerResponse, createServer } from "http";
-import { readFile, readdir, existsSync } from "fs";
+import { readFileSync, readdirSync, existsSync, writeFileSync } from "fs";
 import { join, dirname, extname } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const HEADER_JSON = { "Content-Type": "application/json" };
+
+const PATH_DIR_CHAINS = join(__dirname, "chains");
+const PATH_FILE_SETTINGS = join(__dirname, "data", "settings.json");
+
 /**
  * @param {IncomingMessage} req
- * @param {ServerResponse} res
+ * @returns {Promise<Record<string, any>>}
  */
-const saveHandler = (req, res) => {
-    let body = "";
-    req.on("data", (chunk) => {
-        body += chunk.toString(); // convert Buffer to string
-    });
-    req.on("end", () => {
-        console.log(body);
-        // TODO: read body as json
-        // TODO: save chain data to disk
-        res.writeHead(200);
-        res.end();
+const readRequestJson = (req) => {
+    return new Promise((res, rej) => {
+        let body = "";
+        req.on("data", (chunk) => {
+            body += chunk.toString(); // convert Buffer to string
+        });
+        req.on("end", () => {
+            if (!body.length) {
+                rej("Empty data!");
+            } else {
+                try {
+                    const data = JSON.parse(body);
+                    res(data);
+                } catch (error) {
+                    rej(error);
+                }
+            }
+        });
     });
 };
 
@@ -28,37 +40,67 @@ const saveHandler = (req, res) => {
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
  */
-const readAllHandler = (req, res) => {
-    const chainsDir = join(__dirname, "chains");
+const saveSettingsHandler = async (req, res) => {
+    const data = await readRequestJson(req);
+    writeFileSync(PATH_FILE_SETTINGS, JSON.stringify(data));
+    res.writeHead(200);
+    res.end();
+};
 
-    const emptyRes = (status = 200) => {
-        res.writeHead(status, { "Content-Type": "application/json" });
+/**
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
+const readSettingsHandler = (req, res) => {
+    if (!existsSync(PATH_FILE_SETTINGS)) {
+        res.writeHead(200, HEADER_JSON);
         res.end("{}");
-    };
+        return;
+    }
+    const content = readFileSync(join(chainsDir, PATH_FILE_SETTINGS));
+    res.writeHead(200, HEADER_JSON);
+    res.end(JSON.stringify(content));
+};
 
-    if (!existsSync(chainsDir)) {
-        emptyRes();
+/**
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
+const saveGraphHandler = async (req, res) => {
+    const data = await readRequestJson(req);
+    if (data.graphId) {
+        writeFileSync(
+            join(PATH_DIR_CHAINS, `${data.graphId}.json`),
+            JSON.stringify(data)
+        );
+    } else {
+        throw new Error("Corrupted data");
+    }
+    res.writeHead(200);
+    res.end();
+};
+
+/**
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
+const readAllGraphsHandler = (req, res) => {
+    if (!existsSync(PATH_DIR_CHAINS)) {
+        res.writeHead(200, HEADER_JSON);
+        res.end("{}");
         return;
     }
 
-    fs.readdir(chainsDir, (err, filenames) => {
-        if (err) {
-            emptyRes();
-        }
-        //
-        else {
-            const filesContent = {};
-            filenames.forEach((filename) => {
-                const content = fs.readFileSync(
-                    path.join(chainsDir, filename),
-                    "utf-8"
-                );
-                filesContent[filename] = content;
-            });
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify(filesContent));
-        }
-    });
+    const files = readdirSync(PATH_DIR_CHAINS);
+
+    const content = {};
+    for (const file of files) {
+        const parsed = JSON.parse(readFileSync(join(PATH_DIR_CHAINS, file)));
+        content[parsed.graphId] = parsed;
+    }
+
+    res.writeHead(200, HEADER_JSON);
+    res.end(JSON.stringify(content));
 };
 
 /**
@@ -74,9 +116,12 @@ const staticServer = (req, res) => {
 
     const ext = extname(filePath);
 
-    let contentType = "text/html";
+    let contentType = "text/plain";
 
     switch (ext) {
+        case ".html":
+            contentType = "text/html";
+            break;
         case ".js":
             contentType = "application/javascript";
             break;
@@ -89,30 +134,42 @@ const staticServer = (req, res) => {
             break;
     }
 
-    readFile(filePath, (err, data) => {
-        if (err) {
-            res.writeHead(404);
-            res.end(JSON.stringify(err));
-            return;
-        }
-        res.writeHead(200, { "Content-Type": contentType });
-        res.end(data);
-    });
+    if (!existsSync(filePath)) {
+        res.writeHead(404);
+        res.end(JSON.stringify(err));
+        return;
+    }
+
+    const data = readFileSync(filePath);
+
+    res.writeHead(200, { "Content-Type": contentType });
+    res.end(data);
 };
 
 const server = createServer((req, res) => {
     console.log(req.url);
 
-    switch (req.url) {
-        case "/api/read/all":
-            readAllHandler(req, res);
-            break;
-        case "/api/save":
-            saveHandler(req, res);
-            break;
-        default:
-            staticServer(req, res);
-            break;
+    try {
+        switch (req.url) {
+            case "/api/graphs/read/all":
+                readAllGraphsHandler(req, res);
+                break;
+            case "/api/graphs/save":
+                saveGraphHandler(req, res);
+                break;
+            case "/api/settings/read":
+                readSettingsHandler(req, res);
+                break;
+            case "/api/settings/save":
+                saveSettingsHandler(req, res);
+                break;
+            default:
+                staticServer(req, res);
+                break;
+        }
+    } catch (error) {
+        res.writeHead(500, HEADER_JSON);
+        res.end(JSON.stringify(error));
     }
 });
 
