@@ -8,7 +8,7 @@ type OptionsState = {
     userAvatarId: string | null;
     chainChatId: string | null;
     chainApiId: string | null;
-    apiPort: number | 13000;
+    apiPort: number;
 };
 
 const _optionsAtom = atom<OptionsState>({
@@ -69,7 +69,7 @@ export const setApiPort = (apiPort: number) => {
         ...s,
         apiPort,
     });
-    localStorage.setItem("apiPort", `${apiPort}`);
+    localStorage.setItem("apiPort", apiPort.toString());
 };
 
 export const clearRedundantOptions = () => {

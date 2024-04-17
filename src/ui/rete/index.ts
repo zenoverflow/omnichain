@@ -78,7 +78,7 @@ export async function createEditor(container: HTMLElement) {
         onError(error) {
             showNotification({
                 type: "error",
-                text: (error as Error).message,
+                text: error.message,
                 ts: Date.now(),
                 duration: 3,
             });
@@ -154,6 +154,7 @@ export async function createEditor(container: HTMLElement) {
             const selectedNodes = editor
                 .getNodes()
                 .filter((n) => n.selected)
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 .map((n) => n.id);
             for (const id of selectedNodes) {
                 nodeContext.unselect(id);

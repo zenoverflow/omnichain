@@ -44,9 +44,13 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
     border: 3px solid #91caff;
     border-radius: 10px;
     width: ${(props) =>
-        Number.isFinite(props.width) ? `${props.width}px` : `${200}px`};
+        Number.isFinite(props.width) && props.width
+            ? `${props.width.toString()}px`
+            : "200px"};
     height: ${(props) =>
-        Number.isFinite(props.height) ? `${props.height}px` : "auto"};
+        Number.isFinite(props.height) && props.height
+            ? `${props.height.toString()}px`
+            : "auto"};
     position: relative;
     user-select: none;
     ${(props) =>
@@ -101,7 +105,10 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
         height: auto;
         padding: ${SOCKET_MARGIN}px ${SOCKET_SIZE / 2 + SOCKET_MARGIN}px;
     }
-    ${(props) => props.styles && props.styles(props)}
+    ${
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        (props) => props.styles && props.styles(props)
+    }
 `;
 
 function sortByIndex<T extends [string, undefined | { index?: number }][]>(
@@ -171,7 +178,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
 
     return (
         <StyledWrapper
-            data-context-menu={`${props.data.id}`}
+            data-context-menu={props.data.id}
             selected={props.data.selected || false}
             width={props.data.width}
             height={props.data.height}
@@ -195,7 +202,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                                 className="output-title"
                                 data-testid="output-title"
                             >
-                                {output?.label}
+                                {output.label}
                             </div>
                             <RefSocket
                                 name="output-socket"
@@ -227,16 +234,15 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                                 payload={input.socket}
                                 data-testid="input-socket"
                             />
-                            {input &&
-                                (!input.control || !input.showControl) && (
-                                    <div
-                                        className="input-title"
-                                        data-testid="input-title"
-                                    >
-                                        {input?.label}
-                                    </div>
-                                )}
-                            {input?.control && input?.showControl && (
+                            {(!input.control || !input.showControl) && (
+                                <div
+                                    className="input-title"
+                                    data-testid="input-title"
+                                >
+                                    {input.label}
+                                </div>
+                            )}
+                            {input.control && input.showControl && (
                                 <span className="input-control">
                                     <RefControl
                                         key={key}

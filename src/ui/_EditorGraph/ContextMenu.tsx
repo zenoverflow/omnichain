@@ -107,9 +107,9 @@ export const ContextMenu: React.FC = () => {
                 <Input
                     type="text"
                     value={filter}
-                    onChange={(e) =>
-                        setFilter((e.target.value || "").toLowerCase())
-                    }
+                    onChange={(e) => {
+                        setFilter((e.target.value || "").toLowerCase());
+                    }}
                     placeholder="Search..."
                     onMouseEnter={haltTimeout}
                     style={{ marginBottom: "10px" }}

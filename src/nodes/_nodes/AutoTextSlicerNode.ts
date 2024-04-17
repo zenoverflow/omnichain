@@ -123,7 +123,7 @@ export const AutoTextSlicerNode = makeNode(
                 // if that also fails, do granular splitting (always gives results)
                 output = _granularSplit(text, chunkLimit);
 
-                return { dataOut: output ?? [] };
+                return { dataOut: output };
             },
         },
     }

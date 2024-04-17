@@ -76,7 +76,9 @@ export class SelectControl extends ClassicPreset.Control {
                 <div
                     // key={lastUpdate}
                     // ref={parentRef}
-                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => {
+                        e.stopPropagation();
+                    }}
                 >
                     <div
                         style={{

@@ -33,7 +33,7 @@ export const TextNode = makeNode(
 
                 const valControl = node.controls.val;
 
-                valControl.value = (inputs?.in || [])[0] ?? valControl.value;
+                valControl.value = (inputs.in || [])[0] ?? valControl.value;
 
                 // Update graph
                 context.onControlChange(

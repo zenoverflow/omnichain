@@ -21,7 +21,9 @@ export class ButtonControl extends ClassicPreset.Control {
             return (
                 <Button
                     className="c__nodecontrol"
-                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => {
+                        e.stopPropagation();
+                    }}
                     type="primary"
                     size="large"
                     style={{ width: "100%", color: "#fff" }}

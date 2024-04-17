@@ -86,7 +86,7 @@ const mkSocket = (socket: CustomIO["type"]) => {
         case "templateSlot":
             return new TemplateSlotSocket();
         default:
-            throw new Error("Invalid socket type " + socket);
+            throw new Error("Invalid socket type " + (socket as string));
     }
 };
 
@@ -118,9 +118,8 @@ const mkControl = (
     return new Maker(
         nodeId,
         nodeControl,
-        // @ts-ignore
+        // @ts-expect-error
         controlData.defaultValue,
-        // @ts-ignore
         controlData.config,
         context
     );
@@ -191,8 +190,8 @@ export const makeNode = (
             // Control flow setup
             if (controlFlow) {
                 context.control.add(self, {
-                    inputs: () => controlFlow.inputs as any,
-                    outputs: () => controlFlow.outputs as any,
+                    inputs: () => controlFlow.inputs,
+                    outputs: () => controlFlow.outputs,
                     async execute(_: never, forward): Promise<void> {
                         if (!context.getIsActive()) return;
 

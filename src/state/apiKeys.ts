@@ -80,7 +80,7 @@ export const deleteApiKey = (apiKeyId: string) => {
         appStore.set(
             _apiKeyStorageAtom,
             Object.fromEntries(
-                Object.entries(s).filter(([id, _]) => id !== apiKeyId)
+                Object.entries(s).filter(([id]) => id !== apiKeyId)
             )
         );
         await db.apiKeys.delete(apiKeyId);

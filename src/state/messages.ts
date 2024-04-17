@@ -72,7 +72,7 @@ export const deleteMessage = (messageId: string) => {
         appStore.set(
             _messageStorageAtom,
             Object.fromEntries(
-                Object.entries(s).filter(([id, _]) => id !== messageId)
+                Object.entries(s).filter(([id]) => id !== messageId)
             )
         );
         await db.chatMessages.delete(messageId);

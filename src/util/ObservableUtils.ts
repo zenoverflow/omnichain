@@ -16,7 +16,9 @@ export class SimpleObservable<T> {
     }
 
     public next(data: T) {
-        this.observers.forEach((observer) => observer(data));
+        this.observers.forEach((observer) => {
+            observer(data);
+        });
     }
 }
 
@@ -45,6 +47,8 @@ export class StatefulObservable<T> {
 
     public set(data: T) {
         this.state = data;
-        this.observers.forEach((fn) => fn(this.state));
+        this.observers.forEach((fn) => {
+            fn(this.state);
+        });
     }
 }

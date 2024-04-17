@@ -1,10 +1,10 @@
 import { NodeContextObj } from "../../nodes/context";
 
-export class FlowWatcher {
-    public static observe(nodeContext: NodeContextObj) {
+export const FlowWatcher = {
+    observe(nodeContext: NodeContextObj) {
         const { editor, control, dataflow, area } = nodeContext;
 
-        if (!editor || !area || !control || !dataflow) return;
+        if (!area) return;
 
         const removeFromFlow = (id: string) => {
             // Nodes might not be added to both flows
@@ -33,5 +33,5 @@ export class FlowWatcher {
             }
             return context;
         });
-    }
-}
+    },
+};

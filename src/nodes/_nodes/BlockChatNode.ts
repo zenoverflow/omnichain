@@ -35,7 +35,7 @@ export const BlockChatNode = makeNode(
 
                 if (action === "block") {
                     blockChat();
-                } else if (action === "unblock") {
+                } else {
                     unblockChat();
                 }
 

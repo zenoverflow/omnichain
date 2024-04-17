@@ -7,8 +7,8 @@ import * as NODE_MAKERS from "../nodes";
 import type { NodeContextObj } from "../nodes/context";
 import type { SerializedGraph, SerializedNode } from "../data/types";
 
-export class GraphUtils {
-    public static empty(name = "New Chain"): SerializedGraph {
+export const GraphUtils = {
+    empty(name = "New Chain"): SerializedGraph {
         return {
             name,
             graphId: uuidv4(),
@@ -19,9 +19,9 @@ export class GraphUtils {
             areaY: 0,
             created: Date.now(),
         };
-    }
+    },
 
-    public static serializeFromEditor(
+    serializeFromEditor(
         editor: NodeEditor<any>,
         area: AreaPlugin<any, any>,
         oldGraph: SerializedGraph
@@ -54,9 +54,9 @@ export class GraphUtils {
                         !!c.targetInput
                 ),
         };
-    }
+    },
 
-    public static async hydrate(
+    async hydrate(
         graph: SerializedGraph,
         context: NodeContextObj
     ): Promise<void> {
@@ -67,7 +67,7 @@ export class GraphUtils {
             await editor.addNode(this.deserializeNode(n, context));
             // Positions
             await context.area?.nodeViews
-                ?.get(n.nodeId)
+                .get(n.nodeId)
                 //
                 ?.translate(n.positionX, n.positionY);
         }
@@ -90,20 +90,25 @@ export class GraphUtils {
             await a.zoom(graph.zoom);
             await a.translate(graph.areaX, graph.areaY);
         }
-    }
+    },
 
     //
     // UTIL
     //
 
-    private static serializeNode(
+    serializeNode(
         area: AreaPlugin<any, any>,
         node: ClassicPreset.Node
     ): SerializedNode {
         const controlsEntries = Object.entries(node.controls).map(
             ([key, control]) => {
                 const c = control as any;
-                return [key, Object.keys(c).includes("value") ? c.value : null];
+                return [
+                    key,
+                    Object.keys(c).includes("value")
+                        ? (c.value as string)
+                        : null,
+                ];
             }
         );
         const position = area.nodeViews.get(node.id)?.position;
@@ -114,17 +119,14 @@ export class GraphUtils {
             positionX: position?.x ?? 0,
             positionY: position?.y ?? 0,
         };
-    }
+    },
 
-    private static deserializeNode(
-        nodeObj: SerializedNode,
-        context: NodeContextObj
-    ) {
+    deserializeNode(nodeObj: SerializedNode, context: NodeContextObj) {
         const { nodeType, nodeId, controls } = nodeObj;
 
         const Maker = (NODE_MAKERS as any)[nodeType];
         const node = new Maker(context, nodeId, controls) as ClassicPreset.Node;
 
         return node;
-    }
-}
+    },
+};

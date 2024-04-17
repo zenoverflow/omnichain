@@ -50,7 +50,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     type="primary"
                     size="large"
                     style={{ width: "100%" }}
-                    onClick={() => createApiKey()}
+                    onClick={() => {
+                        createApiKey();
+                    }}
                     icon={<PlusCircleOutlined />}
                 >
                     {"API key"}
@@ -87,7 +89,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                                 <Button
                                     type="primary"
                                     size="large"
-                                    onClick={() => deleteApiKey(a.apiKeyId)}
+                                    onClick={() => {
+                                        deleteApiKey(a.apiKeyId);
+                                    }}
                                     icon={<DeleteOutlined />}
                                     danger
                                 />

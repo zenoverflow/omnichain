@@ -69,7 +69,9 @@ export class TextControl extends ClassicPreset.Control {
                         self.handleChange(v);
                     }}
                     className="c__nodecontrol"
-                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => {
+                        e.stopPropagation();
+                    }}
                     style={{
                         width: "100%",
                         height: "300px",
@@ -85,7 +87,9 @@ export class TextControl extends ClassicPreset.Control {
                         self.handleChange(v);
                     }}
                     className="c__nodecontrol"
-                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => {
+                        e.stopPropagation();
+                    }}
                     addonBefore={self.config.label ?? "text"}
                     styles={{
                         prefix: {

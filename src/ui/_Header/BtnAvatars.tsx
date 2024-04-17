@@ -34,10 +34,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         fileInput.onchange = () => {
             if (fileInput.files?.length) {
                 const file = fileInput.files[0];
-                if (file) {
-                    updateAvatarImage(avatarId, file);
-                }
-                console.log(file);
+                updateAvatarImage(avatarId, file);
             }
         };
 
@@ -75,7 +72,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     type="primary"
                     size="large"
                     style={{ width: "100%" }}
-                    onClick={() => createAvatar()}
+                    onClick={() => {
+                        createAvatar();
+                    }}
                     icon={<PlusCircleOutlined />}
                 >
                     {"Avatar"}
@@ -102,7 +101,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                                     backgroundColor: "grey",
                                     cursor: "pointer",
                                 }}
-                                onClick={() => handleAvatarUpdate(a.avatarId)}
+                                onClick={() => {
+                                    handleAvatarUpdate(a.avatarId);
+                                }}
                             />
                             <div style={{ width: "5px" }} />
                             <Input
@@ -120,7 +121,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                             <Button
                                 type="primary"
                                 size="large"
-                                onClick={() => deleteAvatar(a.avatarId)}
+                                onClick={() => {
+                                    deleteAvatar(a.avatarId);
+                                }}
                                 icon={<DeleteOutlined />}
                                 danger
                             />

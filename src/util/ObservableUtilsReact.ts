@@ -15,5 +15,10 @@ export const useOuterState = <T>(s: StatefulObservable<T>) => {
         };
     }, [s]);
 
-    return [state, s.set];
+    return [
+        state,
+        (data: T) => {
+            s.set(data);
+        },
+    ];
 };

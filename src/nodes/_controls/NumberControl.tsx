@@ -67,7 +67,9 @@ export class NumberControl extends ClassicPreset.Control {
                         backgroundColor: "#fff",
                         borderRadius: "6px",
                     }}
-                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => {
+                        e.stopPropagation();
+                    }}
                 >
                     <InputNumber
                         value={value}

@@ -74,14 +74,14 @@ export const updateAvatarImage = (avatarId: string, image: File) => {
     });
 };
 
-export const deleteAvatar = async (avatarId: string) => {
+export const deleteAvatar = (avatarId: string) => {
     QueueUtils.addTask(async () => {
         const s = appStore.get(_avatarStorageAtom);
 
         appStore.set(
             _avatarStorageAtom,
             Object.fromEntries(
-                Object.entries(s).filter(([id, _]) => id !== avatarId)
+                Object.entries(s).filter(([id]) => id !== avatarId)
             )
         );
         await db.chatAvatars.delete(avatarId);

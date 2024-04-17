@@ -8,7 +8,7 @@ export const getNodeRect = (node: any, view: NodeView) => {
     return {
         left: x,
         top: y,
-        right: x + node.width,
-        bottom: y + node.height,
+        right: x + (node.width as number),
+        bottom: y + (node.height as number),
     };
 };

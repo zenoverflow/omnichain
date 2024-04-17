@@ -34,7 +34,7 @@ export const LogOutputNode = makeNode(
 
                 const valControl = node.controls.val;
 
-                valControl.value = (inputs?.data || [])[0] ?? valControl.value;
+                valControl.value = (inputs.data || [])[0] ?? valControl.value;
 
                 // Update graph
                 node.context.onControlChange(

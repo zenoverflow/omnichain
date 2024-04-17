@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { NodeEditor } from "rete";
+import { ClassicPreset, NodeEditor } from "rete";
 import { ControlFlow, Dataflow } from "rete-engine";
 
 import { appStore } from ".";
@@ -7,8 +7,9 @@ import { graphStorageAtom, updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { GraphUtils } from "../util/GraphUtils";
+import { SerializedGraph } from "../data/types";
 
-type ExecutorInstance = {
+export type ExecutorInstance = {
     graphId: string;
     startTs: number;
     step: string | null;
@@ -62,10 +63,10 @@ const markActiveNode = (force = false) => {
             if (!inst.step) continue;
 
             targets.push(
-                `${[
+                [
                     `[data-exec-graph="${inst.graphId}"]`,
                     `[data-exec-node="${inst.step}"]`,
-                ].join("")}`
+                ].join("")
             );
         }
         for (const query of targets) {
@@ -79,7 +80,9 @@ const markActiveNode = (force = false) => {
         console.error(error);
     }
 
-    setTimeout(() => markActiveNode(true), 250);
+    setTimeout(() => {
+        markActiveNode(true);
+    }, 250);
 };
 
 export const stopGraph = (graphId: string) => {
@@ -94,7 +97,11 @@ export const stopGraph = (graphId: string) => {
 };
 
 export const runGraph = async (graphId: string) => {
-    const target = appStore.get(graphStorageAtom)[graphId];
+    const target = appStore.get(graphStorageAtom)[
+        graphId
+    ] as SerializedGraph | null;
+
+    if (!target) return;
 
     // Ensure entrypoint presence
     const triggers = target.nodes.filter((n) => n.nodeType === "StartNode");
@@ -108,8 +115,6 @@ export const runGraph = async (graphId: string) => {
         });
         return;
     }
-
-    if (!target) return;
 
     appStore.set(_executorAtom, {
         ...appStore.get(_executorAtom),
@@ -144,7 +149,7 @@ export const runGraph = async (graphId: string) => {
         onError(error) {
             showNotification({
                 type: "error",
-                text: (error as Error).message,
+                text: error.message,
                 ts: Date.now(),
                 duration: 3,
             });
@@ -177,10 +182,11 @@ export const runGraph = async (graphId: string) => {
         const targets = ["StartNode"];
         const triggerNodes = editor
             .getNodes()
-            .filter((n) => targets.includes(n.label));
+            .filter((n: ClassicPreset.Node) => targets.includes(n.label));
+
         for (const trigger of triggerNodes) {
             setTimeout(() => {
-                control.execute(trigger.id);
+                control.execute((trigger as ClassicPreset.Node).id);
             });
         }
 

@@ -2,22 +2,23 @@ import { NodeContextObj } from "../../nodes/context";
 
 import { updateNodeSelection } from "../../state/nodeSelection";
 
-export class AreaSelectionWatcher {
+export const AreaSelectionWatcher = {
     /**
      * Activate area selection.
      * Plugin must be configured beforehand.
      *
      * @param nodeContext
      */
-    public static observe(nodeContext: NodeContextObj): void {
+    observe(nodeContext: NodeContextObj): void {
         const { editor, area } = nodeContext;
 
-        if (!editor || !area) return;
+        if (!area) return;
 
         const syncSelection = () => {
             const sel = editor
                 .getNodes()
                 .filter((n) => n.selected)
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 .map((n) => n.id);
             updateNodeSelection(sel);
         };
@@ -51,5 +52,5 @@ export class AreaSelectionWatcher {
             }
             return context;
         });
-    }
-}
+    },
+};

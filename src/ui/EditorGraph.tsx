@@ -25,7 +25,7 @@ import {
 
 import { nodeSelectionAtom } from "../state/nodeSelection";
 import { appStore } from "../state";
-import { executorAtom } from "../state/executor";
+import { ExecutorInstance, executorAtom } from "../state/executor";
 
 import { NodeContextObj } from "../nodes/context";
 import { ContextMenu } from "./_EditorGraph/ContextMenu";
@@ -39,14 +39,17 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
     const [targets] = useAtom(nodeSelectionAtom);
 
     useEffect(() => {
-        const listener = async (e: KeyboardEvent) => {
+        const listener = (e: KeyboardEvent) => {
             if (e.key === "Delete" && targets.length) {
                 // Prevent deletions on active graph
                 const editorState = appStore.get(editorStateAtom);
-                if (editorState?.graphId) {
+                if (editorState.graphId) {
                     const executorState = appStore.get(executorAtom);
-                    if (!executorState[editorState?.graphId]) {
-                        await deleteSelectedNodes(props.nodeContext);
+                    const currentExec = executorState[
+                        editorState.graphId
+                    ] as ExecutorInstance | null;
+                    if (!currentExec) {
+                        void deleteSelectedNodes(props.nodeContext);
                     }
                 }
             }
@@ -64,11 +67,13 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
     return (
         <Popconfirm
             title={
-                `Deleting ${targets.length} node` +
+                `Deleting ${targets.length.toString()} node` +
                 (targets.length === 1 ? "" : "s")
             }
             description="Are you sure?"
-            onConfirm={() => deleteSelectedNodes(props.nodeContext)}
+            onConfirm={() => {
+                void deleteSelectedNodes(props.nodeContext);
+            }}
             okText="Yes"
             cancelText="No"
             placement="leftTop"
@@ -112,7 +117,9 @@ const GraphRunButton: React.FC = () => {
             type="primary"
             size="large"
             icon={<PlayCircleOutlined />}
-            onClick={runCurrentGraph}
+            onClick={() => {
+                void runCurrentGraph();
+            }}
             style={{ pointerEvents: "all" }}
         />
     );
@@ -209,7 +216,9 @@ export const EditorGraph: React.FC = () => {
                             type="primary"
                             size="large"
                             icon={<EditOutlined />}
-                            onClick={() => setPropertiesOpen(true)}
+                            onClick={() => {
+                                setPropertiesOpen(true);
+                            }}
                             disabled={editingDisabled}
                         />
                         <GraphRunButton />
@@ -226,7 +235,9 @@ export const EditorGraph: React.FC = () => {
             <Drawer
                 title="Properties"
                 placement="right"
-                onClose={() => setPropertiesOpen(false)}
+                onClose={() => {
+                    setPropertiesOpen(false);
+                }}
                 open={propertiesOpen}
                 extra={
                     <Space>

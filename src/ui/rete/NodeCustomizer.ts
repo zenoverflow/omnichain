@@ -7,8 +7,8 @@ import { renderControl } from "../../nodes/controls";
 import { NodeContextObj } from "../../nodes/context";
 import { MagneticConnection } from "./magconnection";
 
-export class NodeCustomizer {
-    public static presetForNodes(nodeContext: NodeContextObj) {
+export const NodeCustomizer = {
+    presetForNodes(nodeContext: NodeContextObj) {
         const { editor } = nodeContext;
 
         return Presets.classic.setup({
@@ -52,5 +52,5 @@ export class NodeCustomizer {
                 },
             },
         });
-    }
-}
+    },
+};

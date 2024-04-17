@@ -13,7 +13,7 @@ export const BtnCreateGraph: React.FC = () => {
     const handleOpenModal = () => {
         setModalOpen(true);
         setTimeout(() => {
-            inputRef?.current?.focus();
+            inputRef.current?.focus();
         });
     };
 
@@ -54,9 +54,9 @@ export const BtnCreateGraph: React.FC = () => {
                     onChange={(e) => {
                         setValOfName(e.target.value);
                     }}
-                    onKeyDown={async (e) => {
+                    onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            await handleCreate();
+                            handleCreate();
                         }
                     }}
                     autoFocus

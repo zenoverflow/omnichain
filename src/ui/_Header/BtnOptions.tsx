@@ -100,12 +100,12 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                         style={{ width: "100%" }}
                         placeholder="Select an avatar..."
                         options={avatarOptions}
-                        onChange={(v) =>
+                        onChange={(v) => {
                             setUpdates((u) => ({
                                 ...u,
                                 userAvatarId: v,
-                            }))
-                        }
+                            }));
+                        }}
                         value={updates.userAvatarId}
                     />
                 </Space>
@@ -120,12 +120,12 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                         style={{ width: "100%" }}
                         placeholder="Select a chain..."
                         options={chainOptions}
-                        onChange={(v) =>
+                        onChange={(v) => {
                             setUpdates((u) => ({
                                 ...u,
                                 chainChatId: v,
-                            }))
-                        }
+                            }));
+                        }}
                         value={updates.chainChatId}
                     />
                 </Space>

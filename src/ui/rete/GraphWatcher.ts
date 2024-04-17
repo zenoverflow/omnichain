@@ -12,11 +12,11 @@ let debouncerAreaReorder: NodeJS.Timeout | null = null;
 
 let debouncerAreaZoom: NodeJS.Timeout | null = null;
 
-export class GraphWatcher {
-    public static observe(nodeContext: NodeContextObj) {
+export const GraphWatcher = {
+    observe(nodeContext: NodeContextObj) {
         const { editor, area, graphId } = nodeContext;
 
-        if (!editor || !area || !graphId) return;
+        if (!area || !graphId) return;
 
         editor.addPipe((context) => {
             if (
@@ -101,5 +101,5 @@ export class GraphWatcher {
             }
             return context;
         });
-    }
-}
+    },
+};

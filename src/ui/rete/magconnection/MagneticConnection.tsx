@@ -17,7 +17,10 @@ const Path = styled.path<{ styles?: (props: any) => any }>`
     stroke: #ffc53d;
     opacity: 0.5;
     pointer-events: auto;
-    ${(props) => props.styles && props.styles(props)};
+    ${
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        (props) => props.styles && props.styles(props)
+    };
 `;
 
 export function MagneticConnection(props: {

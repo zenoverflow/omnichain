@@ -1,17 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 import type { ChatAvatar } from "../data/types";
 
-export class ImgUtils {
-    public static empty(name = "Anon"): ChatAvatar {
+export const ImgUtils = {
+    empty(name = "Anon"): ChatAvatar {
         return {
             avatarId: uuidv4(),
             name,
             imageBase64: "",
             created: Date.now(),
         };
-    }
+    },
 
-    public static resizeImage(
+    resizeImage(
         file: File,
         maxWidth: number,
         maxHeight: number
@@ -27,7 +27,8 @@ export class ImgUtils {
                     const ctx = canvas.getContext("2d");
 
                     if (!ctx) {
-                        return res("");
+                        res("");
+                        return;
                     }
 
                     // Set the image smoothing quality
@@ -52,9 +53,9 @@ export class ImgUtils {
                     // Call the callback with the result
                     res(dataUrl);
                 };
-                img.src = (event.target?.result as string) ?? "";
+                img.src = (event.target?.result ?? "") as string;
             };
             reader.readAsDataURL(file);
         });
-    }
-}
+    },
+};

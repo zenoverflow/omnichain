@@ -42,8 +42,9 @@ export const configureMagCon = (
     let picked: null | SocketData = null;
     let nearestSocket: null | (SocketData & Position) = null;
 
-    (connection as ConnectionPlugin<any, any>).addPipe(async (context) => {
+    connection.addPipe(async (context) => {
         if (!context || typeof context !== "object" || !("type" in context))
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
 
         if (context.type === "connectionpick") {
@@ -59,6 +60,7 @@ export const configureMagCon = (
             picked = null;
             magneticConnection.unmount(area);
         } else if (context.type === "pointermove") {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             if (!picked) return context;
             const point = context.data.position;
             const nodes = Array.from(area.nodeViews.entries());
@@ -119,6 +121,7 @@ export const configureMagCon = (
         } else if (context.type === "unmount") {
             sockets.delete(context.data.element);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return context;
     });
 };

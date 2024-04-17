@@ -41,7 +41,9 @@ export const Sider: React.FC<{
         <AntSider
             style={{ overflowY: "auto", overflowX: "hidden" }}
             collapsed={collapsed}
-            onBreakpoint={(broken) => setCollapsed(broken)}
+            onBreakpoint={(broken) => {
+                setCollapsed(broken);
+            }}
             collapsible
             breakpoint="sm"
             trigger={null}

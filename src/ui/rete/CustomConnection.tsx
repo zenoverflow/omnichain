@@ -21,7 +21,10 @@ export const Path = styled.path<PathProps>`
     stroke-width: 5px;
     stroke: ${(props) => props.stroke};
     pointer-events: auto;
-    ${(props) => props.styles && props.styles(props)}
+    ${
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        (props) => props.styles && props.styles(props)
+    }
 `;
 
 type ConnectionProps = {

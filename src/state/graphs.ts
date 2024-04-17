@@ -29,7 +29,7 @@ export const loadGraphsFromDb = async () => {
 export const createGraph = (name = "New Chain") => {
     QueueUtils.addTask(async () => {
         const s = appStore.get(_graphStorageAtom);
-        const created = GraphUtils.empty(name ?? "New Chain");
+        const created = GraphUtils.empty(name);
         appStore.set(_graphStorageAtom, {
             ...s,
 
@@ -88,7 +88,7 @@ export const updateNodeControl = (
     graphId: string,
     nodeId: string,
     controlKey: string,
-    controlValue: any
+    controlValue: string | number
 ) => {
     QueueUtils.addTask(async () => {
         console.log("UPDATE NODE CONTROL");
@@ -121,7 +121,7 @@ export const deleteGraph = (graphId: string) => {
         appStore.set(
             _graphStorageAtom,
             Object.fromEntries(
-                Object.entries(s).filter(([id, _]) => id !== graphId)
+                Object.entries(s).filter(([id]) => id !== graphId)
             )
         );
         await db.chains.delete(graphId);

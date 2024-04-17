@@ -5,25 +5,29 @@ import {
     getSourceTarget,
 } from "rete-connection-plugin";
 
-export class FlowCustomizer {
-    public static canMakeConnection(from: SocketData, to: SocketData) {
-        const [sourceSocket, targetSocket] = (getSourceTarget(from, to) as [
-            any,
-            any
-        ]) || [null, null];
+export const FlowCustomizer = {
+    canMakeConnection(from: SocketData, to: SocketData) {
+        const [sourceSocket, targetSocket] = getSourceTarget(from, to) || [
+            null,
+            null,
+        ];
 
         if (!sourceSocket || !targetSocket) return false;
 
         if (
-            !sourceSocket.payload.isCompatibleWith(targetSocket.payload) &&
-            !targetSocket.payload.isCompatibleWith(sourceSocket.payload)
+            !(sourceSocket as any).payload.isCompatibleWith(
+                (targetSocket as any).payload
+            ) &&
+            !(targetSocket as any).payload.isCompatibleWith(
+                (sourceSocket as any).payload
+            )
         ) {
             return false;
         }
         return true;
-    }
+    },
 
-    public static getFlowBuilder(connectionPlugin: ConnectionPlugin<any, any>) {
+    getFlowBuilder(connectionPlugin: ConnectionPlugin<any, any>) {
         return () =>
             new ClassicFlow({
                 canMakeConnection(from, to) {
@@ -34,5 +38,5 @@ export class FlowCustomizer {
                     return can;
                 },
             });
-    }
-}
+    },
+};

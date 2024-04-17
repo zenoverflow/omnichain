@@ -34,7 +34,7 @@ export const DelayOutputNode = makeNode(
                 await new Promise((r) =>
                     setTimeout(r, controls["millis"] as number)
                 );
-                return { dataOut: (inputs?.dataIn || [""])[0] };
+                return { dataOut: (inputs.dataIn || [""])[0] };
             },
         },
     }

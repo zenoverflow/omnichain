@@ -8,8 +8,8 @@ import { isGraphActive } from "../state/executor";
 const makeRootMenu = (nodeContext: NodeContextObj) => {
     const { editor, area } = nodeContext;
 
-    if (!editor || !area) {
-        throw new Error("Context menu: editor/area missing!");
+    if (!area) {
+        throw new Error("Context menu: area missing!");
     }
 
     const entrypointsCount = editor
