@@ -152,6 +152,8 @@ export const makeNode = (
             const self = this;
             self.id = id ?? self.id;
 
+            console.log("Creating node", self.id, nodeName, controlValues);
+
             // Inputs
             for (const { name, label, type: socket, multi } of inputs) {
                 self.addInput(
@@ -184,6 +186,13 @@ export const makeNode = (
                     mkControl(self.id, name, context, control)
                 );
                 if (controlValues[name]) {
+                    console.log(
+                        "Setting control value",
+                        this.id,
+                        nodeName,
+                        name,
+                        controlValues[name]
+                    );
                     self.controls[name].value = controlValues[name];
                 }
             }

@@ -9,5 +9,6 @@ export const nodeSelectionAtom = atom<string[]>((get) => [
 ]);
 
 export const updateNodeSelection = (selection: string[]) => {
+    console.log("updateNodeSelection", selection);
     appStore.set(_nodeSelectionAtom, selection);
 };

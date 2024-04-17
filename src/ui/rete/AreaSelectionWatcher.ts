@@ -43,8 +43,8 @@ export const AreaSelectionWatcher = {
                 (
                     [
                         "nodepicked",
-                        "pointerup",
-                        "pointerdown",
+                        // "pointerup",
+                        // "pointerdown",
                     ] as (typeof context.type)[]
                 ).includes(context.type)
             ) {
