@@ -26,7 +26,15 @@ export class TextControl extends ClassicPreset.Control {
             nodeControl,
             defaultValue
         );
-        this.value = defaultValue;
+        this.value = this.grabValue();
+    }
+
+    private grabValue() {
+        return (this.context.getControlValue(
+            this.context.graphId,
+            this.nodeId,
+            this.nodeControl
+        ) ?? this.defaultValue) as string;
     }
 
     private handleChange(value: string) {
@@ -47,7 +55,7 @@ export class TextControl extends ClassicPreset.Control {
         const self = this;
 
         const _Component: React.FC = () => {
-            const [value, setValue] = useState(self.value);
+            const [value, setValue] = useState(this.grabValue());
 
             console.log("TextControl", self.nodeId, self.nodeControl, value);
 

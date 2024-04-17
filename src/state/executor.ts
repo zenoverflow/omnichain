@@ -169,6 +169,14 @@ export const runGraph = async (graphId: string) => {
         getControlObservable() {
             return controlObservable;
         },
+        getControlValue(graphId, node, control) {
+            const s = appStore.get(graphStorageAtom);
+            const graph = s[graphId] as SerializedGraph | null;
+            if (!graph) return null;
+            return graph.nodes.find((n) => n.nodeId === node)?.controls[
+                control
+            ] as string | number | null;
+        },
         getIsActive() {
             return isGraphActive(graphId);
         },

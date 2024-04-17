@@ -21,7 +21,15 @@ export class NumberControl extends ClassicPreset.Control {
         private context: NodeContextObj
     ) {
         super();
-        this.value = defaultValue;
+        this.value = this.grabValue();
+    }
+
+    private grabValue() {
+        return (this.context.getControlValue(
+            this.context.graphId,
+            this.nodeId,
+            this.nodeControl
+        ) ?? this.defaultValue) as number | null;
     }
 
     private handleChange(value: number) {
@@ -42,7 +50,7 @@ export class NumberControl extends ClassicPreset.Control {
         const self = this;
 
         const _Component: React.FC = () => {
-            const [value, setValue] = useState(self.value);
+            const [value, setValue] = useState(this.grabValue());
 
             useEffect(() => {
                 const unsub = self.context
@@ -59,7 +67,7 @@ export class NumberControl extends ClassicPreset.Control {
                 return () => {
                     if (unsub) unsub();
                 };
-            }, [setValue]);
+            }, []);
 
             return (
                 <div

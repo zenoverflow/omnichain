@@ -145,14 +145,11 @@ export const makeNode = (
 
         constructor(
             public context: NodeContextObj,
-            id: string | null = null, // for deserialization
-            controlValues: Record<string, any> = {} // for deserialization
+            id: string | null = null // for deserialization
         ) {
             super(nodeName);
             const self = this;
             self.id = id ?? self.id;
-
-            console.log("Creating node", self.id, nodeName, controlValues);
 
             // Inputs
             for (const { name, label, type: socket, multi } of inputs) {
@@ -185,16 +182,6 @@ export const makeNode = (
                     name,
                     mkControl(self.id, name, context, control)
                 );
-                if (controlValues[name]) {
-                    console.log(
-                        "Setting control value",
-                        this.id,
-                        nodeName,
-                        name,
-                        controlValues[name]
-                    );
-                    self.controls[name].value = controlValues[name];
-                }
             }
             // Control flow setup
             if (controlFlow) {

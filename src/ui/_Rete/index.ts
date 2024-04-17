@@ -13,7 +13,11 @@ import { ControlFlow, Dataflow } from "rete-engine";
 
 import { appStore } from "../../state";
 import { editorStateAtom } from "../../state/editor";
-import { initGraph, updateNodeControl } from "../../state/graphs";
+import {
+    initGraph,
+    updateNodeControl,
+    graphStorageAtom,
+} from "../../state/graphs";
 import { controlObservable } from "../../state/watcher";
 import { showNotification } from "../../state/notifications";
 import { isGraphActive } from "../../state/executor";
@@ -29,6 +33,7 @@ import { NodeCustomizer } from "./NodeCustomizer";
 import { FlowCustomizer } from "./FlowCustomizer";
 import { GraphTemplate } from "./GraphTemplate";
 import { integrateMagCon } from "./magconnection";
+import { SerializedGraph } from "../../data/types";
 
 // const { TransitionApplier } = ArrangeAppliers;
 
@@ -95,6 +100,14 @@ export async function createEditor(container: HTMLElement) {
         },
         getControlObservable() {
             return controlObservable;
+        },
+        getControlValue(graphId, node, control) {
+            const s = appStore.get(graphStorageAtom);
+            const graph = s[graphId] as SerializedGraph | null;
+            if (!graph) return null;
+            return graph.nodes.find((n) => n.nodeId === node)?.controls[
+                control
+            ] as string | number | null;
         },
         getIsActive() {
             return isGraphActive(graphId);

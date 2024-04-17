@@ -26,7 +26,15 @@ export class SelectControl extends ClassicPreset.Control {
         private context: NodeContextObj
     ) {
         super();
-        this.value = defaultValue;
+        this.value = this.grabValue();
+    }
+
+    private grabValue() {
+        return (this.context.getControlValue(
+            this.context.graphId,
+            this.nodeId,
+            this.nodeControl
+        ) ?? this.defaultValue) as string | null;
     }
 
     private handleChange(value: string) {
@@ -52,7 +60,9 @@ export class SelectControl extends ClassicPreset.Control {
                 : null;
 
         const _Component: React.FC = () => {
-            const [value, setValue] = useState(findValueMatch(self.value));
+            const [value, setValue] = useState(
+                findValueMatch(this.grabValue())
+            );
 
             useEffect(() => {
                 const unsub = self.context

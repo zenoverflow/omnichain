@@ -122,10 +122,10 @@ export const GraphUtils = {
     },
 
     deserializeNode(nodeObj: SerializedNode, context: NodeContextObj) {
-        const { nodeType, nodeId, controls } = nodeObj;
+        const { nodeType, nodeId } = nodeObj;
 
         const Maker = (NODE_MAKERS as any)[nodeType];
-        const node = new Maker(context, nodeId, controls) as ClassicPreset.Node;
+        const node = new Maker(context, nodeId) as ClassicPreset.Node;
 
         return node;
     },
