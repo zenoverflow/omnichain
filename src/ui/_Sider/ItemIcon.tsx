@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { useAtom } from "jotai";
 import { PlayCircleOutlined, PartitionOutlined } from "@ant-design/icons";
 
-import { executorAtom } from "../../state/executor";
+import { executorStorage } from "../../state/executor";
+import { useOuterState } from "../../util/ObservableUtilsReact";
 
 export const ItemIcon: React.FC<{ graphId: string }> = (props) => {
-    const [executor] = useAtom(executorAtom);
+    const [executor] = useOuterState(executorStorage);
 
     const isBeingExecuted = useMemo(() => {
         for (const execInst of Object.values(executor)) {

@@ -1,15 +1,11 @@
-import { atom } from "jotai";
+import { StatefulObservable } from "../util/ObservableUtils";
 
-import { appStore } from ".";
-
-const _loaderAtom = atom<boolean>(false);
-
-export const loaderAtom = atom((get) => get(_loaderAtom));
+export const loaderStorage = new StatefulObservable<boolean>(false);
 
 export const startGlobalLoading = () => {
-    appStore.set(_loaderAtom, true);
+    loaderStorage.set(true);
 };
 
 export const finishGlobalLoading = () => {
-    appStore.set(_loaderAtom, false);
+    loaderStorage.set(false);
 };

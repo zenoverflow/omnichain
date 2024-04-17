@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { useAtom } from "jotai";
 import { Button, Modal, Select, Space } from "antd";
 import {
     SettingOutlined,
@@ -8,20 +7,21 @@ import {
 } from "@ant-design/icons";
 
 import {
-    optionsAtom,
+    optionsStorage,
     setChatChain,
     setApiChain,
     setApiPort,
     setUserAvatar,
 } from "../../state/options";
-import { graphStorageAtom } from "../../state/graphs";
-import { avatarStorageAtom } from "../../state/avatars";
+import { graphStorage } from "../../state/graphs";
+import { avatarStorage } from "../../state/avatars";
+import { useOuterState } from "../../util/ObservableUtilsReact";
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     const [{ chainChatId, chainApiId, apiPort, userAvatarId }] =
-        useAtom(optionsAtom);
-    const [graphStorage] = useAtom(graphStorageAtom);
-    const [avatarStorage] = useAtom(avatarStorageAtom);
+        useOuterState(optionsStorage);
+    const [graphs] = useOuterState(graphStorage);
+    const [avatars] = useOuterState(avatarStorage);
 
     const [updates, setUpdates] = useState({
         userAvatarId,
@@ -32,24 +32,24 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
 
     const avatarOptions = useMemo(
         () =>
-            Object.values(avatarStorage)
+            Object.values(avatars)
                 .sort((a, b) => b.created - a.created)
                 .map((c) => ({
                     label: c.name,
                     value: c.avatarId,
                 })),
-        [avatarStorage]
+        [avatars]
     );
 
     const chainOptions = useMemo(
         () =>
-            Object.values(graphStorage)
+            Object.values(graphs)
                 .sort((a, b) => b.created - a.created)
                 .map((c) => ({
                     label: c.name,
                     value: c.graphId,
                 })),
-        [graphStorage]
+        [graphs]
     );
 
     const handleApply = () => {

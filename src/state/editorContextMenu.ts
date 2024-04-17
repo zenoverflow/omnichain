@@ -1,6 +1,4 @@
-import { atom } from "jotai";
-
-import { appStore } from ".";
+import { StatefulObservable } from "../util/ObservableUtils";
 
 type MenuItem = {
     key: string;
@@ -17,19 +15,12 @@ type MenuState = {
     isRoot: boolean;
 };
 
-type _MenuStateAtom = MenuState | null;
-
-const _menuStateAtom = atom<_MenuStateAtom>(null);
-
-export const menuStateAtom = atom<_MenuStateAtom>(
-    //
-    (get) => get(_menuStateAtom)
-);
+export const menuStateStorage = new StatefulObservable<MenuState | null>(null);
 
 export const showContextMenu = (menu: MenuState) => {
-    appStore.set(_menuStateAtom as any, menu);
+    menuStateStorage.set(menu);
 };
 
 export const hideContextMenu = () => {
-    appStore.set(_menuStateAtom as any, null);
+    menuStateStorage.set(null);
 };

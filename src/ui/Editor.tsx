@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useAtom } from "jotai";
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -15,13 +14,14 @@ import { BtnOptions } from "./_Header/BtnOptions";
 import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
 
-import { editorStateAtom, closeEditor } from "../state/editor";
-import { loaderAtom } from "../state/loader";
+import { editorStateStorage, closeEditor } from "../state/editor";
+import { loaderStorage } from "../state/loader";
+import { useOuterState } from "../util/ObservableUtilsReact";
 
 const { Header, Content } = Layout;
 
 const EditorContent: React.FC = () => {
-    const [{ graphId }] = useAtom(editorStateAtom);
+    const [{ graphId }] = useOuterState(editorStateStorage);
     return (
         <Content
             id="TheEditor"
@@ -42,8 +42,8 @@ const EditorContent: React.FC = () => {
 
 export const Editor: React.FC = () => {
     const [siderCollapsed, setSiderCollapsed] = useState(false);
-    const [{ graphId }] = useAtom(editorStateAtom);
-    const [loading] = useAtom(loaderAtom);
+    const [{ graphId }] = useOuterState(editorStateStorage);
+    const [loading] = useOuterState(loaderStorage);
 
     return (
         <>

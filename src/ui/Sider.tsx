@@ -1,9 +1,8 @@
 import { Layout, Menu, MenuProps } from "antd";
-import { useAtom } from "jotai";
 
-import { graphStorageAtom } from "../state/graphs";
-import { editorStateAtom, openGraph } from "../state/editor";
-
+import { graphStorage } from "../state/graphs";
+import { editorStateStorage, openGraph } from "../state/editor";
+import { useOuterState } from "../util/ObservableUtilsReact";
 import { ItemIcon } from "./_Sider/ItemIcon";
 import { BtnCreateGraph } from "./_Sider/BtnCreateGraph";
 
@@ -13,24 +12,16 @@ export const Sider: React.FC<{
     collapsed: boolean;
     setCollapsed: (collapsed: boolean) => void;
 }> = ({ collapsed, setCollapsed }) => {
-    const [graphStorage] = useAtom(graphStorageAtom);
-    const [editorState] = useAtom(editorStateAtom);
+    const [graphs] = useOuterState(graphStorage);
+    const [editorState] = useOuterState(editorStateStorage);
 
-    const items: MenuProps["items"] = Object.values(graphStorage)
+    const items: MenuProps["items"] = Object.values(graphs)
         .sort((a, b) => b.created - a.created)
         .map((graph) => ({
             key: graph.graphId,
             icon: <ItemIcon graphId={graph.graphId} />,
             label: graph.name.trim().length ? graph.name.trim() : "Chain",
         }));
-
-    // const [openKeys, setOpenKeys] = useState<string[]>([]);
-    // // Ensure selection is open
-    // useEffect(() => {
-    //     if (editorState.graphId && !openKeys.includes(editorState.graphId)) {
-    //         setOpenKeys((old) => [...old, editorState.graphId]);
-    //     }
-    // }, [openKeys, editorState]);
 
     const handleMenuClick: MenuProps["onClick"] = ({ keyPath }) => {
         const [key] = keyPath;

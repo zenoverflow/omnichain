@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 
 import { StatefulObservable } from "./ObservableUtils";
 
-export const useOuterState = <T>(s: StatefulObservable<T>) => {
+export const useOuterState = <T>(
+    s: StatefulObservable<T>
+): [T, (data: T) => void] => {
     const [state, setState] = useState(s.get());
 
     useEffect(() => {

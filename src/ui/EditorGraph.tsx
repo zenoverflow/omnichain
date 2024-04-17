@@ -1,34 +1,28 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useRete } from "rete-react-plugin";
-import { useAtom } from "jotai";
-
 import {
     DeleteOutlined,
     EditOutlined,
     PlayCircleOutlined,
     StopOutlined,
 } from "@ant-design/icons";
-
 import { Button, Drawer, Space, Input, Popconfirm } from "antd";
 
 import { createEditor } from "./_Rete";
-
 import {
-    currentGraphAtom,
+    editorStateStorage,
     deleteCurrentGraph,
     deleteSelectedNodes,
-    editorStateAtom,
     runCurrentGraph,
     stopCurrentGraph,
     updateCurrentGraphName,
 } from "../state/editor";
-
-import { nodeSelectionAtom } from "../state/nodeSelection";
-import { appStore } from "../state";
-import { ExecutorInstance, executorAtom } from "../state/executor";
-
+import { nodeSelectionStorage } from "../state/nodeSelection";
+import { graphStorage } from "../state/graphs";
+import { ExecutorInstance, executorStorage } from "../state/executor";
 import { NodeContextObj } from "../nodes/context";
 import { ContextMenu } from "./_EditorGraph/ContextMenu";
+import { useOuterState } from "../util/ObservableUtilsReact";
 
 type DeleteButtonProps = {
     nodeContext: NodeContextObj;
@@ -36,15 +30,15 @@ type DeleteButtonProps = {
 };
 
 const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
-    const [targets] = useAtom(nodeSelectionAtom);
+    const [targets] = useOuterState(nodeSelectionStorage);
 
     useEffect(() => {
         const listener = (e: KeyboardEvent) => {
             if (e.key === "Delete" && targets.length) {
                 // Prevent deletions on active graph
-                const editorState = appStore.get(editorStateAtom);
+                const editorState = editorStateStorage.get();
                 if (editorState.graphId) {
-                    const executorState = appStore.get(executorAtom);
+                    const executorState = executorStorage.get();
                     const currentExec = executorState[
                         editorState.graphId
                     ] as ExecutorInstance | null;
@@ -91,8 +85,8 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
 };
 
 const GraphRunButton: React.FC = () => {
-    const [{ graphId }] = useAtom(editorStateAtom);
-    const [executor] = useAtom(executorAtom);
+    const [{ graphId }] = useOuterState(editorStateStorage);
+    const [executor] = useOuterState(executorStorage);
 
     const graphIsActive = useMemo(
         () => (graphId ? !!executor[graphId] : false),
@@ -130,11 +124,17 @@ export const EditorGraph: React.FC = () => {
 
     const [propertiesOpen, setPropertiesOpen] = useState(false);
 
-    const [currentGraph] = useAtom(currentGraphAtom);
+    const [graphs] = useOuterState(graphStorage);
 
-    const [{ graphId }] = useAtom(editorStateAtom);
+    // Id of the currently open graph
+    const [{ graphId }] = useOuterState(editorStateStorage);
 
-    const [executor] = useAtom(executorAtom);
+    const [executor] = useOuterState(executorStorage);
+
+    const currentGraph = useMemo(
+        () => (graphId ? graphs[graphId] : null),
+        [graphId, graphs]
+    );
 
     // Disable editing if graph is active
     const editingDisabled = useMemo(
@@ -144,7 +144,7 @@ export const EditorGraph: React.FC = () => {
 
     // Disable/enable controls manually
     useEffect(() => {
-        if (currentGraph && editor) {
+        if (graphId && editor) {
             if (editingDisabled && !editor.readonly.enabled) {
                 editor.readonly.enable();
 
@@ -175,9 +175,9 @@ export const EditorGraph: React.FC = () => {
                     });
             }
         }
-    }, [currentGraph, editor, editingDisabled]);
+    }, [graphId, editor, editingDisabled]);
 
-    if (!currentGraph) return null;
+    if (!graphId) return null;
 
     return (
         <>
@@ -264,7 +264,7 @@ export const EditorGraph: React.FC = () => {
                 <Input
                     size="large"
                     addonBefore="name"
-                    value={currentGraph.name}
+                    value={currentGraph?.name ?? ""}
                     maxLength={120}
                     onChange={(e) => {
                         updateCurrentGraphName(e.target.value);

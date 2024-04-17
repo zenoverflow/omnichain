@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { useAtom } from "jotai";
 import { Button, Input, Modal, Space, Empty } from "antd";
 import {
     DeleteOutlined,
@@ -8,22 +7,23 @@ import {
 } from "@ant-design/icons";
 
 import {
-    apiKeyStorageAtom,
+    apiKeyStorage,
     createApiKey,
     updateApiKeyName,
     updateApiKeyContent,
     deleteApiKey,
 } from "../../state/apiKeys";
+import { useOuterState } from "../../util/ObservableUtilsReact";
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
-    const [apiKeyStorage] = useAtom(apiKeyStorageAtom);
+    const [apiKeys] = useOuterState(apiKeyStorage);
 
-    const apiKeys = useMemo(
+    const apiKeysSorted = useMemo(
         () =>
-            Object.values(apiKeyStorage)
+            Object.values(apiKeys)
                 //
                 .sort((a, b) => b.created - a.created),
-        [apiKeyStorage]
+        [apiKeys]
     );
 
     return (
@@ -57,10 +57,10 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                 >
                     {"API key"}
                 </Button>
-                {!apiKeys.length ? (
+                {!apiKeysSorted.length ? (
                     <Empty />
                 ) : (
-                    apiKeys.map((a) => (
+                    apiKeysSorted.map((a) => (
                         <Space
                             key={a.apiKeyId}
                             style={{ width: "100%" }}

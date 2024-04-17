@@ -1,9 +1,8 @@
-import { atom } from "jotai";
 import { ClassicPreset, NodeEditor } from "rete";
 import { ControlFlow, Dataflow } from "rete-engine";
 
-import { appStore } from ".";
-import { graphStorageAtom, updateNodeControl } from "./graphs";
+import { StatefulObservable } from "../util/ObservableUtils";
+import { graphStorage, updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { GraphUtils } from "../util/GraphUtils";
@@ -15,21 +14,20 @@ export type ExecutorInstance = {
     step: string | null;
 };
 
-const _executorAtom = atom<Record<string, ExecutorInstance>>({});
-
-export const executorAtom = atom((get) => ({ ...get(_executorAtom) }));
+export const executorStorage = new StatefulObservable<
+    Record<string, ExecutorInstance>
+>({});
 
 export const isGraphActive = (id: string): boolean => {
-    const executor = appStore.get(executorAtom);
-    return !!executor[id];
+    return !!executorStorage.get()[id];
 };
 
 export const updateActiveNode = (graphId: string, execId: string) => {
-    const s = appStore.get(_executorAtom);
-    appStore.set(_executorAtom, {
-        ...s,
+    const storage = executorStorage.get();
+    executorStorage.set({
+        ...storage,
         [graphId]: {
-            ...s[graphId],
+            ...storage[graphId],
             step: execId,
         },
     });
@@ -49,7 +47,7 @@ const markActiveNode = (force = false) => {
 
     unmarkAllNodes();
 
-    const execInstances = Object.values(appStore.get(_executorAtom));
+    const execInstances = Object.values(executorStorage.get());
 
     if (!execInstances.length) {
         indicatorLock = false;
@@ -86,10 +84,9 @@ const markActiveNode = (force = false) => {
 };
 
 export const stopGraph = (graphId: string) => {
-    appStore.set(
-        _executorAtom,
+    executorStorage.set(
         Object.fromEntries(
-            Object.entries(appStore.get(_executorAtom)).filter(
+            Object.entries(executorStorage.get()).filter(
                 ([key]) => key !== graphId
             )
         )
@@ -97,9 +94,7 @@ export const stopGraph = (graphId: string) => {
 };
 
 export const runGraph = async (graphId: string) => {
-    const target = appStore.get(graphStorageAtom)[
-        graphId
-    ] as SerializedGraph | null;
+    const target = graphStorage.get()[graphId] as SerializedGraph | null;
 
     if (!target) return;
 
@@ -116,8 +111,8 @@ export const runGraph = async (graphId: string) => {
         return;
     }
 
-    appStore.set(_executorAtom, {
-        ...appStore.get(_executorAtom),
+    executorStorage.set({
+        ...executorStorage.get(),
         [graphId]: {
             graphId,
             startTs: Date.now(),
@@ -170,7 +165,7 @@ export const runGraph = async (graphId: string) => {
             return controlObservable;
         },
         getControlValue(graphId, node, control) {
-            const s = appStore.get(graphStorageAtom);
+            const s = graphStorage.get();
             const graph = s[graphId] as SerializedGraph | null;
             if (!graph) return null;
             return graph.nodes.find((n) => n.nodeId === node)?.controls[

@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { useAtom } from "jotai";
 import { Button, Input, Modal, Avatar, Space, Empty } from "antd";
 import {
     DeleteOutlined,
@@ -9,22 +8,23 @@ import {
 } from "@ant-design/icons";
 
 import {
-    avatarStorageAtom,
+    avatarStorage,
     createAvatar,
     updateAvatarName,
     updateAvatarImage,
     deleteAvatar,
 } from "../../state/avatars";
+import { useOuterState } from "../../util/ObservableUtilsReact";
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
-    const [avatarStorage] = useAtom(avatarStorageAtom);
+    const [avatars] = useOuterState(avatarStorage);
 
-    const avatars = useMemo(
+    const avatarsSorted = useMemo(
         () =>
-            Object.values(avatarStorage)
+            Object.values(avatars)
                 //
                 .sort((a, b) => b.created - a.created),
-        [avatarStorage]
+        [avatars]
     );
 
     const handleAvatarUpdate = (avatarId: string) => {
@@ -79,10 +79,10 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                 >
                     {"Avatar"}
                 </Button>
-                {!avatars.length ? (
+                {!avatarsSorted.length ? (
                     <Empty />
                 ) : (
-                    avatars.map((a) => (
+                    avatarsSorted.map((a) => (
                         <div
                             key={a.avatarId}
                             style={{

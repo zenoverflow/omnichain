@@ -1,21 +1,16 @@
-import { atom } from "jotai";
-
-import { appStore } from ".";
+import { StatefulObservable } from "../util/ObservableUtils";
 import { ImgUtils } from "../util/ImgUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { db } from "../data/db";
 import { ChatAvatar } from "../data/types";
 import { clearRedundantOptions } from "./options";
 
-const _avatarStorageAtom = atom<Record<string, ChatAvatar>>({});
-
-export const avatarStorageAtom = atom((get) => ({
-    ...get(_avatarStorageAtom),
-}));
+export const avatarStorage = new StatefulObservable<Record<string, ChatAvatar>>(
+    {}
+);
 
 export const loadAvatarsFromDb = async () => {
-    appStore.set(
-        _avatarStorageAtom,
+    avatarStorage.set(
         Object.fromEntries(
             (await db.chatAvatars.toArray()).map((c) => [c.avatarId, c])
         )
@@ -26,13 +21,10 @@ export const loadAvatarsFromDb = async () => {
 
 export const createAvatar = (name = "Anon") => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_avatarStorageAtom);
         const created: ChatAvatar = ImgUtils.empty(name);
-        const id = created.avatarId;
-        appStore.set(_avatarStorageAtom, {
-            ...s,
-
-            [id]: created,
+        avatarStorage.set({
+            ...avatarStorage.get(),
+            [created.avatarId]: created,
         });
         await db.chatAvatars.add(created);
     });
@@ -40,16 +32,16 @@ export const createAvatar = (name = "Anon") => {
 
 export const updateAvatarName = (avatarId: string, name: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_avatarStorageAtom);
-        const target = s[avatarId];
+        const storage = avatarStorage.get();
+        const target = storage[avatarId];
 
         const update: ChatAvatar = {
             ...target,
             name,
         };
 
-        appStore.set(_avatarStorageAtom, {
-            ...s,
+        avatarStorage.set({
+            ...storage,
             [avatarId]: update,
         });
         await db.chatAvatars.put(update);
@@ -58,16 +50,16 @@ export const updateAvatarName = (avatarId: string, name: string) => {
 
 export const updateAvatarImage = (avatarId: string, image: File) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_avatarStorageAtom);
-        const target = s[avatarId];
+        const storage = avatarStorage.get();
+        const target = storage[avatarId];
 
         const update: ChatAvatar = {
             ...target,
             imageBase64: await ImgUtils.resizeImage(image, 150, 150),
         };
 
-        appStore.set(_avatarStorageAtom, {
-            ...s,
+        avatarStorage.set({
+            ...storage,
             [avatarId]: update,
         });
         await db.chatAvatars.put(update);
@@ -76,12 +68,11 @@ export const updateAvatarImage = (avatarId: string, image: File) => {
 
 export const deleteAvatar = (avatarId: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_avatarStorageAtom);
-
-        appStore.set(
-            _avatarStorageAtom,
+        avatarStorage.set(
             Object.fromEntries(
-                Object.entries(s).filter(([id]) => id !== avatarId)
+                Object.entries(avatarStorage.get()).filter(
+                    ([id]) => id !== avatarId
+                )
             )
         );
         await db.chatAvatars.delete(avatarId);

@@ -8,22 +8,22 @@ import {
 } from "react";
 import { Input, Avatar, Space, Button } from "antd";
 import { UserOutlined, SendOutlined } from "@ant-design/icons";
-import { useAtom } from "jotai";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Markdown from "react-markdown";
 
 import { ChatMessage } from "../data/types";
-import { optionsAtom } from "../state/options";
+import { optionsStorage } from "../state/options";
 import {
-    messageStorageAtom,
+    messageStorage,
     loadMessagesFromDb,
     unloadMessages,
     addMessage,
 } from "../state/messages";
-import { avatarStorageAtom } from "../state/avatars";
+import { avatarStorage } from "../state/avatars";
 import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
-import { chatBlockAtom } from "../state/chatBlock";
+import { chatBlockStorage } from "../state/chatBlock";
+import { useOuterState } from "../util/ObservableUtilsReact";
 
 const { TextArea } = Input;
 
@@ -74,13 +74,13 @@ const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
 };
 
 const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
-    const [avatarStorage] = useAtom(avatarStorageAtom);
+    const [avatars] = useOuterState(avatarStorage);
 
     const avatar = useMemo(() => {
-        return Object.values(avatarStorage).find(
+        return Object.values(avatars).find(
             (a) => a.avatarId === message.avatarId
         );
-    }, [avatarStorage, message.avatarId]);
+    }, [avatars, message.avatarId]);
 
     return (
         <Space direction="vertical" className="c__msg">
@@ -137,17 +137,15 @@ export const EmptyChat: React.FC = () => {
 
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
-    const [{ chainChatId, userAvatarId }] = useAtom(optionsAtom);
-    const [messageStorage] = useAtom(messageStorageAtom);
-    const [blocked] = useAtom(chatBlockAtom);
+    const [{ chainChatId, userAvatarId }] = useOuterState(optionsStorage);
+    const [messages] = useOuterState(messageStorage);
+    const [blocked] = useOuterState(chatBlockStorage);
 
     const [message, setMessage] = useState("");
 
-    const messages = useMemo(() => {
-        return Object.values(messageStorage).sort(
-            (a, b) => b.created - a.created
-        );
-    }, [messageStorage]);
+    const messagesSorted = useMemo(() => {
+        return Object.values(messages).sort((a, b) => b.created - a.created);
+    }, [messages]);
 
     const initCondSatisfied = useMemo(
         () => chainChatId && userAvatarId,
@@ -212,7 +210,7 @@ export const ChatInterface: React.FC = () => {
                             padding: "10px",
                         }}
                     >
-                        {messages.map((m) => (
+                        {messagesSorted.map((m) => (
                             <SingleMessage key={m.messageId} message={m} />
                         ))}
                     </div>

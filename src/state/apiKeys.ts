@@ -1,20 +1,13 @@
-import { atom } from "jotai";
-
-import { appStore } from ".";
+import { StatefulObservable } from "../util/ObservableUtils";
 import { ApiKeyUtils } from "../util/ApiKeyUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { db } from "../data/db";
 import { ApiKey } from "../data/types";
 
-const _apiKeyStorageAtom = atom<Record<string, ApiKey>>({});
-
-export const apiKeyStorageAtom = atom((get) => ({
-    ...get(_apiKeyStorageAtom),
-}));
+export const apiKeyStorage = new StatefulObservable<Record<string, ApiKey>>({});
 
 export const loadApiKeysFromDb = async () => {
-    appStore.set(
-        _apiKeyStorageAtom,
+    apiKeyStorage.set(
         Object.fromEntries(
             (await db.apiKeys.toArray()).map((c) => [c.apiKeyId, c])
         )
@@ -25,13 +18,10 @@ export const loadApiKeysFromDb = async () => {
 
 export const createApiKey = (name = "New Key") => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_apiKeyStorageAtom);
         const created: ApiKey = ApiKeyUtils.empty(name);
-        const id = created.apiKeyId;
-        appStore.set(_apiKeyStorageAtom, {
-            ...s,
-
-            [id]: created,
+        apiKeyStorage.set({
+            ...apiKeyStorage.get(),
+            [created.apiKeyId]: created,
         });
         await db.apiKeys.add(created);
     });
@@ -39,16 +29,16 @@ export const createApiKey = (name = "New Key") => {
 
 export const updateApiKeyName = (apiKeyId: string, name: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_apiKeyStorageAtom);
-        const target = s[apiKeyId];
+        const storage = apiKeyStorage.get();
+        const target = storage[apiKeyId];
 
         const update: ApiKey = {
             ...target,
             name,
         };
 
-        appStore.set(_apiKeyStorageAtom, {
-            ...s,
+        apiKeyStorage.set({
+            ...storage,
             [apiKeyId]: update,
         });
         await db.apiKeys.put(update);
@@ -57,16 +47,16 @@ export const updateApiKeyName = (apiKeyId: string, name: string) => {
 
 export const updateApiKeyContent = (apiKeyId: string, content: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_apiKeyStorageAtom);
-        const target = s[apiKeyId];
+        const storage = apiKeyStorage.get();
+        const target = storage[apiKeyId];
 
         const update: ApiKey = {
             ...target,
             content,
         };
 
-        appStore.set(_apiKeyStorageAtom, {
-            ...s,
+        apiKeyStorage.set({
+            ...storage,
             [apiKeyId]: update,
         });
         await db.apiKeys.put(update);
@@ -75,12 +65,11 @@ export const updateApiKeyContent = (apiKeyId: string, content: string) => {
 
 export const deleteApiKey = (apiKeyId: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_apiKeyStorageAtom);
-
-        appStore.set(
-            _apiKeyStorageAtom,
+        apiKeyStorage.set(
             Object.fromEntries(
-                Object.entries(s).filter(([id]) => id !== apiKeyId)
+                Object.entries(apiKeyStorage.get()).filter(
+                    ([id]) => id !== apiKeyId
+                )
             )
         );
         await db.apiKeys.delete(apiKeyId);

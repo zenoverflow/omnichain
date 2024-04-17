@@ -1,15 +1,11 @@
-import { atom } from "jotai";
+import { StatefulObservable } from "../util/ObservableUtils";
 
-import { appStore } from ".";
-
-const _chatBlockAtom = atom<boolean>(false);
-
-export const chatBlockAtom = atom((get) => get(_chatBlockAtom));
+export const chatBlockStorage = new StatefulObservable<boolean>(false);
 
 export const blockChat = () => {
-    appStore.set(_chatBlockAtom, true);
+    chatBlockStorage.set(true);
 };
 
 export const unblockChat = () => {
-    appStore.set(_chatBlockAtom, false);
+    chatBlockStorage.set(false);
 };

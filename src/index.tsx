@@ -1,9 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Provider as StateProvider } from "jotai";
 
-import { appStore } from "./state";
 import { loadGraphsFromDb } from "./state/graphs";
 import { loadAvatarsFromDb } from "./state/avatars";
 import { clearRedundantOptions } from "./state/options";
@@ -33,9 +31,7 @@ export const run = async () => {
     if (root) {
         ReactDOM.createRoot(root).render(
             <React.StrictMode>
-                <StateProvider store={appStore}>
-                    <Editor />
-                </StateProvider>
+                <Editor />
             </React.StrictMode>
         );
     }

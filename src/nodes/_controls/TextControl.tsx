@@ -20,12 +20,6 @@ export class TextControl extends ClassicPreset.Control {
         private context: NodeContextObj
     ) {
         super();
-        console.log(
-            "TextControl constructor",
-            nodeId,
-            nodeControl,
-            defaultValue
-        );
         this.value = this.grabValue();
     }
 
@@ -57,8 +51,6 @@ export class TextControl extends ClassicPreset.Control {
         const _Component: React.FC = () => {
             const [value, setValue] = useState(this.grabValue());
 
-            console.log("TextControl", self.nodeId, self.nodeControl, value);
-
             useEffect(() => {
                 const unsub = self.context
                     .getControlObservable()
@@ -68,12 +60,6 @@ export class TextControl extends ClassicPreset.Control {
                             node === self.nodeId &&
                             control === self.nodeControl
                         ) {
-                            console.log(
-                                "TextControl subscriber",
-                                self.nodeId,
-                                self.nodeControl,
-                                value
-                            );
                             setValue(value as string);
                         }
                     });

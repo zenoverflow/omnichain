@@ -1,55 +1,44 @@
-import { atom } from "jotai";
-
-import { appStore } from ".";
-import { deleteGraph, graphStorageAtom, updateGraphName } from "./graphs";
+import { StatefulObservable } from "../util/ObservableUtils";
+import { deleteGraph, updateGraphName } from "./graphs";
 import { runGraph, stopGraph } from "./executor";
-import { nodeSelectionAtom, updateNodeSelection } from "./nodeSelection";
+import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
 import * as NODE_MAKERS from "../nodes";
 import { NodeContextObj } from "../nodes/context";
 
-type EditorState = {
+export const editorStateStorage = new StatefulObservable<{
     graphId: string | null;
-};
-
-const _editorStateAtom = atom<EditorState>({
+}>({
     graphId: null,
 });
 
-export const editorStateAtom = atom((get) => ({ ...get(_editorStateAtom) }));
-
-export const currentGraphAtom = atom((get) => {
-    const s = () => get(graphStorageAtom);
-    const { graphId } = get(_editorStateAtom);
-    if (graphId) return s()[graphId];
-    return null;
-});
+// ACTIONS //
 
 export const openGraph = (graphId: string) => {
-    appStore.set(_editorStateAtom, {
-        ...appStore.get(_editorStateAtom),
+    editorStateStorage.set({
+        ...editorStateStorage.get(),
         graphId,
     });
 };
 
 export const closeEditor = () => {
-    appStore.set(_editorStateAtom, {
-        ...appStore.get(_editorStateAtom),
+    editorStateStorage.set({
+        ...editorStateStorage.get(),
         graphId: null,
     });
 };
 
 export const runCurrentGraph = async () => {
-    const { graphId } = appStore.get(_editorStateAtom);
+    const { graphId } = editorStateStorage.get();
     if (graphId) await runGraph(graphId);
 };
 
 export const stopCurrentGraph = () => {
-    const { graphId } = appStore.get(_editorStateAtom);
+    const { graphId } = editorStateStorage.get();
     if (graphId) stopGraph(graphId);
 };
 
 export const deleteCurrentGraph = () => {
-    const { graphId } = appStore.get(_editorStateAtom);
+    const { graphId } = editorStateStorage.get();
     if (graphId) {
         closeEditor();
         deleteGraph(graphId);
@@ -57,7 +46,7 @@ export const deleteCurrentGraph = () => {
 };
 
 export const updateCurrentGraphName = (name: string) => {
-    const { graphId } = appStore.get(_editorStateAtom);
+    const { graphId } = editorStateStorage.get();
     if (graphId) updateGraphName(graphId, name);
 };
 
@@ -108,7 +97,7 @@ export const duplicateNode = async (
 export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
     const { editor, unselect } = nodeContext;
 
-    const selectedNodes = appStore.get(nodeSelectionAtom);
+    const selectedNodes = nodeSelectionStorage.get();
 
     // Ensure all nodes unselected
     for (const id of selectedNodes) {
@@ -140,7 +129,7 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
  * Delete all selected nodes.
  */
 export const deleteSelectedNodes = async (nodeContext: NodeContextObj) => {
-    const selectedNodes = appStore.get(nodeSelectionAtom);
+    const selectedNodes = nodeSelectionStorage.get();
     for (const id of selectedNodes) {
         await deleteNode(id, nodeContext);
     }

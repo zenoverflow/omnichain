@@ -1,14 +1,7 @@
-import { atom } from "jotai";
+import { StatefulObservable } from "../util/ObservableUtils";
 
-import { appStore } from ".";
-
-const _nodeSelectionAtom = atom<string[]>([]);
-
-export const nodeSelectionAtom = atom<string[]>((get) => [
-    ...get(_nodeSelectionAtom),
-]);
+export const nodeSelectionStorage = new StatefulObservable<string[]>([]);
 
 export const updateNodeSelection = (selection: string[]) => {
-    console.log("updateNodeSelection", selection);
-    appStore.set(_nodeSelectionAtom, selection);
+    nodeSelectionStorage.set(selection);
 };

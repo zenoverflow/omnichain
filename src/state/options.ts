@@ -1,8 +1,6 @@
-import { atom } from "jotai";
-
-import { appStore } from ".";
-import { graphStorageAtom } from "./graphs";
-import { avatarStorageAtom } from "./avatars";
+import { StatefulObservable } from "../util/ObservableUtils";
+import { graphStorage } from "./graphs";
+import { avatarStorage } from "./avatars";
 
 type OptionsState = {
     userAvatarId: string | null;
@@ -11,21 +9,16 @@ type OptionsState = {
     apiPort: number;
 };
 
-const _optionsAtom = atom<OptionsState>({
+export const optionsStorage = new StatefulObservable<OptionsState>({
     userAvatarId: localStorage.getItem("userAvatarId") || null,
     chainChatId: localStorage.getItem("chainChatId") || null,
     chainApiId: localStorage.getItem("chainApiId") || null,
     apiPort: Number.parseInt(localStorage.getItem("apiPort") || "13000"),
 });
 
-export const optionsAtom = atom<OptionsState>((get) => ({
-    ...get(_optionsAtom),
-}));
-
 export const setUserAvatar = (userAvatarId: string | null) => {
-    const s = appStore.get(_optionsAtom);
-    appStore.set(_optionsAtom, {
-        ...s,
+    optionsStorage.set({
+        ...optionsStorage.get(),
         userAvatarId,
     });
 
@@ -37,9 +30,8 @@ export const setUserAvatar = (userAvatarId: string | null) => {
 };
 
 export const setChatChain = (chainChatId: string | null) => {
-    const s = appStore.get(_optionsAtom);
-    appStore.set(_optionsAtom, {
-        ...s,
+    optionsStorage.set({
+        ...optionsStorage.get(),
         chainChatId,
     });
 
@@ -51,11 +43,11 @@ export const setChatChain = (chainChatId: string | null) => {
 };
 
 export const setApiChain = (chainApiId: string | null) => {
-    const s = appStore.get(_optionsAtom);
-    appStore.set(_optionsAtom, {
-        ...s,
+    optionsStorage.set({
+        ...optionsStorage.get(),
         chainApiId,
     });
+
     if (!chainApiId) {
         localStorage.removeItem("chainApiId");
     } else {
@@ -64,19 +56,17 @@ export const setApiChain = (chainApiId: string | null) => {
 };
 
 export const setApiPort = (apiPort: number) => {
-    const s = appStore.get(_optionsAtom);
-    appStore.set(_optionsAtom, {
-        ...s,
+    optionsStorage.set({
+        ...optionsStorage.get(),
         apiPort,
     });
     localStorage.setItem("apiPort", apiPort.toString());
 };
 
 export const clearRedundantOptions = () => {
-    const graphs = appStore.get(graphStorageAtom);
-    const avatars = appStore.get(avatarStorageAtom);
-
-    const options = appStore.get(_optionsAtom);
+    const graphs = graphStorage.get();
+    const avatars = avatarStorage.get();
+    const options = optionsStorage.get();
 
     if (
         !options.chainChatId ||

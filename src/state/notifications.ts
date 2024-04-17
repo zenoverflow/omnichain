@@ -1,8 +1,4 @@
-// import { atom } from "jotai";
-
 import { notification } from "antd";
-
-// import { appStore } from ".";
 
 type Notification = {
     type: "error" | "info" | "warning" | "success";
@@ -10,12 +6,6 @@ type Notification = {
     text: string;
     duration: number;
 };
-
-// type NotificationState = Record<number, Notification>
-
-// const _notificationAtom = atom<NotificationState>({});
-
-// export const notificationAtom = atom((get) => ({ ...get(_notificationAtom) }));
 
 export const showNotification = (n: Notification) => {
     notification.open({

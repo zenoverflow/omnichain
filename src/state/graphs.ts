@@ -1,8 +1,7 @@
-import { atom } from "jotai";
 import { NodeEditor } from "rete";
 import { AreaPlugin } from "rete-area-plugin";
 
-import { appStore } from ".";
+import { StatefulObservable } from "../util/ObservableUtils";
 import { GraphUtils } from "../util/GraphUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { db } from "../data/db";
@@ -11,13 +10,12 @@ import { NodeContextObj } from "../nodes/context";
 import { openGraph } from "./editor";
 import { clearRedundantOptions } from "./options";
 
-const _graphStorageAtom = atom<Record<string, SerializedGraph>>({});
-
-export const graphStorageAtom = atom((get) => ({ ...get(_graphStorageAtom) }));
+export const graphStorage = new StatefulObservable<
+    Record<string, SerializedGraph>
+>({});
 
 export const loadGraphsFromDb = async () => {
-    appStore.set(
-        _graphStorageAtom,
+    graphStorage.set(
         Object.fromEntries(
             (await db.chains.toArray()).map((c) => [c.graphId, c])
         )
@@ -28,11 +26,9 @@ export const loadGraphsFromDb = async () => {
 
 export const createGraph = (name = "New Chain") => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_graphStorageAtom);
         const created = GraphUtils.empty(name);
-        appStore.set(_graphStorageAtom, {
-            ...s,
-
+        graphStorage.set({
+            ...graphStorage.get(),
             [created.graphId]: created,
         });
         await db.chains.add(created);
@@ -41,10 +37,7 @@ export const createGraph = (name = "New Chain") => {
 };
 
 export const initGraph = async (context: NodeContextObj) => {
-    await GraphUtils.hydrate(
-        appStore.get(_graphStorageAtom)[context.graphId],
-        context
-    );
+    await GraphUtils.hydrate(graphStorage.get()[context.graphId], context);
 };
 
 export const updateGraph = (
@@ -55,16 +48,15 @@ export const updateGraph = (
 ) => {
     QueueUtils.addTask(async () => {
         console.log("UPDATE GRAPH", callSource ?? "somewhere");
-        const s = appStore.get(_graphStorageAtom);
-        const target = s[graphId];
+        const storage = graphStorage.get();
         const update = GraphUtils.serializeFromEditor(
             editor,
             area,
             // preserve metadata
-            target
+            storage[graphId]
         );
-        appStore.set(_graphStorageAtom, {
-            ...s,
+        graphStorage.set({
+            ...storage,
             [graphId]: update,
         });
         await db.chains.put(update);
@@ -73,12 +65,11 @@ export const updateGraph = (
 
 export const updateGraphName = (graphId: string, name: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_graphStorageAtom);
-        const target = s[graphId];
-        const update = { ...target, name };
-        appStore.set(_graphStorageAtom, {
-            ...s,
-            [graphId]: { ...target, name },
+        const storage = graphStorage.get();
+        const update = { ...storage[graphId], name };
+        graphStorage.set({
+            ...storage,
+            [graphId]: update,
         });
         await db.chains.put(update);
     });
@@ -91,12 +82,10 @@ export const updateNodeControl = (
     controlValue: string | number
 ) => {
     QueueUtils.addTask(async () => {
-        console.log("UPDATE NODE CONTROL");
-        const s = appStore.get(_graphStorageAtom);
-        const target = s[graphId];
+        const storage = graphStorage.get();
         const update = {
-            ...target,
-            nodes: target.nodes.map((n) => {
+            ...storage[graphId],
+            nodes: storage[graphId].nodes.map((n) => {
                 if (n.nodeId !== nodeId) return n;
                 return {
                     ...n,
@@ -107,8 +96,8 @@ export const updateNodeControl = (
                 };
             }),
         };
-        appStore.set(_graphStorageAtom, {
-            ...s,
+        graphStorage.set({
+            ...storage,
             [graphId]: update,
         });
         await db.chains.put(update);
@@ -117,11 +106,11 @@ export const updateNodeControl = (
 
 export const deleteGraph = (graphId: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_graphStorageAtom);
-        appStore.set(
-            _graphStorageAtom,
+        graphStorage.set(
             Object.fromEntries(
-                Object.entries(s).filter(([id]) => id !== graphId)
+                Object.entries(graphStorage.get()).filter(
+                    ([id]) => id !== graphId
+                )
             )
         );
         await db.chains.delete(graphId);

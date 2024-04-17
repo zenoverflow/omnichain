@@ -6,13 +6,16 @@ import React, {
     useCallback,
 } from "react";
 import { Menu, MenuProps, Input } from "antd";
-import { useAtom } from "jotai";
 
-import { hideContextMenu, menuStateAtom } from "../../state/editorContextMenu";
+import {
+    hideContextMenu,
+    menuStateStorage,
+} from "../../state/editorContextMenu";
+import { useOuterState } from "../../util/ObservableUtilsReact";
 import { getMenuIcon } from "../../nodes/icons";
 
 export const ContextMenu: React.FC = () => {
-    const [menu] = useAtom(menuStateAtom);
+    const [menu] = useOuterState(menuStateStorage);
     const menuRef = useRef<any>();
 
     const [active, setActive] = useState(!!menu);

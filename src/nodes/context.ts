@@ -13,6 +13,13 @@ type ExecutionEvent = {
 
 export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
+export type ControlUpdate = {
+    graphId: string;
+    node: string;
+    control: string;
+    value: string | number;
+};
+
 export type NodeContextObj = {
     headless: boolean;
     graphId: string;
@@ -43,12 +50,7 @@ export type NodeContextObj = {
         value: string | number
     ) => void;
 
-    getControlObservable: () => SimpleObservable<{
-        graphId: string;
-        node: string;
-        control: string;
-        value: string | number;
-    }> | null;
+    getControlObservable: () => SimpleObservable<ControlUpdate> | null;
 
     getControlValue: (
         graphId: string,

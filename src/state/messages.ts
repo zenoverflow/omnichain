@@ -1,20 +1,15 @@
-import { atom } from "jotai";
-
-import { appStore } from ".";
+import { StatefulObservable } from "../util/ObservableUtils";
 import { MsgUtils } from "../util/MsgUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { db } from "../data/db";
 import { ChatMessage } from "../data/types";
 
-const _messageStorageAtom = atom<Record<string, ChatMessage>>({});
-
-export const messageStorageAtom = atom((get) => ({
-    ...get(_messageStorageAtom),
-}));
+export const messageStorage = new StatefulObservable<
+    Record<string, ChatMessage>
+>({});
 
 export const loadMessagesFromDb = async (chainId: string) => {
-    appStore.set(
-        _messageStorageAtom,
+    messageStorage.set(
         Object.fromEntries(
             (
                 await db.chatMessages
@@ -28,7 +23,7 @@ export const loadMessagesFromDb = async (chainId: string) => {
 // ACTIONS //
 
 export const unloadMessages = () => {
-    appStore.set(_messageStorageAtom, {});
+    messageStorage.set({});
 };
 
 export const addMessage = (
@@ -37,13 +32,10 @@ export const addMessage = (
     content: string
 ) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_messageStorageAtom);
         const created = MsgUtils.fresh(chainId, avatarId, content);
-        const id = created.messageId;
-        appStore.set(_messageStorageAtom, {
-            ...s,
-
-            [id]: created,
+        messageStorage.set({
+            ...messageStorage.get(),
+            [created.messageId]: created,
         });
         await db.chatMessages.add(created);
     });
@@ -51,13 +43,13 @@ export const addMessage = (
 
 export const setMessageProcessed = (messageId: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_messageStorageAtom);
+        const s = messageStorage.get();
         const target = s[messageId];
         const update: ChatMessage = {
             ...target,
             processed: true,
         };
-        appStore.set(_messageStorageAtom, {
+        messageStorage.set({
             ...s,
             [messageId]: update,
         });
@@ -67,12 +59,11 @@ export const setMessageProcessed = (messageId: string) => {
 
 export const deleteMessage = (messageId: string) => {
     QueueUtils.addTask(async () => {
-        const s = appStore.get(_messageStorageAtom);
-
-        appStore.set(
-            _messageStorageAtom,
+        messageStorage.set(
             Object.fromEntries(
-                Object.entries(s).filter(([id]) => id !== messageId)
+                Object.entries(messageStorage.get()).filter(
+                    ([id]) => id !== messageId
+                )
             )
         );
         await db.chatMessages.delete(messageId);
