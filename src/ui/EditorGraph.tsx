@@ -11,7 +11,7 @@ import {
 
 import { Button, Drawer, Space, Input, Popconfirm } from "antd";
 
-import { createEditor } from "./rete";
+import { createEditor } from "./_Rete";
 
 import {
     currentGraphAtom,

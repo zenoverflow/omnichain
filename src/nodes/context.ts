@@ -36,9 +36,6 @@ export type NodeContextObj = {
      */
     onAutoExecute: (nodeId: string) => any;
 
-    /**
-     * For saving node updates during execution
-     */
     onControlChange: (
         graphId: string,
         node: string,
@@ -52,6 +49,12 @@ export type NodeContextObj = {
         control: string;
         value: string | number;
     }> | null;
+
+    getControlValue: (
+        graphId: string,
+        node: string,
+        control: string
+    ) => string | number | null;
 
     /**
      * For visually tracking graph execution
