@@ -16,90 +16,68 @@ const router = new Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const DIR_DATA = path.join(__dirname, "data");
-const DIR_AVATARS = path.join(DIR_DATA, "avatars");
-const DIR_GRAPHS = path.join(DIR_DATA, "graphs");
-const DIR_MESSAGES = path.join(DIR_DATA, "messages");
-const FILE_OPTIONS = path.join(DIR_DATA, "options.json");
 
 // Setup
 
 if (!fs.existsSync(DIR_DATA)) fs.mkdirSync(DIR_DATA);
-if (!fs.existsSync(DIR_AVATARS)) fs.mkdirSync(DIR_AVATARS);
-if (!fs.existsSync(DIR_GRAPHS)) fs.mkdirSync(DIR_GRAPHS);
-if (!fs.existsSync(DIR_MESSAGES)) fs.mkdirSync(DIR_MESSAGES);
-if (!fs.existsSync(FILE_OPTIONS)) fs.writeFileSync(FILE_OPTIONS, "{}");
 
 // Utils
 
 const readJsonFile = (path: string) =>
     JSON.parse(fs.readFileSync(path, "utf-8")) as Record<string, any>;
 
-// API: Options
+// API: single-file resources
 
-router.get("/api/options", async (ctx) => {
-    ctx.body = readJsonFile(FILE_OPTIONS);
-});
-
-router.post("/api/options", async (ctx) => {
-    fs.writeFileSync(FILE_OPTIONS, JSON.stringify(ctx.body));
-});
-
-// API: Avatars
-
-router.get("/api/avatars", async (ctx) => {
-    const avatarsFiles = fs.readdirSync(DIR_AVATARS);
-    ctx.body = Object.fromEntries(
-        avatarsFiles.map((avatar) => {
-            const content = readJsonFile(path.join(DIR_AVATARS, avatar));
-            return [content.avatarId as string, content];
-        })
-    );
-});
-
-router.post("/api/avatars", async (ctx) => {
-    const avatarId: string = ctx.body.avatarId;
-    fs.writeFileSync(
-        path.join(DIR_AVATARS, `${avatarId}.json`),
-        JSON.stringify(ctx.body)
-    );
-});
-
-// API: Graphs
-
-router.get("/api/graphs", async (ctx) => {
-    const graphsFiles = fs.readdirSync(DIR_GRAPHS);
-    ctx.body = Object.fromEntries(
-        graphsFiles.map((file) => {
-            const content = readJsonFile(path.join(DIR_GRAPHS, file));
-            return [content.graphId as string, content];
-        })
-    );
-});
-
-router.post("/api/graphs", async (ctx) => {
-    const graphId: string = ctx.body.graphId;
-    fs.writeFileSync(
-        path.join(DIR_GRAPHS, `${graphId}.json`),
-        JSON.stringify(ctx.body)
-    );
-});
-
-// API: Messages
-
-router.get("/api/messages/:graph", async (ctx) => {
-    if (!fs.existsSync(path.join(DIR_MESSAGES, `${ctx.params.graph}.json`))) {
+router.get("/api/resource/single/:resource", async (ctx) => {
+    const pathToFile = path.join(DIR_DATA, `${ctx.params.resource}.json`);
+    if (!fs.existsSync(pathToFile)) {
         ctx.body = {};
         return;
     }
 
-    ctx.body = readJsonFile(
-        path.join(DIR_MESSAGES, `${ctx.params.graph}.json`)
+    ctx.body = readJsonFile(pathToFile);
+});
+
+router.post("/api/resource/single/:resource", async (ctx) => {
+    fs.writeFileSync(
+        path.join(DIR_DATA, `${ctx.params.resource}.json`),
+        JSON.stringify(ctx.body)
     );
 });
 
-router.post("/api/messages/:graph", async (ctx) => {
+// API: multi-file resources
+
+router.get("/api/resource/multi/:resource/all", async (ctx) => {
+    const resourceFiles = fs.readdirSync(
+        path.join(DIR_DATA, ctx.params.resource)
+    );
+    ctx.body = Object.fromEntries(
+        resourceFiles.map((file) => {
+            const content = readJsonFile(
+                path.join(DIR_DATA, ctx.params.resource, file)
+            );
+            return [content.id as string, content];
+        })
+    );
+});
+
+router.get("/api/resource/multi/:resource/:id", async (ctx) => {
+    const pathToFile = path.join(
+        DIR_DATA,
+        ctx.params.resource,
+        `${ctx.params.id}.json`
+    );
+    if (!fs.existsSync(pathToFile)) {
+        ctx.body = {};
+        return;
+    }
+
+    ctx.body = readJsonFile(pathToFile);
+});
+
+router.post("/api/resource/multi/:resource/:id", async (ctx) => {
     fs.writeFileSync(
-        path.join(DIR_MESSAGES, `${ctx.params.graph}.json`),
+        path.join(DIR_DATA, ctx.params.resource, `${ctx.params.id}.json`),
         JSON.stringify(ctx.body)
     );
 });
