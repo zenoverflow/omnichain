@@ -1,7 +1,7 @@
 module.exports = {
     root: true,
     // ignores: ["server.js"],
-    ignorePatterns: ["dist", ".eslintrc.cjs", "*.js"],
+    ignorePatterns: ["dist", ".eslintrc.cjs"],
     overrides: [
         // Client configuration
         {
@@ -58,19 +58,17 @@ module.exports = {
             },
             rules: {
                 "@typescript-eslint/no-floating-promises": "error",
-                // "node/no-unsupported-features/es-syntax": "off",
-                // "node/no-missing-import": "off",
-                // "node/no-missing-require": "off",
-                // "node/no-unpublished-import": "off",
-                // "node/no-unpublished-require": "off",
-                // "node/no-extraneous-import": "off",
-                // "node/no-extraneous-require": "off",
-                // "node/no-missing-import": "off",
-                // "node/no-missing-require": "off",
-                // "node/no-unpublished-import": "off",
-                // "node/no-unpublished-require": "off",
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-unused-vars": "off",
+                "@typescript-eslint/ban-ts-comment": "off",
+                "@typescript-eslint/no-this-alias": "off",
+                "@typescript-eslint/no-unsafe-assignment": "off",
+                "@typescript-eslint/no-unsafe-member-access": "off",
+                "@typescript-eslint/no-unsafe-argument": "off",
+                "@typescript-eslint/no-unsafe-call": "off",
+                "@typescript-eslint/require-await": "off",
             },
-            files: ["./server/**/*.{ts,tsx}"],
+            files: ["./server/**/*.{ts,tsx}", "./server.ts"],
         },
     ],
 };
