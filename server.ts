@@ -45,6 +45,11 @@ router.post("/api/resource/single/:resource", async (ctx) => {
     );
 });
 
+router.delete("/api/resource/single/:resource", async (ctx) => {
+    const pathToFile = path.join(DIR_DATA, `${ctx.params.resource}.json`);
+    if (fs.existsSync(pathToFile)) fs.unlinkSync(pathToFile);
+});
+
 // API: multi-file resources
 
 router.get("/api/resource/multi/:resource/all", async (ctx) => {
@@ -80,6 +85,15 @@ router.post("/api/resource/multi/:resource/:id", async (ctx) => {
         path.join(DIR_DATA, ctx.params.resource, `${ctx.params.id}.json`),
         JSON.stringify(ctx.body)
     );
+});
+
+router.delete("/api/resource/multi/:resource/:id", async (ctx) => {
+    const pathToFile = path.join(
+        DIR_DATA,
+        ctx.params.resource,
+        `${ctx.params.id}.json`
+    );
+    if (fs.existsSync(pathToFile)) fs.unlinkSync(pathToFile);
 });
 
 // Config: middleware
