@@ -1,7 +1,9 @@
 module.exports = {
-    // root: true,
+    root: true,
+    // ignores: ["server.js"],
     ignorePatterns: ["dist", ".eslintrc.cjs", "*.js"],
     overrides: [
+        // Client configuration
         {
             env: { browser: true, es2020: true },
             extends: [
@@ -15,7 +17,7 @@ module.exports = {
             parserOptions: {
                 ecmaVersion: "latest",
                 sourceType: "module",
-                project: ["./tsconfig.json", "./tsconfig.node.json"],
+                project: ["./tsconfig.json"],
                 tsconfigRootDir: __dirname,
             },
             plugins: ["react-refresh"],
@@ -37,9 +39,38 @@ module.exports = {
                 "@typescript-eslint/require-await": "off",
                 "react/prop-types": "off",
             },
-            // ignores: ["server.js"],
             files: ["./src/**/*.{ts,tsx}"],
         },
-        // TODO: Add a node.js configuration
+        // Server configuration
+        {
+            env: { node: true, es2020: true },
+            extends: [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/strict-type-checked",
+                "plugin:node/recommended",
+            ],
+            parser: "@typescript-eslint/parser",
+            parserOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+                project: ["./tsconfig.node.json"],
+                tsconfigRootDir: __dirname,
+            },
+            rules: {
+                "@typescript-eslint/no-floating-promises": "error",
+                // "node/no-unsupported-features/es-syntax": "off",
+                // "node/no-missing-import": "off",
+                // "node/no-missing-require": "off",
+                // "node/no-unpublished-import": "off",
+                // "node/no-unpublished-require": "off",
+                // "node/no-extraneous-import": "off",
+                // "node/no-extraneous-require": "off",
+                // "node/no-missing-import": "off",
+                // "node/no-missing-require": "off",
+                // "node/no-unpublished-import": "off",
+                // "node/no-unpublished-require": "off",
+            },
+            files: ["./server/**/*.{ts,tsx}"],
+        },
     ],
 };
