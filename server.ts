@@ -11,7 +11,9 @@ import serve from "koa-static";
 const argv: Record<string, any> = minimist(process.argv.slice(2));
 
 const app = new Koa();
-const router = new Router();
+const router = new Router({
+    sensitive: true,
+});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
