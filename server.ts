@@ -52,6 +52,22 @@ router.delete("/api/resource/single/:resource", async (ctx) => {
 
 // API: multi-file resources
 
+router.get("/api/resource/multi/:resource/index", async (ctx) => {
+    const resourceFiles = fs.readdirSync(
+        path.join(DIR_DATA, ctx.params.resource)
+    );
+    ctx.body = Object.fromEntries(
+        resourceFiles.map((file) => {
+            const content = readJsonFile(
+                path.join(DIR_DATA, ctx.params.resource, file)
+            );
+            // Grab id from filename (strip out the extension, use regex)
+            const id = file.replace(/\.[^/.]+$/, "");
+            return [id, content.name ?? id];
+        })
+    );
+});
+
 router.get("/api/resource/multi/:resource/all", async (ctx) => {
     const resourceFiles = fs.readdirSync(
         path.join(DIR_DATA, ctx.params.resource)
@@ -62,7 +78,8 @@ router.get("/api/resource/multi/:resource/all", async (ctx) => {
                 path.join(DIR_DATA, ctx.params.resource, file)
             );
             // Grab id from filename (strip out the extension, use regex)
-            return [file.replace(/\.[^/.]+$/, ""), content];
+            const id = file.replace(/\.[^/.]+$/, "");
+            return [id, content];
         })
     );
 });
