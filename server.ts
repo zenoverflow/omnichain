@@ -61,7 +61,8 @@ router.get("/api/resource/multi/:resource/all", async (ctx) => {
             const content = readJsonFile(
                 path.join(DIR_DATA, ctx.params.resource, file)
             );
-            return [content.id as string, content];
+            // Grab id from filename (strip out the extension, use regex)
+            return [file.replace(/\.[^/.]+$/, ""), content];
         })
     );
 });
