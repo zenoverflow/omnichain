@@ -5,6 +5,7 @@ export const OpenAIPrompterNode = makeNode(
         nodeName: "OpenAIPrompterNode",
         nodeIcon: "OpenAIOutlined",
         dimensions: [380, 570],
+        doc: "Generate text using OpenAI's basic completions API (/v1/completions).",
     },
     {
         inputs: [{ name: "prompt", type: "string" }],

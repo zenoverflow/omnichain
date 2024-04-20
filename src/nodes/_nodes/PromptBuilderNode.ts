@@ -5,6 +5,7 @@ export const PromptBuilderNode = makeNode(
         nodeName: "PromptBuilderNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [580, 450],
+        doc: "Build a prompt by combining a template with values.",
     },
     {
         inputs: [{ name: "parts", type: "templateSlot", multi: true }],

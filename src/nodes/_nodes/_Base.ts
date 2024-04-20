@@ -14,6 +14,7 @@ type CustomNodeBaseConfig = {
     nodeName: string;
     nodeIcon: string;
     dimensions: [number, number];
+    doc: string;
 };
 
 type CustomNodeIOConfig = {
@@ -140,6 +141,8 @@ export const makeNode = (
         //
         public static customNodeName = nodeName;
         public static icon = (ICONS as any)[nodeIcon] ?? ICONS.BorderOutlined;
+        public static staticDoc = baseConfig.doc;
+        doc = baseConfig.doc;
         width = dimensions[0];
         height = dimensions[1];
 

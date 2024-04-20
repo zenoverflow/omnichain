@@ -5,6 +5,7 @@ export const StartNode = makeNode(
         nodeName: "StartNode",
         nodeIcon: "PlayCircleOutlined",
         dimensions: [200, 120],
+        doc: "Entrypoint that starts the flow of the chain.",
     },
     {
         inputs: [

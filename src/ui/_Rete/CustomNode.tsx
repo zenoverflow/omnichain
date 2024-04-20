@@ -3,6 +3,7 @@ import styled, { css } from "styled-components";
 import { ClassicScheme, RenderEmit, Presets } from "rete-react-plugin";
 
 import { getMenuIcon } from "../../nodes/icons";
+import { BtnDoc } from "./BtnDoc";
 
 const SOCKET_MARGIN = 6;
 const SOCKET_SIZE = 25;
@@ -65,7 +66,7 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
         padding: 8px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
     }
 
     .output {
@@ -186,8 +187,12 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
         >
             <ExecutionIndicator node={props.data} />
             <div className="title" data-testid="title">
-                {icon}
-                <span style={{ paddingLeft: "5px" }}>{cleanLabel}</span>
+                <div>
+                    {icon}
+                    <span style={{ paddingLeft: "5px" }}>{cleanLabel}</span>
+                </div>
+
+                <BtnDoc nodeName={cleanLabel} doc={(props.data as any).doc} />
             </div>
             {/* Outputs */}
             {outputs.map(

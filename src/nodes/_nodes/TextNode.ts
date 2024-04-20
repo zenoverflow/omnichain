@@ -5,6 +5,7 @@ export const TextNode = makeNode(
         nodeName: "TextNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [580, 450],
+        doc: "Simple text node that stores and outputs the input string.",
     },
     {
         inputs: [{ name: "in", type: "string" }],

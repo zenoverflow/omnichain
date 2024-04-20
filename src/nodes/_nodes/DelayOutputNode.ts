@@ -5,6 +5,7 @@ export const DelayOutputNode = makeNode(
         nodeName: "DelayOutputNode",
         nodeIcon: "HourglassOutlined",
         dimensions: [280, 170],
+        doc: "Delay output of data by a specified number of milliseconds.",
     },
     {
         inputs: [{ name: "dataIn", type: "string", label: "data" }],

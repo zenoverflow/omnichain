@@ -5,6 +5,7 @@ export const TemplateSlotNode = makeNode(
         nodeName: "TemplateSlotNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [580, 490],
+        doc: "Create a template slot that can be used in a PromptBuilder.",
     },
     {
         inputs: [{ name: "in", type: "string" }],

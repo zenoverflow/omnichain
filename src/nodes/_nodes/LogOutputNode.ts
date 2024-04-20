@@ -5,6 +5,7 @@ export const LogOutputNode = makeNode(
         nodeName: "LogOutputNode",
         nodeIcon: "CodeOutlined",
         dimensions: [580, 480],
+        doc: "Grab data and display it in the node.",
     },
     {
         inputs: [
