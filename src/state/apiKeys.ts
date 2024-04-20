@@ -16,7 +16,7 @@ const saveApiKeys = async () => {
 
 // ACTIONS //
 
-export const createApiKey = (name = "New Key") => {
+export const createApiKey = (name = "New_Key") => {
     QueueUtils.addTask(async () => {
         const created: ApiKey = ApiKeyUtils.empty(name);
         apiKeyStorage.set({

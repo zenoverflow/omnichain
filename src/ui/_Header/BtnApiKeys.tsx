@@ -81,7 +81,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                                     onChange={(e) => {
                                         updateApiKeyName(
                                             a.apiKeyId,
-                                            e.target.value
+                                            e.target.value.trim()
                                         );
                                     }}
                                 />
