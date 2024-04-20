@@ -14,14 +14,14 @@ import { BtnOptions } from "./_Header/BtnOptions";
 import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
 
-import { editorStateStorage, closeEditor } from "../state/editor";
+import { editorTargetStorage, closeEditor } from "../state/editor";
 import { loaderStorage } from "../state/loader";
 import { useOuterState } from "../util/ObservableUtilsReact";
 
 const { Header, Content } = Layout;
 
 const EditorContent: React.FC = () => {
-    const [{ graphId }] = useOuterState(editorStateStorage);
+    const [graphId] = useOuterState(editorTargetStorage);
     return (
         <Content
             id="TheEditor"
@@ -42,7 +42,7 @@ const EditorContent: React.FC = () => {
 
 export const Editor: React.FC = () => {
     const [siderCollapsed, setSiderCollapsed] = useState(false);
-    const [{ graphId }] = useOuterState(editorStateStorage);
+    const [graphId] = useOuterState(editorTargetStorage);
     const [loading] = useOuterState(loaderStorage);
 
     return (

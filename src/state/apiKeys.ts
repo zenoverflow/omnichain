@@ -1,17 +1,17 @@
 import { StatefulObservable } from "../util/ObservableUtils";
 import { ApiKeyUtils } from "../util/ApiKeyUtils";
 import { QueueUtils } from "../util/QueueUtils";
-import { db } from "../data/db";
+import { BackendResourceUtils } from "../util/BackendResourceUtils";
 import { ApiKey } from "../data/types";
 
 export const apiKeyStorage = new StatefulObservable<Record<string, ApiKey>>({});
 
-export const loadApiKeysFromDb = async () => {
-    apiKeyStorage.set(
-        Object.fromEntries(
-            (await db.apiKeys.toArray()).map((c) => [c.apiKeyId, c])
-        )
-    );
+export const loadApiKeys = async () => {
+    apiKeyStorage.set(await BackendResourceUtils.getSingle("apiKeys"));
+};
+
+const saveApiKeys = async () => {
+    await BackendResourceUtils.setSingle("apiKeys", apiKeyStorage.get());
 };
 
 // ACTIONS //
@@ -23,7 +23,7 @@ export const createApiKey = (name = "New Key") => {
             ...apiKeyStorage.get(),
             [created.apiKeyId]: created,
         });
-        await db.apiKeys.add(created);
+        await saveApiKeys();
     });
 };
 
@@ -41,7 +41,7 @@ export const updateApiKeyName = (apiKeyId: string, name: string) => {
             ...storage,
             [apiKeyId]: update,
         });
-        await db.apiKeys.put(update);
+        await saveApiKeys();
     });
 };
 
@@ -59,7 +59,7 @@ export const updateApiKeyContent = (apiKeyId: string, content: string) => {
             ...storage,
             [apiKeyId]: update,
         });
-        await db.apiKeys.put(update);
+        await saveApiKeys();
     });
 };
 
@@ -72,6 +72,6 @@ export const deleteApiKey = (apiKeyId: string) => {
                 )
             )
         );
-        await db.apiKeys.delete(apiKeyId);
+        await saveApiKeys();
     });
 };

@@ -39,3 +39,5 @@ export type ApiKey = {
     content: string;
     created: number;
 };
+
+export type ResourceIndex = Record<string, { name: string; created: number }>;

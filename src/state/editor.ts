@@ -1,53 +1,18 @@
 import { StatefulObservable } from "../util/ObservableUtils";
-import { deleteGraph, updateGraphName } from "./graphs";
-import { runGraph, stopGraph } from "./executor";
-import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
 import * as NODE_MAKERS from "../nodes";
+import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
 import { NodeContextObj } from "../nodes/context";
 
-export const editorStateStorage = new StatefulObservable<{
-    graphId: string | null;
-}>({
-    graphId: null,
-});
+export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
 // ACTIONS //
 
-export const openGraph = (graphId: string) => {
-    editorStateStorage.set({
-        ...editorStateStorage.get(),
-        graphId,
-    });
+export const openEditor = (graphId: string) => {
+    editorTargetStorage.set(graphId);
 };
 
 export const closeEditor = () => {
-    editorStateStorage.set({
-        ...editorStateStorage.get(),
-        graphId: null,
-    });
-};
-
-export const runCurrentGraph = async () => {
-    const { graphId } = editorStateStorage.get();
-    if (graphId) await runGraph(graphId);
-};
-
-export const stopCurrentGraph = () => {
-    const { graphId } = editorStateStorage.get();
-    if (graphId) stopGraph(graphId);
-};
-
-export const deleteCurrentGraph = () => {
-    const { graphId } = editorStateStorage.get();
-    if (graphId) {
-        closeEditor();
-        deleteGraph(graphId);
-    }
-};
-
-export const updateCurrentGraphName = (name: string) => {
-    const { graphId } = editorStateStorage.get();
-    if (graphId) updateGraphName(graphId, name);
+    editorTargetStorage.set(null);
 };
 
 /**

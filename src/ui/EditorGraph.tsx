@@ -9,20 +9,14 @@ import {
 import { Button, Drawer, Space, Input, Popconfirm } from "antd";
 
 import { createEditor } from "./_Rete";
-import {
-    editorStateStorage,
-    deleteCurrentGraph,
-    deleteSelectedNodes,
-    runCurrentGraph,
-    stopCurrentGraph,
-    updateCurrentGraphName,
-} from "../state/editor";
-import { nodeSelectionStorage } from "../state/nodeSelection";
-import { graphStorage } from "../state/graphs";
-import { ExecutorInstance, executorStorage } from "../state/executor";
-import { NodeContextObj } from "../nodes/context";
 import { ContextMenu } from "./_EditorGraph/ContextMenu";
 import { useOuterState } from "../util/ObservableUtilsReact";
+
+import { graphStorage, updateGraphName, deleteGraph } from "../state/graphs";
+import { deleteSelectedNodes, editorTargetStorage } from "../state/editor";
+import { nodeSelectionStorage } from "../state/nodeSelection";
+import { executorStorage, stopGraph, runGraph } from "../state/executor";
+import { NodeContextObj } from "../nodes/context";
 
 type DeleteButtonProps = {
     nodeContext: NodeContextObj;
@@ -36,15 +30,9 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
         const listener = (e: KeyboardEvent) => {
             if (e.key === "Delete" && targets.length) {
                 // Prevent deletions on active graph
-                const editorState = editorStateStorage.get();
-                if (editorState.graphId) {
-                    const executorState = executorStorage.get();
-                    const currentExec = executorState[
-                        editorState.graphId
-                    ] as ExecutorInstance | null;
-                    if (!currentExec) {
-                        void deleteSelectedNodes(props.nodeContext);
-                    }
+                const executorState = executorStorage.get();
+                if (!executorState) {
+                    void deleteSelectedNodes(props.nodeContext);
                 }
             }
         };
@@ -85,13 +73,15 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
 };
 
 const GraphRunButton: React.FC = () => {
-    const [{ graphId }] = useOuterState(editorStateStorage);
+    const [editorTarget] = useOuterState(editorTargetStorage);
     const [executor] = useOuterState(executorStorage);
 
     const graphIsActive = useMemo(
-        () => (graphId ? !!executor[graphId] : false),
-        [graphId, executor]
+        () => (editorTarget ? executor?.graphId === editorTarget : false),
+        [editorTarget, executor]
     );
+
+    if (!editorTarget) return null;
 
     if (graphIsActive) {
         return (
@@ -99,7 +89,7 @@ const GraphRunButton: React.FC = () => {
                 type="primary"
                 size="large"
                 icon={<StopOutlined />}
-                onClick={stopCurrentGraph}
+                onClick={stopGraph}
                 style={{ pointerEvents: "all" }}
                 danger
             />
@@ -112,7 +102,7 @@ const GraphRunButton: React.FC = () => {
             size="large"
             icon={<PlayCircleOutlined />}
             onClick={() => {
-                void runCurrentGraph();
+                void runGraph(editorTarget);
             }}
             style={{ pointerEvents: "all" }}
         />
@@ -126,25 +116,24 @@ export const EditorGraph: React.FC = () => {
 
     const [graphs] = useOuterState(graphStorage);
 
-    // Id of the currently open graph
-    const [{ graphId }] = useOuterState(editorStateStorage);
+    const [editorTarget] = useOuterState(editorTargetStorage);
 
     const [executor] = useOuterState(executorStorage);
 
     const currentGraph = useMemo(
-        () => (graphId ? graphs[graphId] : null),
-        [graphId, graphs]
+        () => (editorTarget ? graphs[editorTarget] : null),
+        [editorTarget, graphs]
     );
 
     // Disable editing if graph is active
     const editingDisabled = useMemo(
-        () => (graphId ? !!executor[graphId] : false),
-        [executor, graphId]
+        () => (editorTarget ? executor?.graphId === editorTarget : false),
+        [executor, editorTarget]
     );
 
     // Disable/enable controls manually
     useEffect(() => {
-        if (graphId && editor) {
+        if (editorTarget && editor) {
             if (editingDisabled && !editor.readonly.enabled) {
                 editor.readonly.enable();
 
@@ -175,9 +164,9 @@ export const EditorGraph: React.FC = () => {
                     });
             }
         }
-    }, [graphId, editor, editingDisabled]);
+    }, [editorTarget, editor, editingDisabled]);
 
-    if (!graphId) return null;
+    if (!editorTarget) return null;
 
     return (
         <>
@@ -244,7 +233,9 @@ export const EditorGraph: React.FC = () => {
                         <Popconfirm
                             title="Deleting graph"
                             description="Are you sure?"
-                            onConfirm={deleteCurrentGraph}
+                            onConfirm={() => {
+                                deleteGraph(editorTarget);
+                            }}
                             okText="Yes"
                             cancelText="No"
                             placement="leftTop"
@@ -267,7 +258,7 @@ export const EditorGraph: React.FC = () => {
                     value={currentGraph?.name ?? ""}
                     maxLength={120}
                     onChange={(e) => {
-                        updateCurrentGraphName(e.target.value);
+                        updateGraphName(editorTarget, e.target.value);
                     }}
                 />
             </Drawer>

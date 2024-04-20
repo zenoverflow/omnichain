@@ -10,7 +10,6 @@ import {
     optionsStorage,
     setChatChain,
     setApiChain,
-    setApiPort,
     setUserAvatar,
 } from "../../state/options";
 import { graphStorage } from "../../state/graphs";
@@ -18,7 +17,7 @@ import { avatarStorage } from "../../state/avatars";
 import { useOuterState } from "../../util/ObservableUtilsReact";
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
-    const [{ chainChatId, chainApiId, apiPort, userAvatarId }] =
+    const [{ chainChatId, chainApiId, userAvatarId }] =
         useOuterState(optionsStorage);
     const [graphs] = useOuterState(graphStorage);
     const [avatars] = useOuterState(avatarStorage);
@@ -27,7 +26,6 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         userAvatarId,
         chainChatId,
         chainApiId,
-        apiPort,
     });
 
     const avatarOptions = useMemo(
@@ -52,11 +50,10 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         [graphs]
     );
 
-    const handleApply = () => {
-        setUserAvatar(updates.userAvatarId);
-        setChatChain(updates.chainChatId);
-        setApiChain(updates.chainApiId);
-        setApiPort(updates.apiPort);
+    const handleApply = async () => {
+        await setUserAvatar(updates.userAvatarId as string | null);
+        await setChatChain(updates.chainChatId as string | null);
+        await setApiChain(updates.chainApiId as string | null);
         // TODO: restart api server
         closeModal();
     };
@@ -65,7 +62,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
         <Modal
             title={<h3>Options</h3>}
             open={true}
-            onOk={handleApply}
+            onOk={() => {
+                void handleApply();
+            }}
             afterClose={closeModal}
             onCancel={closeModal}
             okText="Apply"

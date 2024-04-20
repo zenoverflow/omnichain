@@ -16,7 +16,7 @@ import { ChatMessage } from "../data/types";
 import { optionsStorage } from "../state/options";
 import {
     messageStorage,
-    loadMessagesFromDb,
+    loadMessages,
     unloadMessages,
     addMessage,
 } from "../state/messages";
@@ -178,7 +178,7 @@ export const ChatInterface: React.FC = () => {
     useEffect(() => {
         if (initCondSatisfied && chainChatId) {
             startGlobalLoading();
-            void loadMessagesFromDb(chainChatId).then(() => {
+            void loadMessages(chainChatId).then(() => {
                 finishGlobalLoading();
             });
         }

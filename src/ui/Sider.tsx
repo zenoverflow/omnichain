@@ -1,10 +1,11 @@
 import { Layout, Menu, MenuProps } from "antd";
 
 import { graphStorage } from "../state/graphs";
-import { editorStateStorage, openGraph } from "../state/editor";
+import { editorTargetStorage, openEditor } from "../state/editor";
 import { useOuterState } from "../util/ObservableUtilsReact";
 import { ItemIcon } from "./_Sider/ItemIcon";
 import { BtnCreateGraph } from "./_Sider/BtnCreateGraph";
+import { useMemo } from "react";
 
 const { Sider: AntSider } = Layout;
 
@@ -13,19 +14,23 @@ export const Sider: React.FC<{
     setCollapsed: (collapsed: boolean) => void;
 }> = ({ collapsed, setCollapsed }) => {
     const [graphs] = useOuterState(graphStorage);
-    const [editorState] = useOuterState(editorStateStorage);
+    const [editorTarget] = useOuterState(editorTargetStorage);
 
-    const items: MenuProps["items"] = Object.values(graphs)
-        .sort((a, b) => b.created - a.created)
-        .map((graph) => ({
-            key: graph.graphId,
-            icon: <ItemIcon graphId={graph.graphId} />,
-            label: graph.name.trim().length ? graph.name.trim() : "Chain",
-        }));
+    const items: MenuProps["items"] = useMemo(
+        () =>
+            Object.entries(graphs)
+                .sort((a, b) => b[1].created - a[1].created)
+                .map(([graphId, { name }]) => ({
+                    key: graphId,
+                    icon: <ItemIcon graphId={graphId} />,
+                    label: name.trim().length ? name.trim() : "Chain",
+                })),
+        [graphs]
+    );
 
     const handleMenuClick: MenuProps["onClick"] = ({ keyPath }) => {
         const [key] = keyPath;
-        openGraph(key);
+        openEditor(key);
     };
 
     return (
@@ -57,9 +62,7 @@ export const Sider: React.FC<{
                 <Menu
                     theme="dark"
                     mode="inline"
-                    selectedKeys={
-                        editorState.graphId ? [editorState.graphId] : []
-                    }
+                    selectedKeys={editorTarget ? [editorTarget] : []}
                     items={items}
                     onClick={handleMenuClick}
                     // openKeys={openKeys}

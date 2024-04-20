@@ -2,10 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import { loadGraphsFromDb } from "./state/graphs";
-import { loadAvatarsFromDb } from "./state/avatars";
-import { clearRedundantOptions } from "./state/options";
-import { loadApiKeysFromDb } from "./state/apiKeys";
+import { loadGraphs } from "./state/graphs";
+import { loadAvatars } from "./state/avatars";
+import { loadOptions } from "./state/options";
+import { loadApiKeys } from "./state/apiKeys";
 
 import { QueueUtils } from "./util/QueueUtils";
 
@@ -19,10 +19,10 @@ import { Editor } from "./ui/Editor";
 // ]);
 
 export const run = async () => {
-    await loadGraphsFromDb();
-    await loadAvatarsFromDb();
-    await loadApiKeysFromDb();
-    clearRedundantOptions();
+    await loadGraphs();
+    await loadAvatars();
+    await loadApiKeys();
+    await loadOptions();
 
     QueueUtils.runQueue();
 

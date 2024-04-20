@@ -1,89 +1,79 @@
 import { StatefulObservable } from "../util/ObservableUtils";
 import { graphStorage } from "./graphs";
 import { avatarStorage } from "./avatars";
+import { BackendResourceUtils } from "../util/BackendResourceUtils";
 
 type OptionsState = {
-    userAvatarId: string | null;
-    chainChatId: string | null;
-    chainApiId: string | null;
-    apiPort: number;
+    userAvatarId?: string | null;
+    chainChatId?: string | null;
+    chainApiId?: string | null;
 };
 
-export const optionsStorage = new StatefulObservable<OptionsState>({
-    userAvatarId: localStorage.getItem("userAvatarId") || null,
-    chainChatId: localStorage.getItem("chainChatId") || null,
-    chainApiId: localStorage.getItem("chainApiId") || null,
-    apiPort: Number.parseInt(localStorage.getItem("apiPort") || "13000"),
-});
+export const optionsStorage = new StatefulObservable<OptionsState>({});
 
-export const setUserAvatar = (userAvatarId: string | null) => {
+export const loadOptions = async () => {
+    optionsStorage.set(
+        (await BackendResourceUtils.getSingle("options")) as OptionsState
+    );
+    await clearRedundantOptions();
+};
+
+export const saveOptions = async () => {
+    await BackendResourceUtils.setSingle("options", optionsStorage.get());
+};
+
+// ACTIONS //
+
+export const setUserAvatar = async (userAvatarId: string | null) => {
     optionsStorage.set({
         ...optionsStorage.get(),
         userAvatarId,
     });
-
-    if (!userAvatarId) {
-        localStorage.removeItem("userAvatarId");
-    } else {
-        localStorage.setItem("userAvatarId", userAvatarId);
-    }
+    await saveOptions();
 };
 
-export const setChatChain = (chainChatId: string | null) => {
+export const setChatChain = async (chainChatId: string | null) => {
     optionsStorage.set({
         ...optionsStorage.get(),
         chainChatId,
     });
-
-    if (!chainChatId) {
-        localStorage.removeItem("chainChatId");
-    } else {
-        localStorage.setItem("chainChatId", chainChatId);
-    }
+    await saveOptions();
 };
 
-export const setApiChain = (chainApiId: string | null) => {
+export const setApiChain = async (chainApiId: string | null) => {
     optionsStorage.set({
         ...optionsStorage.get(),
         chainApiId,
     });
-
-    if (!chainApiId) {
-        localStorage.removeItem("chainApiId");
-    } else {
-        localStorage.setItem("chainApiId", chainApiId);
-    }
+    await saveOptions();
 };
 
-export const setApiPort = (apiPort: number) => {
-    optionsStorage.set({
-        ...optionsStorage.get(),
-        apiPort,
-    });
-    localStorage.setItem("apiPort", apiPort.toString());
-};
-
-export const clearRedundantOptions = () => {
+export const clearRedundantOptions = async () => {
     const graphs = graphStorage.get();
     const avatars = avatarStorage.get();
     const options = optionsStorage.get();
+
+    const update = { ...options };
 
     if (
         !options.chainChatId ||
         !Object.keys(graphs).includes(options.chainChatId)
     ) {
-        setChatChain(null);
+        update.chainChatId = null;
     }
     if (
         !options.chainApiId ||
         !Object.keys(graphs).includes(options.chainApiId)
     ) {
-        setApiChain(null);
+        update.chainApiId = null;
     }
     if (
         !options.userAvatarId ||
         !Object.keys(avatars).includes(options.userAvatarId)
     ) {
-        setUserAvatar(null);
+        update.userAvatarId = null;
     }
+
+    optionsStorage.set(update);
+    await saveOptions();
 };

@@ -1,7 +1,7 @@
 import { StatefulObservable } from "../util/ObservableUtils";
 import { ImgUtils } from "../util/ImgUtils";
 import { QueueUtils } from "../util/QueueUtils";
-import { db } from "../data/db";
+import { BackendResourceUtils } from "../util/BackendResourceUtils";
 import { ChatAvatar } from "../data/types";
 import { clearRedundantOptions } from "./options";
 
@@ -9,12 +9,16 @@ export const avatarStorage = new StatefulObservable<Record<string, ChatAvatar>>(
     {}
 );
 
-export const loadAvatarsFromDb = async () => {
-    avatarStorage.set(
-        Object.fromEntries(
-            (await db.chatAvatars.toArray()).map((c) => [c.avatarId, c])
-        )
-    );
+export const loadAvatars = async () => {
+    avatarStorage.set(await BackendResourceUtils.getMultiAll("chatAvatars"));
+};
+
+const backendSetChatAvatar = async (id: string, data: Record<string, any>) => {
+    await BackendResourceUtils.setMultiSingle("chatAvatars", id, data);
+};
+
+const backendDeleteChatAvatar = async (id: string) => {
+    await BackendResourceUtils.deleteMultiSingle("chatAvatars", id);
 };
 
 // ACTIONS //
@@ -26,7 +30,7 @@ export const createAvatar = (name = "Anon") => {
             ...avatarStorage.get(),
             [created.avatarId]: created,
         });
-        await db.chatAvatars.add(created);
+        await backendSetChatAvatar(created.avatarId, created);
     });
 };
 
@@ -44,7 +48,7 @@ export const updateAvatarName = (avatarId: string, name: string) => {
             ...storage,
             [avatarId]: update,
         });
-        await db.chatAvatars.put(update);
+        await backendSetChatAvatar(avatarId, update);
     });
 };
 
@@ -62,7 +66,7 @@ export const updateAvatarImage = (avatarId: string, image: File) => {
             ...storage,
             [avatarId]: update,
         });
-        await db.chatAvatars.put(update);
+        await backendSetChatAvatar(avatarId, update);
     });
 };
 
@@ -75,7 +79,7 @@ export const deleteAvatar = (avatarId: string) => {
                 )
             )
         );
-        await db.chatAvatars.delete(avatarId);
-        clearRedundantOptions();
+        await backendDeleteChatAvatar(avatarId);
+        await clearRedundantOptions();
     });
 };

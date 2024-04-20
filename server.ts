@@ -12,7 +12,7 @@ const argv: Record<string, any> = minimist(process.argv.slice(2));
 
 const app = new Koa();
 const router = new Router({
-    sensitive: true,
+    // sensitive: true,
 });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,102 +30,120 @@ const readJsonFile = (path: string) =>
 
 // API: single-file resources
 
-router.get("/api/resource/single/:resource", async (ctx) => {
+router.get("/api/resource/single/:resource", (ctx) => {
     const pathToFile = path.join(DIR_DATA, `${ctx.params.resource}.json`);
     if (!fs.existsSync(pathToFile)) {
-        ctx.body = {};
-        return;
+        ctx.body = JSON.stringify({});
+    } else {
+        ctx.body = JSON.stringify(readJsonFile(pathToFile));
     }
-
-    ctx.body = readJsonFile(pathToFile);
 });
 
-router.post("/api/resource/single/:resource", async (ctx) => {
+router.post("/api/resource/single/:resource", (ctx) => {
     fs.writeFileSync(
         path.join(DIR_DATA, `${ctx.params.resource}.json`),
-        JSON.stringify(ctx.body)
+        JSON.stringify(ctx.request.body)
     );
+    ctx.body = "OK";
 });
 
-router.delete("/api/resource/single/:resource", async (ctx) => {
+router.delete("/api/resource/single/:resource", (ctx) => {
     const pathToFile = path.join(DIR_DATA, `${ctx.params.resource}.json`);
     if (fs.existsSync(pathToFile)) fs.unlinkSync(pathToFile);
+    ctx.body = "OK";
 });
 
 // API: multi-file resources
 
-router.get("/api/resource/multi/:resource/index", async (ctx) => {
-    const resourceFiles = fs.readdirSync(
-        path.join(DIR_DATA, ctx.params.resource)
-    );
-    ctx.body = Object.fromEntries(
-        resourceFiles.map((file) => {
-            const content = readJsonFile(
-                path.join(DIR_DATA, ctx.params.resource, file)
-            );
-            // Grab id from filename (strip out the extension, use regex)
-            const id = file.replace(/\.[^/.]+$/, "");
-            return [id, content.name ?? id];
-        })
-    );
+router.get("/api/resource/multi/index/:resource", (ctx) => {
+    const resourceDir = path.join(DIR_DATA, ctx.params.resource);
+    if (!fs.existsSync(resourceDir)) {
+        ctx.body = JSON.stringify({});
+    } else {
+        const resourceFiles = fs.readdirSync(resourceDir);
+        ctx.body = JSON.stringify(
+            Object.fromEntries(
+                resourceFiles.map((file) => {
+                    const content = readJsonFile(
+                        path.join(DIR_DATA, ctx.params.resource, file)
+                    );
+                    // Grab id from filename (strip out the extension, use regex)
+                    const id = file.replace(/\.[^/.]+$/, "");
+                    return [
+                        id,
+                        {
+                            name: content.name ?? id,
+                            created: content.created ?? Date.now(),
+                        },
+                    ];
+                })
+            )
+        );
+    }
 });
 
-router.get("/api/resource/multi/:resource/all", async (ctx) => {
-    const resourceFiles = fs.readdirSync(
-        path.join(DIR_DATA, ctx.params.resource)
-    );
-    ctx.body = Object.fromEntries(
-        resourceFiles.map((file) => {
-            const content = readJsonFile(
-                path.join(DIR_DATA, ctx.params.resource, file)
-            );
-            // Grab id from filename (strip out the extension, use regex)
-            const id = file.replace(/\.[^/.]+$/, "");
-            return [id, content];
-        })
-    );
+router.get("/api/resource/multi/all/:resource", (ctx) => {
+    const resourceDir = path.join(DIR_DATA, ctx.params.resource);
+    if (!fs.existsSync(resourceDir)) {
+        ctx.body = JSON.stringify({});
+    } else {
+        const resourceFiles = fs.readdirSync(resourceDir);
+        ctx.body = JSON.stringify(
+            Object.fromEntries(
+                resourceFiles.map((file) => {
+                    const content = readJsonFile(
+                        path.join(DIR_DATA, ctx.params.resource, file)
+                    );
+                    // Grab id from filename (strip out the extension, use regex)
+                    const id = file.replace(/\.[^/.]+$/, "");
+                    return [id, content];
+                })
+            )
+        );
+    }
 });
 
-router.get("/api/resource/multi/:resource/:id", async (ctx) => {
+router.get("/api/resource/multi/single/:resource/:id", (ctx) => {
     const pathToFile = path.join(
         DIR_DATA,
         ctx.params.resource,
         `${ctx.params.id}.json`
     );
     if (!fs.existsSync(pathToFile)) {
-        ctx.body = {};
-        return;
+        ctx.body = JSON.stringify({});
+    } else {
+        ctx.body = JSON.stringify(readJsonFile(pathToFile));
     }
-
-    ctx.body = readJsonFile(pathToFile);
 });
 
-router.post("/api/resource/multi/:resource/:id", async (ctx) => {
+router.post("/api/resource/multi/single/:resource/:id", (ctx) => {
     fs.writeFileSync(
         path.join(DIR_DATA, ctx.params.resource, `${ctx.params.id}.json`),
-        JSON.stringify(ctx.body)
+        JSON.stringify(ctx.request.body)
     );
+    ctx.body = "OK";
 });
 
-router.delete("/api/resource/multi/:resource/:id", async (ctx) => {
+router.delete("/api/resource/multi/single/:resource/:id", (ctx) => {
     const pathToFile = path.join(
         DIR_DATA,
         ctx.params.resource,
         `${ctx.params.id}.json`
     );
     if (fs.existsSync(pathToFile)) fs.unlinkSync(pathToFile);
+    ctx.body = "OK";
 });
 
 // Config: middleware
 
 app
+    // body parsing
+    .use(koaBody())
     // routing
     .use(router.routes())
     .use(router.allowedMethods())
     // frontend
-    .use(serve(path.join(__dirname, "dist")))
-    // body parsing
-    .use(koaBody);
+    .use(serve(path.join(__dirname, "dist")));
 
 // Config: server
 

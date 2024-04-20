@@ -23,8 +23,6 @@
         "@types/styled-components": "^5.1.34",
         "@types/uuid": "^9.0.8",
         "antd": "^5.16.1",
-        "dexie": "^4.0.1",
-        "dexie-react-hooks": "^1.1.7",
         "koa": "^2.15.3",
         "koa-body": "^6.0.1",
         "koa-router": "^12.0.1",

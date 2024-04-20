@@ -11,7 +11,7 @@ import { ControlFlow, Dataflow } from "rete-engine";
 //     ArrangeAppliers,
 // } from "rete-auto-arrange-plugin";
 
-import { editorStateStorage } from "../../state/editor";
+import { editorTargetStorage } from "../../state/editor";
 import { initGraph, updateNodeControl, graphStorage } from "../../state/graphs";
 import { controlObservable } from "../../state/watcher";
 import { showNotification } from "../../state/notifications";
@@ -28,12 +28,11 @@ import { NodeCustomizer } from "./NodeCustomizer";
 import { FlowCustomizer } from "./FlowCustomizer";
 import { GraphTemplate } from "./GraphTemplate";
 import { integrateMagCon } from "./magconnection";
-import { SerializedGraph } from "../../data/types";
 
 // const { TransitionApplier } = ArrangeAppliers;
 
 export async function createEditor(container: HTMLElement) {
-    const { graphId } = editorStateStorage.get();
+    const graphId = editorTargetStorage.get();
 
     if (!graphId) {
         throw new Error("Tried to create editor without graph!");
@@ -97,9 +96,7 @@ export async function createEditor(container: HTMLElement) {
             return controlObservable;
         },
         getControlValue(graphId, node, control) {
-            const s = graphStorage.get();
-            const graph = s[graphId] as SerializedGraph | null;
-            if (!graph) return null;
+            const graph = graphStorage.get()[graphId];
             return graph.nodes.find((n) => n.nodeId === node)?.controls[
                 control
             ] as string | number | null;

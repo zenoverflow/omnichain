@@ -1,23 +1,24 @@
 import { StatefulObservable } from "../util/ObservableUtils";
 import { MsgUtils } from "../util/MsgUtils";
 import { QueueUtils } from "../util/QueueUtils";
-import { db } from "../data/db";
+import { BackendResourceUtils } from "../util/BackendResourceUtils";
 import { ChatMessage } from "../data/types";
 
 export const messageStorage = new StatefulObservable<
     Record<string, ChatMessage>
 >({});
 
-export const loadMessagesFromDb = async (chainId: string) => {
+export const loadMessages = async (chainId: string) => {
     messageStorage.set(
-        Object.fromEntries(
-            (
-                await db.chatMessages
-                    .filter((c) => c.chainId === chainId)
-                    .toArray()
-            ).map((c) => [c.avatarId, c])
-        )
+        await BackendResourceUtils.getMultiSingle("chatMessages", chainId)
     );
+};
+
+const backendSetMessages = async (
+    chainId: string,
+    data: Record<string, any>
+) => {
+    await BackendResourceUtils.setMultiSingle("chatMessages", chainId, data);
 };
 
 // ACTIONS //
@@ -37,11 +38,11 @@ export const addMessage = (
             ...messageStorage.get(),
             [created.messageId]: created,
         });
-        await db.chatMessages.add(created);
+        await backendSetMessages(chainId, messageStorage.get());
     });
 };
 
-export const setMessageProcessed = (messageId: string) => {
+export const setMessageProcessed = (chainId: string, messageId: string) => {
     QueueUtils.addTask(async () => {
         const s = messageStorage.get();
         const target = s[messageId];
@@ -53,11 +54,11 @@ export const setMessageProcessed = (messageId: string) => {
             ...s,
             [messageId]: update,
         });
-        await db.chatMessages.put(update);
+        await backendSetMessages(chainId, messageStorage.get());
     });
 };
 
-export const deleteMessage = (messageId: string) => {
+export const deleteMessage = (chainId: string, messageId: string) => {
     QueueUtils.addTask(async () => {
         messageStorage.set(
             Object.fromEntries(
@@ -66,6 +67,6 @@ export const deleteMessage = (messageId: string) => {
                 )
             )
         );
-        await db.chatMessages.delete(messageId);
+        await backendSetMessages(chainId, messageStorage.get());
     });
 };
