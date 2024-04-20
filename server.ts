@@ -19,14 +19,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const DIR_DATA = path.join(__dirname, "data");
 
-// Setup
-
-if (!fs.existsSync(DIR_DATA)) fs.mkdirSync(DIR_DATA);
-
 // Utils
 
 const readJsonFile = (path: string) =>
     JSON.parse(fs.readFileSync(path, "utf-8")) as Record<string, any>;
+
+const ensureDirExists = (dir: string) => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+};
+
+// Setup
+
+ensureDirExists(DIR_DATA);
 
 // API: single-file resources
 
@@ -57,58 +61,53 @@ router.delete("/api/resource/single/:resource", (ctx) => {
 
 router.get("/api/resource/multi/index/:resource", (ctx) => {
     const resourceDir = path.join(DIR_DATA, ctx.params.resource);
-    if (!fs.existsSync(resourceDir)) {
-        ctx.body = JSON.stringify({});
-    } else {
-        const resourceFiles = fs.readdirSync(resourceDir);
-        ctx.body = JSON.stringify(
-            Object.fromEntries(
-                resourceFiles.map((file) => {
-                    const content = readJsonFile(
-                        path.join(DIR_DATA, ctx.params.resource, file)
-                    );
-                    // Grab id from filename (strip out the extension, use regex)
-                    const id = file.replace(/\.[^/.]+$/, "");
-                    return [
-                        id,
-                        {
-                            name: content.name ?? id,
-                            created: content.created ?? Date.now(),
-                        },
-                    ];
-                })
-            )
-        );
-    }
+    ensureDirExists(resourceDir);
+
+    const resourceFiles = fs.readdirSync(resourceDir);
+    ctx.body = JSON.stringify(
+        Object.fromEntries(
+            resourceFiles.map((file) => {
+                const content = readJsonFile(
+                    path.join(DIR_DATA, ctx.params.resource, file)
+                );
+                // Grab id from filename (strip out the extension, use regex)
+                const id = file.replace(/\.[^/.]+$/, "");
+                return [
+                    id,
+                    {
+                        name: content.name ?? id,
+                        created: content.created ?? Date.now(),
+                    },
+                ];
+            })
+        )
+    );
 });
 
 router.get("/api/resource/multi/all/:resource", (ctx) => {
     const resourceDir = path.join(DIR_DATA, ctx.params.resource);
-    if (!fs.existsSync(resourceDir)) {
-        ctx.body = JSON.stringify({});
-    } else {
-        const resourceFiles = fs.readdirSync(resourceDir);
-        ctx.body = JSON.stringify(
-            Object.fromEntries(
-                resourceFiles.map((file) => {
-                    const content = readJsonFile(
-                        path.join(DIR_DATA, ctx.params.resource, file)
-                    );
-                    // Grab id from filename (strip out the extension, use regex)
-                    const id = file.replace(/\.[^/.]+$/, "");
-                    return [id, content];
-                })
-            )
-        );
-    }
+    ensureDirExists(resourceDir);
+
+    const resourceFiles = fs.readdirSync(resourceDir);
+    ctx.body = JSON.stringify(
+        Object.fromEntries(
+            resourceFiles.map((file) => {
+                const content = readJsonFile(
+                    path.join(DIR_DATA, ctx.params.resource, file)
+                );
+                // Grab id from filename (strip out the extension, use regex)
+                const id = file.replace(/\.[^/.]+$/, "");
+                return [id, content];
+            })
+        )
+    );
 });
 
 router.get("/api/resource/multi/single/:resource/:id", (ctx) => {
-    const pathToFile = path.join(
-        DIR_DATA,
-        ctx.params.resource,
-        `${ctx.params.id}.json`
-    );
+    const resourceDir = path.join(DIR_DATA, ctx.params.resource);
+    ensureDirExists(resourceDir);
+
+    const pathToFile = path.join(resourceDir, `${ctx.params.id}.json`);
     if (!fs.existsSync(pathToFile)) {
         ctx.body = JSON.stringify({});
     } else {
@@ -117,19 +116,21 @@ router.get("/api/resource/multi/single/:resource/:id", (ctx) => {
 });
 
 router.post("/api/resource/multi/single/:resource/:id", (ctx) => {
+    const resourceDir = path.join(DIR_DATA, ctx.params.resource);
+    ensureDirExists(resourceDir);
+
     fs.writeFileSync(
-        path.join(DIR_DATA, ctx.params.resource, `${ctx.params.id}.json`),
+        path.join(resourceDir, `${ctx.params.id}.json`),
         JSON.stringify(ctx.request.body)
     );
     ctx.body = "OK";
 });
 
 router.delete("/api/resource/multi/single/:resource/:id", (ctx) => {
-    const pathToFile = path.join(
-        DIR_DATA,
-        ctx.params.resource,
-        `${ctx.params.id}.json`
-    );
+    const resourceDir = path.join(DIR_DATA, ctx.params.resource);
+    ensureDirExists(resourceDir);
+
+    const pathToFile = path.join(resourceDir, `${ctx.params.id}.json`);
     if (fs.existsSync(pathToFile)) fs.unlinkSync(pathToFile);
     ctx.body = "OK";
 });
