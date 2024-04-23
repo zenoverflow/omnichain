@@ -1,7 +1,7 @@
 module.exports = {
     root: true,
     // ignores: ["server.js"],
-    ignorePatterns: ["dist", ".eslintrc.cjs"],
+    ignorePatterns: ["dist", ".eslintrc.cjs", "custom_nodes", "data"],
     overrides: [
         // Client configuration
         {

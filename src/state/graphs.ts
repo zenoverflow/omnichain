@@ -10,6 +10,7 @@ import { NodeContextObj } from "../nodes/context";
 import { openEditor } from "./editor";
 import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
+import { nodeRegistryStorage } from "./nodeRegistry";
 
 export const graphStorage = new StatefulObservable<
     Record<string, SerializedGraph>
@@ -43,7 +44,7 @@ export const createGraph = (name = "New Chain") => {
 
 export const initGraph = async (context: NodeContextObj) => {
     const graph = graphStorage.get()[context.graphId];
-    await GraphUtils.hydrate(graph, context);
+    await GraphUtils.hydrate(graph, context, nodeRegistryStorage.get());
 };
 
 /**

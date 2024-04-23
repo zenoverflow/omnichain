@@ -2,10 +2,11 @@ import { ClassicPreset, NodeEditor } from "rete";
 import { ControlFlow, Dataflow } from "rete-engine";
 
 import { StatefulObservable } from "../util/ObservableUtils";
+import { GraphUtils } from "../util/GraphUtils";
 import { graphStorage, updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
-import { GraphUtils } from "../util/GraphUtils";
+import { nodeRegistryStorage } from "./nodeRegistry";
 
 export type ExecutorInstance = {
     graphId: string;
@@ -103,57 +104,61 @@ export const runGraph = async (graphId: string) => {
     const dataflow = new Dataflow(editor);
 
     // Hydrate
-    await GraphUtils.hydrate(graph, {
-        headless: true,
-        graphId: graph.graphId,
-        editor,
-        control,
-        dataflow,
-        onEvent(event) {
-            const { type, text } = event;
-            showNotification({
-                type,
-                text,
-                ts: Date.now(),
-                duration: 3,
-            });
+    await GraphUtils.hydrate(
+        graph,
+        {
+            headless: true,
+            graphId: graph.graphId,
+            editor,
+            control,
+            dataflow,
+            onEvent(event) {
+                const { type, text } = event;
+                showNotification({
+                    type,
+                    text,
+                    ts: Date.now(),
+                    duration: 3,
+                });
+            },
+            onError(error) {
+                showNotification({
+                    type: "error",
+                    text: error.message,
+                    ts: Date.now(),
+                    duration: 3,
+                });
+            },
+            onAutoExecute(nodeId) {
+                if (!isGraphActive(graph.graphId)) return;
+                control.execute(nodeId);
+            },
+            onFlowNode(nodeId) {
+                if (!isGraphActive(graph.graphId)) return;
+                updateActiveNode(graph.graphId, nodeId);
+            },
+            onControlChange(graphId, node, control, value) {
+                updateNodeControl(graphId, node, control, value);
+                controlObservable.next({ graphId, node, control, value });
+            },
+            getControlObservable() {
+                return controlObservable;
+            },
+            getControlValue(graphId, node, control) {
+                const graph = graphStorage.get()[graphId];
+                return graph.nodes.find((n) => n.nodeId === node)?.controls[
+                    control
+                ] as string | number | null;
+            },
+            getIsActive() {
+                return isGraphActive(graph.graphId);
+            },
+            unselect() {
+                // No selection in headless
+            },
         },
-        onError(error) {
-            showNotification({
-                type: "error",
-                text: error.message,
-                ts: Date.now(),
-                duration: 3,
-            });
-        },
-        onAutoExecute(nodeId) {
-            if (!isGraphActive(graph.graphId)) return;
-            control.execute(nodeId);
-        },
-        onFlowNode(nodeId) {
-            if (!isGraphActive(graph.graphId)) return;
-            updateActiveNode(graph.graphId, nodeId);
-        },
-        onControlChange(graphId, node, control, value) {
-            updateNodeControl(graphId, node, control, value);
-            controlObservable.next({ graphId, node, control, value });
-        },
-        getControlObservable() {
-            return controlObservable;
-        },
-        getControlValue(graphId, node, control) {
-            const graph = graphStorage.get()[graphId];
-            return graph.nodes.find((n) => n.nodeId === node)?.controls[
-                control
-            ] as string | number | null;
-        },
-        getIsActive() {
-            return isGraphActive(graph.graphId);
-        },
-        unselect() {
-            // No selection in headless
-        },
-    });
+        nodeRegistryStorage.get()
+    );
 
     setTimeout(() => {
         try {

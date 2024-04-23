@@ -1,7 +1,7 @@
 import { StatefulObservable } from "../util/ObservableUtils";
-import * as NODE_MAKERS from "../nodes";
 import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
 import { NodeContextObj } from "../nodes/context";
+import { nodeRegistryStorage } from "./nodeRegistry";
 
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
@@ -33,7 +33,7 @@ export const duplicateNode = async (
         const nodeView = area.nodeViews.get(id);
         if (!nodeView) return;
 
-        const Maker = (NODE_MAKERS as any)[original.label];
+        const Maker = nodeRegistryStorage.get()[original.label];
         if (!Maker) return;
 
         const duplicate = new Maker(nodeContext);

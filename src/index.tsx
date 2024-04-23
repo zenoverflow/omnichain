@@ -6,8 +6,10 @@ import { loadGraphs } from "./state/graphs";
 import { loadAvatars } from "./state/avatars";
 import { loadOptions } from "./state/options";
 import { loadApiKeys } from "./state/apiKeys";
+import { loadNodeRegistry } from "./state/nodeRegistry";
 
 import { QueueUtils } from "./util/QueueUtils";
+import { CustomNodeUtils } from "./util/CustomNodeUtils";
 
 import { Editor } from "./ui/Editor";
 
@@ -19,6 +21,8 @@ import { Editor } from "./ui/Editor";
 // ]);
 
 export const run = async () => {
+    CustomNodeUtils.exposeNodeMaker();
+    await loadNodeRegistry();
     await loadGraphs();
     await loadAvatars();
     await loadApiKeys();

@@ -18,6 +18,7 @@ const router = new Router({
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const DIR_DATA = path.join(__dirname, "data");
+const DIR_CUSTOM_NODES = path.join(__dirname, "custom_nodes");
 
 // Utils
 
@@ -31,6 +32,33 @@ const ensureDirExists = (dir: string) => {
 // Setup
 
 ensureDirExists(DIR_DATA);
+ensureDirExists(DIR_CUSTOM_NODES);
+
+// API: custom nodes (fetch only)
+
+router.get("/api/custom_nodes", (ctx) => {
+    const customNodes: string[] = [];
+
+    for (const obj of fs.readdirSync(DIR_CUSTOM_NODES)) {
+        // Check for makers in roots of subdirectories
+        if (fs.statSync(path.join(DIR_CUSTOM_NODES, obj)).isDirectory()) {
+            const subdir = path.join(DIR_CUSTOM_NODES, obj);
+            // Read makers from subdirectory root
+            for (const subObj of fs.readdirSync(subdir)) {
+                if (subObj.endsWith(".maker.js")) {
+                    customNodes.push(path.join(DIR_CUSTOM_NODES, obj, subObj));
+                }
+            }
+        }
+        // Directly add makers from root custom_nodes directory
+        else if (obj.endsWith(".maker.js")) {
+            customNodes.push(path.join(DIR_CUSTOM_NODES, obj));
+        }
+    }
+    ctx.body = JSON.stringify(
+        customNodes.map((file) => [file, fs.readFileSync(file, "utf-8")])
+    );
+});
 
 // API: single-file resources
 

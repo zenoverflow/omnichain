@@ -3,7 +3,6 @@ import { ClassicPreset } from "rete";
 import type { NodeEditor } from "rete";
 import type { AreaPlugin } from "rete-area-plugin";
 
-import * as NODE_MAKERS from "../nodes";
 import type { NodeContextObj } from "../nodes/context";
 import type { SerializedGraph, SerializedNode } from "../data/types";
 
@@ -58,13 +57,16 @@ export const GraphUtils = {
 
     async hydrate(
         graph: SerializedGraph,
-        context: NodeContextObj
+        context: NodeContextObj,
+        nodeRegistry: Record<string, any>
     ): Promise<void> {
         const { editor } = context;
         // Nodes
         for (const n of graph.nodes) {
             // Node
-            await editor.addNode(this.deserializeNode(n, context));
+            await editor.addNode(
+                this.deserializeNode(n, context, nodeRegistry)
+            );
             // Positions
             await context.area?.nodeViews
                 .get(n.nodeId)
@@ -121,10 +123,17 @@ export const GraphUtils = {
         };
     },
 
-    deserializeNode(nodeObj: SerializedNode, context: NodeContextObj) {
+    deserializeNode(
+        nodeObj: SerializedNode,
+        context: NodeContextObj,
+        nodeRegistry: Record<string, any>
+    ) {
         const { nodeType, nodeId } = nodeObj;
 
-        const Maker = (NODE_MAKERS as any)[nodeType];
+        const Maker = nodeRegistry[nodeType];
+
+        // TODO: make special empty node to use when nodeType not found
+
         const node = new Maker(context, nodeId) as ClassicPreset.Node;
 
         return node;

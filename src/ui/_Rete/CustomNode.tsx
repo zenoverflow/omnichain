@@ -170,7 +170,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     );
 
     const cleanLabel = useMemo(() => {
-        return props.data.label.replace("Node", "").trim();
+        return props.data.label.replace(/Node$/, "").trim();
     }, [props.data.label]);
 
     const icon = useMemo(() => {

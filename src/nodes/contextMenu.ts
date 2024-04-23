@@ -1,9 +1,8 @@
-import * as NODE_MAKERS from ".";
-
 import { NodeContextObj } from "./context";
 import { deleteNode, duplicateNode } from "../state/editor";
 import { showContextMenu } from "../state/editorContextMenu";
 import { isGraphActive } from "../state/executor";
+import { nodeRegistryStorage } from "../state/nodeRegistry";
 
 const makeRootMenu = (nodeContext: NodeContextObj) => {
     const { editor, area } = nodeContext;
@@ -18,7 +17,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
 
     const { x, y } = area.area.pointer;
 
-    const filtered = Object.entries(NODE_MAKERS)
+    const filtered = Object.entries(nodeRegistryStorage.get())
         .filter(([key]) => {
             if (key === "StartNode") {
                 // Prevent adding more than 1 entrypoint
@@ -28,9 +27,9 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
         })
         .map(([key, Maker]) => ({
             key,
-            label: key.replace("Node", "").trim(),
+            label: key.replace(/Node$/, "").trim(),
             handler: async () => {
-                const n = new (Maker as any)(nodeContext);
+                const n = new Maker(nodeContext);
                 await editor.addNode(n);
                 await area.translate(n.id, { x, y });
             },
