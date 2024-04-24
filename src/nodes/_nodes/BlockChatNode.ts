@@ -1,5 +1,4 @@
 import { makeNode } from "./_Base";
-import { blockChat, unblockChat } from "../../state/chatBlock";
 
 export const BlockChatNode = makeNode(
     {
@@ -31,14 +30,13 @@ export const BlockChatNode = makeNode(
         controlFlow: {
             inputs: ["triggerIn"],
             outputs: ["triggerOut"],
-            async logic(_node, _context, controls, _fetchInputs, forward) {
-                const action = controls["value"] as "block" | "unblock";
+            async logic(_node, context, controls, _fetchInputs, forward) {
+                const action = controls["action"] as "block" | "unblock";
 
-                if (action === "block") {
-                    blockChat();
-                } else {
-                    unblockChat();
-                }
+                await context.onExternalAction({
+                    type: "chatBlock",
+                    args: { blocked: action === "block" },
+                });
 
                 forward("triggerOut");
             },

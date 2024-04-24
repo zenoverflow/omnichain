@@ -92,6 +92,9 @@ export async function createEditor(container: HTMLElement) {
             updateNodeControl(graphId, node, control, value);
             controlObservable.next({ graphId, node, control, value });
         },
+        async onExternalAction(_action) {
+            // No external actions from visual editor
+        },
         getControlObservable() {
             return controlObservable;
         },

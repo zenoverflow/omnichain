@@ -11,6 +11,10 @@ type ExecutionEvent = {
     text: string;
 };
 
+export type ExternalAction =
+    | { type: "chatBlock"; args: { blocked: boolean } }
+    | { type: "terminal"; args: { command: string } };
+
 export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
 export type ControlUpdate = {
@@ -43,6 +47,10 @@ export type NodeContextObj = {
      */
     onAutoExecute: (nodeId: string) => any;
 
+    /**
+     * For handling control updates, either from the UI, or from
+     * changes during graph execution.
+     */
     onControlChange: (
         graphId: string,
         node: string,
@@ -50,8 +58,24 @@ export type NodeContextObj = {
         value: string | number
     ) => void;
 
+    /**
+     * Allows nodes to trigger external actions such as
+     * state changes, terminal commands, etc.
+     */
+    onExternalAction: (action: ExternalAction) => Promise<any>;
+
+    /**
+     * Used to send updates down to a node's controls.
+     *
+     * @returns The observable for control updates.
+     */
     getControlObservable: () => SimpleObservable<ControlUpdate> | null;
 
+    /**
+     * Allows a node's controls to grab their values from state/storage.
+     *
+     * @returns The value of the control.
+     */
     getControlValue: (
         graphId: string,
         node: string,
@@ -59,7 +83,7 @@ export type NodeContextObj = {
     ) => string | number | null;
 
     /**
-     * For visually tracking graph execution
+     * For visually tracking graph execution.
      */
     onFlowNode: (nodeId: string) => any;
 
@@ -71,7 +95,7 @@ export type NodeContextObj = {
     getIsActive: () => boolean;
 
     /**
-     * For node unselection in the plugin's internal state
+     * For node unselection in the plugin's internal state.
      */
     unselect: (id: string) => any;
 };

@@ -7,6 +7,7 @@ import { graphStorage, updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { nodeRegistryStorage } from "./nodeRegistry";
+import { blockChat, unblockChat } from "./chatBlock";
 
 export type ExecutorInstance = {
     graphId: string;
@@ -151,6 +152,23 @@ export const runGraph = async (graphId: string) => {
             onControlChange(graphId, node, control, value) {
                 updateNodeControl(graphId, node, control, value);
                 controlObservable.next({ graphId, node, control, value });
+            },
+            async onExternalAction(action) {
+                console.log("External action", action);
+                switch (action.type) {
+                    case "chatBlock":
+                        if (action.args.blocked) {
+                            blockChat();
+                        } else {
+                            unblockChat();
+                        }
+                        break;
+                    case "terminal":
+                        // TODO: implement via backend
+                        break;
+                    default:
+                        break;
+                }
             },
             getControlObservable() {
                 return controlObservable;
