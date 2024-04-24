@@ -2,13 +2,32 @@ import { StatefulObservable } from "../util/ObservableUtils";
 import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
 import { NodeContextObj } from "../nodes/context";
 import { nodeRegistryStorage } from "./nodeRegistry";
+import { graphStorage } from "./graphs";
+import { complexErrorObservable } from "./watcher";
 
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
 // ACTIONS //
 
 export const openEditor = (graphId: string) => {
-    editorTargetStorage.set(graphId);
+    const targetGraph = graphStorage.get()[graphId];
+
+    // Missing nodes check
+    const missingNodes = targetGraph.nodes.filter(
+        (n) => !nodeRegistryStorage.get()[n.nodeType]
+    );
+    if (missingNodes.length > 0) {
+        complexErrorObservable.next([
+            "Hydration error!",
+            `Cannot load graph! Missing nodes: ${missingNodes
+                .map((n) => n.nodeType)
+                .join(", ")}`,
+        ]);
+    }
+    // Open graph
+    else {
+        editorTargetStorage.set(graphId);
+    }
 };
 
 export const closeEditor = () => {

@@ -61,6 +61,17 @@ export const GraphUtils = {
         nodeRegistry: Record<string, any>
     ): Promise<void> {
         const { editor } = context;
+        // Missing nodes check
+        const missingNodes = graph.nodes.filter(
+            (n) => !nodeRegistry[n.nodeType]
+        );
+        if (missingNodes.length > 0) {
+            throw new Error(
+                `Cannot load graph! Missing nodes: ${missingNodes
+                    .map((n) => n.nodeType)
+                    .join(", ")}`
+            );
+        }
         // Nodes
         for (const n of graph.nodes) {
             // Node
@@ -131,8 +142,6 @@ export const GraphUtils = {
         const { nodeType, nodeId } = nodeObj;
 
         const Maker = nodeRegistry[nodeType];
-
-        // TODO: make special empty node to use when nodeType not found
 
         const node = new Maker(context, nodeId) as ClassicPreset.Node;
 

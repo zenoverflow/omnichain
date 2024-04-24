@@ -81,6 +81,17 @@ export const stopGraph = () => {
 export const runGraph = async (graphId: string) => {
     const graph = graphStorage.get()[graphId];
 
+    // Ensure nodes availability in registry
+    if (graph.nodes.find((n) => !nodeRegistryStorage.get()[n.nodeType])) {
+        showNotification({
+            type: "error",
+            duration: 3,
+            ts: Date.now(),
+            text: "Tried to execute a graph with missing custom nodes!",
+        });
+        return;
+    }
+
     // Ensure entrypoint presence
     if (!graph.nodes.find((n) => n.nodeType === "StartNode")) {
         showNotification({

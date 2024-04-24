@@ -8,6 +8,7 @@ import {
 import { Button, Layout, Space, Spin } from "antd";
 
 import { Sider } from "./Sider";
+import { ComplexErrorModal } from "./_Editor/ComplexErrorModal";
 import { EditorGraph } from "./EditorGraph";
 import { ChatInterface } from "./Chat";
 import { BtnOptions } from "./_Header/BtnOptions";
@@ -113,6 +114,8 @@ export const Editor: React.FC = () => {
                     <EditorContent />
                 </Layout>
             </Layout>
+
+            <ComplexErrorModal />
 
             {loading ? <Spin fullscreen /> : null}
         </>

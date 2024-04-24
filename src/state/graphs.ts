@@ -11,6 +11,7 @@ import { openEditor } from "./editor";
 import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
 import { nodeRegistryStorage } from "./nodeRegistry";
+import { complexErrorObservable } from "./watcher";
 
 export const graphStorage = new StatefulObservable<
     Record<string, SerializedGraph>
@@ -44,7 +45,11 @@ export const createGraph = (name = "New Chain") => {
 
 export const initGraph = async (context: NodeContextObj) => {
     const graph = graphStorage.get()[context.graphId];
-    await GraphUtils.hydrate(graph, context, nodeRegistryStorage.get());
+    try {
+        await GraphUtils.hydrate(graph, context, nodeRegistryStorage.get());
+    } catch (error: any) {
+        complexErrorObservable.next(["Hydration error!", error.message]);
+    }
 };
 
 /**

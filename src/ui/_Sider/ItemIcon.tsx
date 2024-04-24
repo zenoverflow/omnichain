@@ -5,11 +5,11 @@ import { executorStorage } from "../../state/executor";
 import { useOuterState } from "../../util/ObservableUtilsReact";
 
 export const ItemIcon: React.FC<{ graphId: string }> = (props) => {
-    const [executorGraph] = useOuterState(executorStorage);
+    const [executorInstance] = useOuterState(executorStorage);
 
     const isBeingExecuted = useMemo(
-        () => executorGraph?.graph.graphId === props.graphId,
-        [executorGraph, props.graphId]
+        () => executorInstance?.graphId === props.graphId,
+        [executorInstance, props.graphId]
     );
 
     if (isBeingExecuted) {

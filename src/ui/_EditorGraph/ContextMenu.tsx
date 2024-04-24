@@ -137,7 +137,7 @@ export const ContextMenu: React.FC = () => {
                     theme="dark"
                     items={items}
                     style={{
-                        maxHeight: "420px",
+                        maxHeight: "200px",
                         overflowY: "auto",
                     }}
                     onMouseEnter={haltTimeout}
