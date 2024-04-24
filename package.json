@@ -22,6 +22,7 @@
         "@types/react-syntax-highlighter": "^15.5.11",
         "@types/styled-components": "^5.1.34",
         "@types/uuid": "^9.0.8",
+        "ajv": "^8.12.0",
         "antd": "^5.16.1",
         "koa": "^2.15.3",
         "koa-body": "^6.0.1",

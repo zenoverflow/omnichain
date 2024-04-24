@@ -1,5 +1,6 @@
 import { ClassicPreset } from "rete";
 import * as ICONS from "@ant-design/icons";
+import Ajv from "ajv";
 
 import { NodeContextObj } from "../context";
 import { StringSocket } from "../_sockets/StringSocket";
@@ -126,16 +127,136 @@ const mkControl = (
     );
 };
 
+const ajv = new Ajv();
+const CLASSES = { Function: Function };
+
+ajv.addKeyword({
+    keyword: "instanceof",
+    compile: (schema) => (data) => data instanceof (CLASSES as any)[schema],
+});
+
+const baseConfigSchema = ajv.compile<CustomNodeBaseConfig>({
+    type: "object",
+    properties: {
+        nodeName: { type: "string" },
+        nodeIcon: { type: "string" },
+        dimensions: {
+            type: "array",
+            items: [{ type: "number" }, { type: "number" }],
+            minItems: 2,
+            maxItems: 2,
+        },
+        doc: { type: "string" },
+    },
+    required: ["nodeName", "nodeIcon", "dimensions", "doc"],
+    additionalProperties: false,
+});
+
+const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
+    type: "object",
+    properties: {
+        inputs: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    name: { type: "string" },
+                    type: { type: "string" },
+                    label: { type: "string" },
+                    multi: { type: "boolean" },
+                },
+                required: ["name", "type"],
+                additionalProperties: false,
+            },
+        },
+        outputs: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    name: { type: "string" },
+                    type: { type: "string" },
+                    label: { type: "string" },
+                    multi: { type: "boolean" },
+                },
+                required: ["name", "type"],
+                additionalProperties: false,
+            },
+        },
+        controls: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    name: { type: "string" },
+                    control: {
+                        type: "object",
+                        properties: {
+                            type: { type: "string" },
+                            defaultValue: {
+                                type: ["string", "number", "null"],
+                            },
+                            config: { type: "object" },
+                        },
+                        required: ["type", "defaultValue", "config"],
+                        additionalProperties: false,
+                    },
+                },
+                required: ["name", "control"],
+                additionalProperties: false,
+            },
+        },
+    },
+    required: ["inputs", "outputs", "controls"],
+    additionalProperties: false,
+});
+
+const flowConfigSchema = ajv.compile<CustomFlowConfig>({
+    type: "object",
+    properties: {
+        controlFlow: {
+            type: "object",
+            properties: {
+                inputs: { type: "array" },
+                outputs: { type: "array" },
+                logic: { instanceof: "Function" },
+            },
+            required: ["inputs", "outputs", "logic"],
+            additionalProperties: false,
+        },
+        dataFlow: {
+            type: "object",
+            properties: {
+                inputs: { type: "array" },
+                outputs: { type: "array" },
+                logic: { instanceof: "Function" },
+            },
+            required: ["inputs", "outputs", "logic"],
+            additionalProperties: false,
+        },
+    },
+    additionalProperties: false,
+});
+
 export const makeNode = (
     baseConfig: CustomNodeBaseConfig,
     ioConfig: CustomNodeIOConfig,
     flowConfig: CustomFlowConfig | null = null
 ) => {
+    // Validation
+    if (!baseConfigSchema(baseConfig)) {
+        throw new Error("Invalid node base config: " + ajv.errorsText());
+    }
+    if (!ioConfigSchema(ioConfig)) {
+        throw new Error("Invalid node io config: " + ajv.errorsText());
+    }
+    if (flowConfig && !flowConfigSchema(flowConfig)) {
+        throw new Error("Invalid node flow config: " + ajv.errorsText());
+    }
+
     const { nodeName, nodeIcon, dimensions } = baseConfig;
     const { inputs, outputs, controls } = ioConfig;
     const { controlFlow, dataFlow } = flowConfig ?? {};
-
-    // TODO: validation
 
     return class CustomNode extends ClassicPreset.Node<any, any, any> {
         //
