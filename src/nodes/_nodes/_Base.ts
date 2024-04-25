@@ -127,7 +127,9 @@ const mkControl = (
     );
 };
 
-const ajv = new Ajv();
+const ajv = new Ajv({
+    allowUnionTypes: true,
+});
 const CLASSES = { Function: Function };
 
 ajv.addKeyword({
