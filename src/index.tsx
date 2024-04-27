@@ -7,6 +7,7 @@ import { loadAvatars } from "./state/avatars";
 import { loadOptions } from "./state/options";
 import { loadApiKeys } from "./state/apiKeys";
 import { loadNodeRegistry } from "./state/nodeRegistry";
+import { loadExecutor } from "./state/executor";
 
 import { QueueUtils } from "./util/QueueUtils";
 import { CustomNodeUtils } from "./util/CustomNodeUtils";
@@ -27,6 +28,7 @@ export const run = async () => {
     await loadAvatars();
     await loadApiKeys();
     await loadOptions();
+    await loadExecutor();
 
     QueueUtils.runQueue();
 

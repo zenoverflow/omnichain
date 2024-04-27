@@ -127,7 +127,7 @@ export const EditorGraph: React.FC = () => {
 
     // Disable editing if graph is active
     const editingDisabled = useMemo(
-        () => (editorTarget ? executor?.graphId === editorTarget : false),
+        () => executor?.graphId === editorTarget,
         [executor, editorTarget]
     );
 
@@ -136,6 +136,8 @@ export const EditorGraph: React.FC = () => {
         if (editorTarget && editor) {
             if (editingDisabled && !editor.readonly.enabled) {
                 editor.readonly.enable();
+
+                // TODO: replace with NodeContext logic
 
                 document
                     .querySelectorAll(".c__nodecontrol")

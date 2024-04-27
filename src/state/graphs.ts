@@ -103,7 +103,8 @@ export const updateNodeControl = (
     graphId: string,
     nodeId: string,
     controlKey: string,
-    controlValue: string | number
+    controlValue: string | number,
+    saveToBackend = true
 ) => {
     QueueUtils.addTask(async () => {
         const graph = graphStorage.get()[graphId];
@@ -121,7 +122,9 @@ export const updateNodeControl = (
             }),
         };
 
-        await backendSetGraph(graphId, update);
+        if (saveToBackend) {
+            await backendSetGraph(graphId, update);
+        }
         graphStorage.set({
             ...graphStorage.get(),
             [graphId]: update,

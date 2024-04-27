@@ -14,8 +14,10 @@
         "serve": "tsx server.ts"
     },
     "dependencies": {
+        "@types/koa-route": "^3.2.8",
         "@types/koa-router": "^7.4.8",
         "@types/koa-static": "^4.0.4",
+        "@types/koa-websocket": "^5.0.10",
         "@types/minimist": "^1.2.5",
         "@types/react": "^18.2.74",
         "@types/react-dom": "^18.2.24",
@@ -26,8 +28,10 @@
         "antd": "^5.16.1",
         "koa": "^2.15.3",
         "koa-body": "^6.0.1",
+        "koa-route": "^4.0.1",
         "koa-router": "^12.0.1",
         "koa-static": "^5.0.0",
+        "koa-websocket": "^7.0.0",
         "minimist": "^1.2.8",
         "ollama": "^0.5.0",
         "openai": "^4.33.0",
@@ -47,7 +51,8 @@
         "rete-render-utils": "^2.0.2",
         "styled-components": "^6.1.8",
         "tsx": "^4.7.2",
-        "uuid": "^9.0.1"
+        "uuid": "^9.0.1",
+        "ws": "^8.16.0"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^7.2.0",

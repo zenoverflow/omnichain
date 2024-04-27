@@ -1,13 +1,8 @@
-import { ClassicPreset, NodeEditor } from "rete";
-import { ControlFlow, Dataflow } from "rete-engine";
-
 import { StatefulObservable } from "../util/ObservableUtils";
-import { GraphUtils } from "../util/GraphUtils";
-import { graphStorage, updateNodeControl } from "./graphs";
+import { updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
-import { nodeRegistryStorage } from "./nodeRegistry";
-import { blockChat, unblockChat } from "./chatBlock";
+import { ExecutorUtils } from "../util/ExecutorUtils";
 
 export type ExecutorInstance = {
     graphId: string;
@@ -19,17 +14,45 @@ export const executorStorage = new StatefulObservable<ExecutorInstance | null>(
     null
 );
 
-export const isGraphActive = (id: string): boolean => {
-    return executorStorage.get()?.graphId === id;
+const updateChecker = async () => {
+    // let messages: { type: string; data: any }[] = [];
+    try {
+        const messages = await ExecutorUtils.pingExecutor();
+        for (const message of messages) {
+            switch (message.type) {
+                case "executorUpdate":
+                    executorStorage.set(message.data);
+                    // console.log("Executor update", message.data);
+                    break;
+                case "notification":
+                    showNotification(message.data);
+                    break;
+                case "controlUpdate":
+                    updateNodeControl(
+                        message.data.graphId,
+                        message.data.node,
+                        message.data.control,
+                        message.data.value,
+                        false // do not save, already saved
+                    );
+                    controlObservable.next(message.data);
+                    break;
+                default:
+                    break;
+            }
+        }
+    } catch (error) {
+        console.error(error);
+    }
+    setTimeout(() => {
+        if (executorStorage.get()) {
+            void updateChecker();
+        }
+    }, 50);
 };
 
-export const updateActiveNode = (graphId: string, nodeId: string) => {
-    const storage = executorStorage.get();
-    if (storage?.graphId !== graphId) return;
-    executorStorage.set({
-        ...storage,
-        step: nodeId,
-    });
+export const isGraphActive = (id: string): boolean => {
+    return executorStorage.get()?.graphId === id;
 };
 
 let indicatorLock = false;
@@ -76,135 +99,22 @@ const markActiveNode = (force = false) => {
 };
 
 export const stopGraph = () => {
-    executorStorage.set(null);
+    void ExecutorUtils.stopGraph();
 };
 
 export const runGraph = async (graphId: string) => {
-    const graph = graphStorage.get()[graphId];
+    const executorUpdate = await ExecutorUtils.runGraph(graphId);
+    executorStorage.set(executorUpdate as any);
+    markActiveNode();
 
-    // Ensure nodes availability in registry
-    if (graph.nodes.find((n) => !nodeRegistryStorage.get()[n.nodeType])) {
-        showNotification({
-            type: "error",
-            duration: 3,
-            ts: Date.now(),
-            text: "Tried to execute a graph with missing custom nodes!",
-        });
-        return;
+    void updateChecker();
+};
+
+export const loadExecutor = async () => {
+    const state = await ExecutorUtils.getState();
+    executorStorage.set(state as any);
+    if (state) {
+        markActiveNode();
+        void updateChecker();
     }
-
-    // Ensure entrypoint presence
-    if (!graph.nodes.find((n) => n.nodeType === "StartNode")) {
-        showNotification({
-            type: "error",
-            duration: 3,
-            ts: Date.now(),
-            text: "The Chain needs an Entrypoint to start execution!",
-        });
-        return;
-    }
-
-    executorStorage.set({
-        graphId: graph.graphId,
-        startTs: Date.now(),
-        step: null,
-    });
-
-    // Headless editor
-    const editor = new NodeEditor<any>();
-    const control = new ControlFlow(editor);
-    const dataflow = new Dataflow(editor);
-
-    // Hydrate
-    await GraphUtils.hydrate(
-        graph,
-        {
-            headless: true,
-            graphId: graph.graphId,
-            editor,
-            control,
-            dataflow,
-            onEvent(event) {
-                const { type, text } = event;
-                showNotification({
-                    type,
-                    text,
-                    ts: Date.now(),
-                    duration: 3,
-                });
-            },
-            onError(error) {
-                showNotification({
-                    type: "error",
-                    text: error.message,
-                    ts: Date.now(),
-                    duration: 3,
-                });
-            },
-            onAutoExecute(nodeId) {
-                if (!isGraphActive(graph.graphId)) return;
-                control.execute(nodeId);
-            },
-            onFlowNode(nodeId) {
-                if (!isGraphActive(graph.graphId)) return;
-                updateActiveNode(graph.graphId, nodeId);
-            },
-            onControlChange(graphId, node, control, value) {
-                updateNodeControl(graphId, node, control, value);
-                controlObservable.next({ graphId, node, control, value });
-            },
-            async onExternalAction(action) {
-                console.log("External action", action);
-                switch (action.type) {
-                    case "chatBlock":
-                        if (action.args.blocked) {
-                            blockChat();
-                        } else {
-                            unblockChat();
-                        }
-                        break;
-                    case "terminal":
-                        // TODO: implement via backend
-                        break;
-                    default:
-                        break;
-                }
-            },
-            getControlObservable() {
-                return controlObservable;
-            },
-            getControlValue(graphId, node, control) {
-                const graph = graphStorage.get()[graphId];
-                return graph.nodes.find((n) => n.nodeId === node)?.controls[
-                    control
-                ] as string | number | null;
-            },
-            getIsActive() {
-                return isGraphActive(graph.graphId);
-            },
-            unselect() {
-                // No selection in headless
-            },
-        },
-        nodeRegistryStorage.get()
-    );
-
-    setTimeout(() => {
-        try {
-            const entrypoint = editor
-                .getNodes()
-                .find((n: ClassicPreset.Node) => n.label === "StartNode");
-
-            control.execute((entrypoint as ClassicPreset.Node).id);
-
-            markActiveNode();
-        } catch (error) {
-            showNotification({
-                type: "error",
-                text: (error as Error).message,
-                ts: Date.now(),
-                duration: 3,
-            });
-        }
-    }, 3);
 };

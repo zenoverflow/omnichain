@@ -9,6 +9,7 @@ import serve from "koa-static";
 
 import { ensureDirExists } from "./server/utils.ts";
 import { setupResourcesApi } from "./server/resources.ts";
+import { setupExecutorApi } from "./server/executor.ts";
 
 // Base setup
 
@@ -25,6 +26,8 @@ const app = new Koa();
 const router = new Router();
 
 setupResourcesApi(router, DIR_DATA, DIR_CUSTOM_NODES);
+setupExecutorApi(router, DIR_DATA, DIR_CUSTOM_NODES);
+// setupExecutorWs(router);
 
 // Setup folders
 
