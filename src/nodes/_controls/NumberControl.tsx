@@ -51,9 +51,12 @@ export class NumberControl extends ClassicPreset.Control {
 
         const _Component: React.FC = () => {
             const [value, setValue] = useState(this.grabValue());
+            const [disabled, setDisabled] = useState(
+                this.context.getControlDisabled(this.context.graphId)
+            );
 
             useEffect(() => {
-                const unsub = self.context
+                const valUnsub = self.context
                     .getControlObservable()
                     ?.subscribe(({ graphId, node, control, value }) => {
                         if (
@@ -64,8 +67,16 @@ export class NumberControl extends ClassicPreset.Control {
                             setValue(value as number);
                         }
                     });
+                const disabledUnsub = self.context
+                    .getControlDisabledObservable()
+                    ?.subscribe(([graphId, disabled]) => {
+                        if (graphId === self.context.graphId) {
+                            setDisabled(disabled);
+                        }
+                    });
                 return () => {
-                    if (unsub) unsub();
+                    if (valUnsub) valUnsub();
+                    if (disabledUnsub) disabledUnsub();
                 };
             }, []);
 
@@ -80,6 +91,7 @@ export class NumberControl extends ClassicPreset.Control {
                     }}
                 >
                     <InputNumber
+                        disabled={disabled}
                         value={value}
                         onChange={(val) => {
                             const v = val ?? self.config.min ?? 0;

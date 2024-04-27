@@ -216,10 +216,17 @@ export const setupExecutorApi = (
                 getControlObservable() {
                     return controlObservable;
                 },
+                getControlDisabledObservable() {
+                    return null;
+                },
                 getControlValue(_graphId, node, control) {
                     // const graph = graphStorage.get()[graphId];
                     return execGraph.nodes.find((n) => n.nodeId === node)
                         ?.controls[control] as string | number | null;
+                },
+                getControlDisabled(_graphId) {
+                    // Always enabled in headless exec
+                    return true;
                 },
                 getIsActive() {
                     return isGraphActive(execGraph.graphId);

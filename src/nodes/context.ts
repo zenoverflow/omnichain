@@ -72,6 +72,15 @@ export type NodeContextObj = {
     getControlObservable: () => SimpleObservable<ControlUpdate> | null;
 
     /**
+     * Used to send disabled state down to a node's controls.
+     *
+     * @returns The observable for control updates.
+     */
+    getControlDisabledObservable: () => SimpleObservable<
+        [string, boolean]
+    > | null;
+
+    /**
      * Allows a node's controls to grab their values from state/storage.
      *
      * @returns The value of the control.
@@ -81,6 +90,13 @@ export type NodeContextObj = {
         node: string,
         control: string
     ) => string | number | null;
+
+    /**
+     * Allows a node's controls to grab their disabled state from state/storage.
+     *
+     * @returns The disabled state of the control.
+     */
+    getControlDisabled: (graphId: string) => boolean;
 
     /**
      * For visually tracking graph execution.

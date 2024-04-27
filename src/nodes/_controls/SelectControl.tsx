@@ -63,9 +63,12 @@ export class SelectControl extends ClassicPreset.Control {
             const [value, setValue] = useState(
                 findValueMatch(this.grabValue())
             );
+            const [disabled, setDisabled] = useState(
+                this.context.getControlDisabled(this.context.graphId)
+            );
 
             useEffect(() => {
-                const unsub = self.context
+                const valUnsub = self.context
                     .getControlObservable()
                     ?.subscribe(({ graphId, node, control, value }) => {
                         if (
@@ -76,8 +79,16 @@ export class SelectControl extends ClassicPreset.Control {
                             setValue(findValueMatch(value as string));
                         }
                     });
+                const disabledUnsub = self.context
+                    .getControlDisabledObservable()
+                    ?.subscribe(([graphId, disabled]) => {
+                        if (graphId === self.context.graphId) {
+                            setDisabled(disabled);
+                        }
+                    });
                 return () => {
-                    if (unsub) unsub();
+                    if (valUnsub) valUnsub();
+                    if (disabledUnsub) disabledUnsub();
                 };
             }, [setValue]);
             // const parentRef = useRef<any>();
@@ -112,6 +123,7 @@ export class SelectControl extends ClassicPreset.Control {
                             {self.config.label ?? "Option"}
                         </span>
                         <Select
+                            disabled={disabled}
                             value={value}
                             onSelect={(_, option) => {
                                 setValue(option);

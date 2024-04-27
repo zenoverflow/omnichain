@@ -17,6 +17,7 @@ import { deleteSelectedNodes, editorTargetStorage } from "../state/editor";
 import { nodeSelectionStorage } from "../state/nodeSelection";
 import { executorStorage, stopGraph, runGraph } from "../state/executor";
 import { NodeContextObj } from "../nodes/context";
+import { controlDisabledObservable } from "../state/watcher";
 
 type DeleteButtonProps = {
     nodeContext: NodeContextObj;
@@ -136,34 +137,10 @@ export const EditorGraph: React.FC = () => {
         if (editorTarget && editor) {
             if (editingDisabled && !editor.readonly.enabled) {
                 editor.readonly.enable();
-
-                // TODO: replace with NodeContext logic
-
-                document
-                    .querySelectorAll(".c__nodecontrol")
-                    .forEach((i: any) => {
-                        i.disabled = true;
-                    });
-
-                document
-                    .querySelectorAll(".c__nodecontrol input")
-                    .forEach((i: any) => {
-                        i.disabled = true;
-                    });
+                controlDisabledObservable.next([editorTarget, true]);
             } else if (!editingDisabled && editor.readonly.enabled) {
                 editor.readonly.disable();
-
-                document
-                    .querySelectorAll(".c__nodecontrol")
-                    .forEach((i: any) => {
-                        i.disabled = false;
-                    });
-
-                document
-                    .querySelectorAll(".c__nodecontrol input")
-                    .forEach((i: any) => {
-                        i.disabled = false;
-                    });
+                controlDisabledObservable.next([editorTarget, false]);
             }
         }
     }, [editorTarget, editor, editingDisabled]);

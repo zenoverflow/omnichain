@@ -13,7 +13,10 @@ import { ControlFlow, Dataflow } from "rete-engine";
 
 import { editorTargetStorage } from "../../state/editor";
 import { initGraph, updateNodeControl, graphStorage } from "../../state/graphs";
-import { controlObservable } from "../../state/watcher";
+import {
+    controlObservable,
+    controlDisabledObservable,
+} from "../../state/watcher";
 import { showNotification } from "../../state/notifications";
 import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
@@ -98,11 +101,17 @@ export async function createEditor(container: HTMLElement) {
         getControlObservable() {
             return controlObservable;
         },
+        getControlDisabledObservable() {
+            return controlDisabledObservable;
+        },
         getControlValue(graphId, node, control) {
             const graph = graphStorage.get()[graphId];
             return graph.nodes.find((n) => n.nodeId === node)?.controls[
                 control
             ] as string | number | null;
+        },
+        getControlDisabled(graphId) {
+            return isGraphActive(graphId);
         },
         getIsActive() {
             return isGraphActive(graphId);

@@ -50,9 +50,12 @@ export class TextControl extends ClassicPreset.Control {
 
         const _Component: React.FC = () => {
             const [value, setValue] = useState(this.grabValue());
+            const [disabled, setDisabled] = useState(
+                this.context.getControlDisabled(this.context.graphId)
+            );
 
             useEffect(() => {
-                const unsub = self.context
+                const valUnsub = self.context
                     .getControlObservable()
                     ?.subscribe(({ graphId, node, control, value }) => {
                         if (
@@ -63,13 +66,22 @@ export class TextControl extends ClassicPreset.Control {
                             setValue(value as string);
                         }
                     });
+                const disabledUnsub = self.context
+                    .getControlDisabledObservable()
+                    ?.subscribe(([graphId, disabled]) => {
+                        if (graphId === self.context.graphId) {
+                            setDisabled(disabled);
+                        }
+                    });
                 return () => {
-                    if (unsub) unsub();
+                    if (valUnsub) valUnsub();
+                    if (disabledUnsub) disabledUnsub();
                 };
             }, [setValue]);
 
             return self.config.large ?? false ? (
                 <Input.TextArea
+                    disabled={disabled}
                     value={value}
                     onChange={(e) => {
                         const v = e.target.value;
@@ -88,6 +100,7 @@ export class TextControl extends ClassicPreset.Control {
                 />
             ) : (
                 <Input
+                    disabled={disabled}
                     value={value}
                     onChange={(e) => {
                         const v = e.target.value;
