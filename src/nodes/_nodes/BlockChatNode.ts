@@ -4,7 +4,7 @@ export const BlockChatNode = makeNode(
     {
         nodeName: "BlockChatNode",
         nodeIcon: "PauseCircleOutlined",
-        dimensions: [300, 165],
+        dimensions: [300, 175],
         doc: "Block or unblock user's ability to send new chat messages.",
     },
     {
