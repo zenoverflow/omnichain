@@ -5,11 +5,13 @@ import { BackendResourceUtils } from "../util/BackendResourceUtils";
 
 type OptionsState = {
     userAvatarId?: string | null;
-    chainChatId?: string | null;
-    chainApiId?: string | null;
+    defaultChainId?: string | null;
+    execPersistence: "onChange" | "onDemand";
 };
 
-export const optionsStorage = new StatefulObservable<OptionsState>({});
+export const optionsStorage = new StatefulObservable<OptionsState>({
+    execPersistence: "onChange",
+});
 
 export const loadOptions = async () => {
     optionsStorage.set(
@@ -24,6 +26,11 @@ export const saveOptions = async () => {
 
 // ACTIONS //
 
+export const setOptions = async (options: OptionsState) => {
+    optionsStorage.set(options);
+    await saveOptions();
+};
+
 export const setUserAvatar = async (userAvatarId: string | null) => {
     optionsStorage.set({
         ...optionsStorage.get(),
@@ -32,18 +39,20 @@ export const setUserAvatar = async (userAvatarId: string | null) => {
     await saveOptions();
 };
 
-export const setChatChain = async (chainChatId: string | null) => {
+export const setDefaultChain = async (graphId: string | null) => {
     optionsStorage.set({
         ...optionsStorage.get(),
-        chainChatId,
+        defaultChainId: graphId,
     });
     await saveOptions();
 };
 
-export const setApiChain = async (chainApiId: string | null) => {
+export const setExecPersistence = async (
+    execPersistence: "onChange" | "onDemand"
+) => {
     optionsStorage.set({
         ...optionsStorage.get(),
-        chainApiId,
+        execPersistence,
     });
     await saveOptions();
 };
@@ -53,27 +62,32 @@ export const clearRedundantOptions = async () => {
     const avatars = avatarStorage.get();
     const options = optionsStorage.get();
 
+    let haveUpdate = false;
+
     const update = { ...options };
 
-    if (
-        !options.chainChatId ||
-        !Object.keys(graphs).includes(options.chainChatId)
-    ) {
-        update.chainChatId = null;
-    }
-    if (
-        !options.chainApiId ||
-        !Object.keys(graphs).includes(options.chainApiId)
-    ) {
-        update.chainApiId = null;
-    }
     if (
         !options.userAvatarId ||
         !Object.keys(avatars).includes(options.userAvatarId)
     ) {
         update.userAvatarId = null;
+        haveUpdate = true;
+    }
+    if (
+        !options.defaultChainId ||
+        !Object.keys(graphs).includes(options.defaultChainId)
+    ) {
+        update.defaultChainId = null;
+        haveUpdate = true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!["onChange", "onDemand"].includes(options.execPersistence || "")) {
+        update.execPersistence = "onChange";
+        haveUpdate = true;
     }
 
-    optionsStorage.set(update);
-    await saveOptions();
+    if (haveUpdate) {
+        optionsStorage.set(update);
+        await saveOptions();
+    }
 };

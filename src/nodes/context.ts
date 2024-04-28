@@ -5,6 +5,7 @@ import type { ReactArea2D } from "rete-react-plugin";
 import type { ContextMenuExtra } from "rete-context-menu-plugin";
 
 import type { SimpleObservable } from "../util/ObservableUtils";
+import { ChatMessage } from "../data/types";
 
 type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
@@ -13,7 +14,10 @@ type ExecutionEvent = {
 
 export type ExternalAction =
     | { type: "chatBlock"; args: { blocked: boolean } }
-    | { type: "terminal"; args: { command: string } };
+    | { type: "terminal"; args: { command: string } }
+    | { type: "readMessage"; args: never }
+    | { type: "addMessageToSession"; args: { message: ChatMessage } }
+    | { type: "saveGraph"; args: never };
 
 export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
@@ -60,7 +64,7 @@ export type NodeContextObj = {
 
     /**
      * Allows nodes to trigger external actions such as
-     * state changes, terminal commands, etc.
+     * state changes, terminal commands, reading the message queue, etc.
      */
     onExternalAction: (action: ExternalAction) => Promise<any>;
 

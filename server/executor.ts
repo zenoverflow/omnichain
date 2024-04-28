@@ -15,15 +15,15 @@ import {
     SimpleObservable,
 } from "../src/util/ObservableUtils.ts";
 import { GraphUtils } from "../src/util/GraphUtils.ts";
-import { SerializedGraph } from "../src/data/types.ts";
+import {
+    ChatMessage,
+    ExecutorInstance,
+    SerializedGraph,
+} from "../src/data/types.ts";
 
 // State
 
-const executorStorage = new StatefulObservable<{
-    graphId: string;
-    startTs: number;
-    step: string | null;
-} | null>(null);
+const executorStorage = new StatefulObservable<ExecutorInstance | null>(null);
 
 const notificationObservable = new SimpleObservable<{
     type: "info" | "error";
@@ -54,6 +54,28 @@ const updateActiveNode = (graphId: string, nodeId: string) => {
 let events: { type: string; data: any }[] = [];
 let currentGraph: SerializedGraph | null = null;
 
+const messageQueue: ChatMessage[] = [];
+
+const addMessageToSession = (message: ChatMessage) => {
+    const storage = executorStorage.get();
+    if (!storage) return;
+    executorStorage.set({
+        ...storage,
+        sessionMessages: [...storage.sessionMessages, message],
+    });
+};
+
+const saveCurrentGraph = (dirData: string) => {
+    if (currentGraph) {
+        const graphPath = path.join(
+            dirData,
+            "chains",
+            `${currentGraph.graphId}.json`
+        );
+        fs.writeFileSync(graphPath, JSON.stringify(currentGraph));
+    }
+};
+
 // Main logic
 
 export const setupExecutorApi = (
@@ -82,6 +104,11 @@ export const setupExecutorApi = (
     });
 
     const nodeRegistry = buildNodeRegistry(dirCustomNodes);
+    const saveOption = fs.existsSync(path.join(dirData, "options.json"))
+        ? JSON.parse(
+              fs.readFileSync(path.join(dirData, "options.json"), "utf-8")
+          ).execPersistence || "onChange"
+        : "onChange";
 
     router.get("/api/executor/state", async (ctx) => {
         ctx.body = JSON.stringify({ state: executorStorage.get() });
@@ -97,7 +124,16 @@ export const setupExecutorApi = (
     // Endpoint to stop graph
     router.post("/api/executor/stop", async (ctx) => {
         executorStorage.set(null);
+        // Always save graph after execution
+        saveCurrentGraph(dirData);
         currentGraph = null;
+        ctx.body = "OK";
+    });
+
+    // Endpoint to send message
+    router.post("/api/executor/message", async (ctx) => {
+        const message = ctx.request.body as ChatMessage;
+        messageQueue.push(message);
         ctx.body = "OK";
     });
 
@@ -138,6 +174,7 @@ export const setupExecutorApi = (
 
         executorStorage.set({
             graphId: execGraph.graphId,
+            sessionMessages: [],
             startTs: Date.now(),
             step: null,
         });
@@ -184,34 +221,51 @@ export const setupExecutorApi = (
                 onControlChange(graphId, node, control, value) {
                     // updateNodeControl(graphId, node, control, value);
                     // Update current graph
-                    const update = {
-                        ...execGraph,
-                        nodes: execGraph.nodes.map((n) => {
-                            if (n.nodeId !== node) return n;
-                            return {
-                                ...n,
-                                controls: {
-                                    ...n.controls,
-                                    [control]: value,
-                                },
-                            };
-                        }),
-                    };
-                    execGraph = update;
-                    currentGraph = update;
-                    fs.writeFileSync(graphPath, JSON.stringify(update));
+                    if (saveOption === "onChange") {
+                        const update = {
+                            ...execGraph,
+                            nodes: execGraph.nodes.map((n) => {
+                                if (n.nodeId !== node) return n;
+                                return {
+                                    ...n,
+                                    controls: {
+                                        ...n.controls,
+                                        [control]: value,
+                                    },
+                                };
+                            }),
+                        };
+                        execGraph = update;
+                        currentGraph = update;
+                        fs.writeFileSync(graphPath, JSON.stringify(update));
+                    }
                     controlObservable.next({ graphId, node, control, value });
                 },
                 async onExternalAction(action) {
                     console.log("External action", action);
+
+                    let result: any;
+
                     switch (action.type) {
                         case "terminal":
                             // TODO: implement via backend
+                            break;
+                        case "readMessage":
+                            result = messageQueue.shift();
+                            break;
+                        case "addMessageToSession":
+                            addMessageToSession(action.args.message);
+                            break;
+                        case "saveGraph":
+                            saveCurrentGraph(dirData);
                             break;
                         default:
                             externalActionObservable.next(action);
                             break;
                     }
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                    return result;
                 },
                 getControlObservable() {
                     return controlObservable;

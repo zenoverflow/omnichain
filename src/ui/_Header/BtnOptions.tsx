@@ -6,26 +6,21 @@ import {
     DownloadOutlined,
 } from "@ant-design/icons";
 
-import {
-    optionsStorage,
-    setChatChain,
-    setApiChain,
-    setUserAvatar,
-} from "../../state/options";
+import { optionsStorage, setOptions } from "../../state/options";
 import { graphStorage } from "../../state/graphs";
 import { avatarStorage } from "../../state/avatars";
 import { useOuterState } from "../../util/ObservableUtilsReact";
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
-    const [{ chainChatId, chainApiId, userAvatarId }] =
+    const [{ defaultChainId, userAvatarId, execPersistence }] =
         useOuterState(optionsStorage);
     const [graphs] = useOuterState(graphStorage);
     const [avatars] = useOuterState(avatarStorage);
 
     const [updates, setUpdates] = useState({
         userAvatarId,
-        chainChatId,
-        chainApiId,
+        defaultChainId,
+        execPersistence,
     });
 
     const avatarOptions = useMemo(
@@ -51,10 +46,12 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     );
 
     const handleApply = async () => {
-        await setUserAvatar(updates.userAvatarId as string | null);
-        await setChatChain(updates.chainChatId as string | null);
-        await setApiChain(updates.chainApiId as string | null);
-        // TODO: restart api server
+        await setOptions({
+            userAvatarId: updates.userAvatarId || null,
+            defaultChainId: updates.defaultChainId || null,
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            execPersistence: updates.execPersistence || "onChange",
+        });
         closeModal();
     };
 
@@ -89,6 +86,8 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     <Button icon={<UploadOutlined />}>Import chains</Button>
                 </Space>
 
+                {/* User chat avatar setting */}
+
                 <Space
                     direction="vertical"
                     size="small"
@@ -107,14 +106,23 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                         }}
                         value={updates.userAvatarId}
                     />
+                    <span
+                        className="c__mstyle"
+                        style={{ fontSize: "16px", opacity: 0.7 }}
+                    >
+                        Info: Avatar for the user in the chat interface. Purely
+                        cosmetic.
+                    </span>
                 </Space>
+
+                {/* Default chain setting */}
 
                 <Space
                     direction="vertical"
                     size="small"
                     style={{ width: "100%" }}
                 >
-                    <span>Chat chain</span>
+                    <span>Default chain</span>
                     <Select
                         style={{ width: "100%" }}
                         placeholder="Select a chain..."
@@ -125,31 +133,57 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                                 chainChatId: v,
                             }));
                         }}
-                        value={updates.chainChatId}
+                        value={updates.defaultChainId}
                     />
+                    <span
+                        className="c__mstyle"
+                        style={{ fontSize: "16px", opacity: 0.7 }}
+                    >
+                        Info: Default chain to execute for chat messages and API
+                        calls if no chain is running. Note that API calls may
+                        still specify a different chain.
+                    </span>
                 </Space>
 
-                {/* <Space
+                {/* Execution persistence setting */}
+
+                <Space
                     direction="vertical"
                     size="small"
                     style={{ width: "100%" }}
                 >
-                    <span>Default API chain</span>
+                    <span>Save chain updates during execution</span>
                     <Select
                         style={{ width: "100%" }}
-                        placeholder="Select a chain..."
-                        options={chainOptions}
-                        onChange={(v) =>
+                        placeholder="Select an option..."
+                        options={[
+                            { label: "On change", value: "onChange" },
+                            { label: "On demand", value: "onDemand" },
+                        ]}
+                        onChange={(v) => {
                             setUpdates((u) => ({
                                 ...u,
-                                chainApiId: v,
-                            }))
-                        }
-                        value={updates.chainApiId}
+                                execPersistence: v,
+                            }));
+                        }}
+                        value={updates.execPersistence}
                     />
+                    <span
+                        className="c__mstyle"
+                        style={{ fontSize: "16px", opacity: 0.7 }}
+                    >
+                        Restart the running chain for this to take effect! Info:
+                        The chain can update its own state and save it to disk
+                        during execution. This can bottleneck performance, and
+                        is the reason why the SaveState node exists. When you
+                        select the On Demand option, the chain will only save
+                        its state when the SaveState node is triggered. This can
+                        vastly improve performance for complex chains that
+                        involve a lot of internal state updates.
+                    </span>
                 </Space>
 
-                <Space
+                {/* <Space
                     direction="vertical"
                     size="small"
                     style={{ width: "100%" }}

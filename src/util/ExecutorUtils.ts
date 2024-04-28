@@ -1,4 +1,5 @@
 import { EnvUtils } from "./EnvUtils";
+import { ChatMessage } from "../data/types";
 
 export const ExecutorUtils = {
     async runGraph(graphId: string) {
@@ -44,5 +45,15 @@ export const ExecutorUtils = {
             console.error(error);
             return null;
         }
+    },
+
+    async sendMessage(message: ChatMessage) {
+        await fetch(`${EnvUtils.baseUrl()}/api/executor/message`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+        });
     },
 };

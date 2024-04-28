@@ -14,16 +14,10 @@ import Markdown from "react-markdown";
 
 import { ChatMessage } from "../data/types";
 import { optionsStorage } from "../state/options";
-import {
-    messageStorage,
-    loadMessages,
-    unloadMessages,
-    addMessage,
-} from "../state/messages";
 import { avatarStorage } from "../state/avatars";
-import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
 import { chatBlockStorage } from "../state/chatBlock";
 import { useOuterState } from "../util/ObservableUtilsReact";
+import { addUserMessage, executorStorage } from "../state/executor";
 
 const { TextArea } = Input;
 
@@ -77,10 +71,8 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
     const [avatars] = useOuterState(avatarStorage);
 
     const avatar = useMemo(() => {
-        return Object.values(avatars).find(
-            (a) => a.avatarId === message.avatarId
-        );
-    }, [avatars, message.avatarId]);
+        return Object.values(avatars).find((a) => a.name === message.from);
+    }, [avatars, message]);
 
     return (
         <Space direction="vertical" className="c__msg">
@@ -92,7 +84,11 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
                         : { icon: <UserOutlined /> })}
                     style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
                 />
-                <div>{avatar?.name ?? "Anon"}</div>
+                <div>
+                    {avatar?.name ?? message.role === "user"
+                        ? "User"
+                        : "Assistant"}
+                </div>
             </div>
             <CMarkdown>{message.content}</CMarkdown>
         </Space>
@@ -124,12 +120,9 @@ export const EmptyChat: React.FC = () => {
             </div>
 
             <div style={{ maxWidth: "700px" }}>
-                To start chatting here, first create avatars for yourself and
-                your AI from the avatars menu in the top bar. Then, create and
-                configure a chain (+Chain in the sidebar on the left) to
-                communicate with your AI. Finally, use the options menu in the
-                top bar to select your own avatar and the chain to use for the
-                chat.
+                To start chatting, create a chain (+Chain in the sidebar on the
+                left), configure it, click the run button to start it, and then
+                come back here.
             </div>
         </div>
     );
@@ -137,27 +130,30 @@ export const EmptyChat: React.FC = () => {
 
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
-    const [{ chainChatId, userAvatarId }] = useOuterState(optionsStorage);
-    const [messages] = useOuterState(messageStorage);
+    const [{ userAvatarId }] = useOuterState(optionsStorage);
     const [blocked] = useOuterState(chatBlockStorage);
+    const [executor] = useOuterState(executorStorage);
+    const [avatars] = useOuterState(avatarStorage);
 
     const [message, setMessage] = useState("");
 
-    const messagesSorted = useMemo(() => {
-        return Object.values(messages).sort((a, b) => b.created - a.created);
-    }, [messages]);
+    const messages = executor?.sessionMessages ?? [];
 
-    const initCondSatisfied = useMemo(
-        () => chainChatId && userAvatarId,
-        [chainChatId, userAvatarId]
-    );
+    const initCondSatisfied = useMemo(() => !!executor, [executor]);
 
     const sendMessage = useCallback(() => {
-        if (!blocked && chainChatId && userAvatarId) {
-            addMessage(chainChatId, userAvatarId, message);
+        if (!blocked && initCondSatisfied && message.length > 0) {
+            const chainId = executor?.graphId;
+            if (chainId) {
+                addUserMessage(
+                    chainId,
+                    userAvatarId ? avatars[userAvatarId].name : "User",
+                    message
+                );
+            }
             setMessage("");
         }
-    }, [chainChatId, userAvatarId, message, setMessage, blocked]);
+    }, [avatars, blocked, executor, initCondSatisfied, message, userAvatarId]);
 
     const handleTextboxEnter = useCallback(
         (e: KeyboardEvent) => {
@@ -173,20 +169,6 @@ export const ChatInterface: React.FC = () => {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
     }, [listRef]);
-
-    // Load messages for the selected chat chain
-    useEffect(() => {
-        if (initCondSatisfied && chainChatId) {
-            startGlobalLoading();
-            void loadMessages(chainChatId).then(() => {
-                finishGlobalLoading();
-            });
-        }
-
-        return () => {
-            unloadMessages();
-        };
-    }, [chainChatId, initCondSatisfied]);
 
     return (
         <div
@@ -210,7 +192,7 @@ export const ChatInterface: React.FC = () => {
                             padding: "10px",
                         }}
                     >
-                        {messagesSorted.map((m) => (
+                        {messages.map((m) => (
                             <SingleMessage key={m.messageId} message={m} />
                         ))}
                     </div>

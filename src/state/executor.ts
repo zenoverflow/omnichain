@@ -3,12 +3,9 @@ import { updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { ExecutorUtils } from "../util/ExecutorUtils";
-
-export type ExecutorInstance = {
-    graphId: string;
-    startTs?: number | null;
-    step?: string | null;
-};
+import { ExecutorInstance } from "../data/types";
+import { QueueUtils } from "../util/QueueUtils";
+import { MsgUtils } from "../util/MsgUtils";
 
 export const executorStorage = new StatefulObservable<ExecutorInstance | null>(
     null
@@ -108,6 +105,17 @@ export const runGraph = async (graphId: string) => {
     markActiveNode();
 
     void updateChecker();
+};
+
+export const addUserMessage = (
+    chainId: string,
+    content: string,
+    from?: string | null
+) => {
+    QueueUtils.addTask(async () => {
+        const created = MsgUtils.freshFromUser(chainId, content, from);
+        await ExecutorUtils.sendMessage(created);
+    });
 };
 
 export const loadExecutor = async () => {

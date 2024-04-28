@@ -20,10 +20,12 @@ export type SerializedGraph = {
 export type ChatMessage = {
     messageId: string;
     chainId: string;
-    avatarId: string;
+    from?: string | null;
+    role: "user" | "assistant";
     content: string;
     created: number;
-    processed: boolean;
+    attachments: string[];
+    // processed: boolean;
 };
 
 export type ChatAvatar = {
@@ -38,6 +40,13 @@ export type ApiKey = {
     name: string;
     content: string;
     created: number;
+};
+
+export type ExecutorInstance = {
+    graphId: string;
+    sessionMessages: ChatMessage[];
+    startTs?: number | null;
+    step?: string | null;
 };
 
 export type ResourceIndex = Record<string, { name: string; created: number }>;

@@ -72,15 +72,15 @@ export const BackendResourceUtils = {
         }
     },
 
-    async getMultiSingle(resource: string, id: string) {
+    async getMultiSingle<T>(resource: string, id: string) {
         try {
             const res = await fetch(
                 `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`
             );
-            return (await res.json()) as Record<string, any>;
+            return (await res.json()) as T;
         } catch (error) {
             console.error(error);
-            return {} as Record<string, any>;
+            return {} as T;
         }
     },
 
