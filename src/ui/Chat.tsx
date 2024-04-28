@@ -15,7 +15,6 @@ import Markdown from "react-markdown";
 import { ChatMessage } from "../data/types";
 import { optionsStorage } from "../state/options";
 import { avatarStorage } from "../state/avatars";
-import { chatBlockStorage } from "../state/chatBlock";
 import { useOuterState } from "../util/ObservableUtilsReact";
 import { addUserMessage, executorStorage } from "../state/executor";
 
@@ -131,7 +130,6 @@ export const EmptyChat: React.FC = () => {
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
     const [{ userAvatarId }] = useOuterState(optionsStorage);
-    const [blocked] = useOuterState(chatBlockStorage);
     const [executor] = useOuterState(executorStorage);
     const [avatars] = useOuterState(avatarStorage);
 
@@ -140,6 +138,8 @@ export const ChatInterface: React.FC = () => {
     const messages = executor?.sessionMessages ?? [];
 
     const initCondSatisfied = useMemo(() => !!executor, [executor]);
+
+    const blocked = executor?.chatBlocked || false;
 
     const sendMessage = useCallback(() => {
         if (!blocked && initCondSatisfied && message.length > 0) {

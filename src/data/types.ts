@@ -25,7 +25,6 @@ export type ChatMessage = {
     content: string;
     created: number;
     attachments: string[];
-    // processed: boolean;
 };
 
 export type ChatAvatar = {
@@ -43,9 +42,19 @@ export type ApiKey = {
 };
 
 export type ExecutorInstance = {
+    /** ID of the graph (chain) the executor is running. */
     graphId: string;
+
+    /** Messages for the frontend chat. Does not concern the API. */
     sessionMessages: ChatMessage[];
+
+    /** Block the frontend chat. Does not affect the API. */
+    chatBlocked?: boolean;
+
+    /** Timestamp of when the executor started. */
     startTs?: number | null;
+
+    /** The current step the executor is on. */
     step?: string | null;
 };
 

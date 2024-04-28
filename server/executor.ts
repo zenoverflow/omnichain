@@ -56,6 +56,15 @@ let currentGraph: SerializedGraph | null = null;
 
 const messageQueue: ChatMessage[] = [];
 
+const handleChatBlock = (blocked: boolean) => {
+    const storage = executorStorage.get();
+    if (!storage) return;
+    executorStorage.set({
+        ...storage,
+        chatBlocked: blocked,
+    });
+};
+
 const addMessageToSession = (message: ChatMessage) => {
     const storage = executorStorage.get();
     if (!storage) return;
@@ -247,6 +256,9 @@ export const setupExecutorApi = (
                     let result: any;
 
                     switch (action.type) {
+                        case "chatBlock":
+                            handleChatBlock(action.args.blocked);
+                            break;
                         case "terminal":
                             // TODO: implement via backend
                             break;
