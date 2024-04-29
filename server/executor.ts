@@ -139,10 +139,11 @@ export const setupExecutorApi = (
         ctx.body = "OK";
     });
 
-    // Endpoint to send message
+    // Endpoint to send message from the frontend
     router.post("/api/executor/message", async (ctx) => {
         const message = ctx.request.body as ChatMessage;
         messageQueue.push(message);
+        console.log("Message Added", message);
         ctx.body = "OK";
     });
 

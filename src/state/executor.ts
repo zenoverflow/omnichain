@@ -110,10 +110,12 @@ export const runGraph = async (graphId: string) => {
 export const addUserMessage = (
     chainId: string,
     content: string,
-    from?: string | null
+    from: string | null = null,
+    images: string[] = []
 ) => {
     QueueUtils.addTask(async () => {
         const created = MsgUtils.freshFromUser(chainId, content, from);
+        created.images = images;
         await ExecutorUtils.sendMessage(created);
     });
 };

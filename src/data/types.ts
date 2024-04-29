@@ -24,7 +24,7 @@ export type ChatMessage = {
     role: "user" | "assistant";
     content: string;
     created: number;
-    attachments: string[];
+    images: string[];
 };
 
 export type ChatAvatar = {

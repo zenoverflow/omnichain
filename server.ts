@@ -38,7 +38,11 @@ ensureDirExists(DIR_CUSTOM_NODES);
 
 app
     // body parsing
-    .use(koaBody())
+    .use(
+        koaBody({
+            jsonLimit: "1gb",
+        })
+    )
     // routing
     .use(router.routes())
     .use(router.allowedMethods())

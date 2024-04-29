@@ -7,7 +7,11 @@ import {
     KeyboardEvent,
 } from "react";
 import { Input, Avatar, Space, Button } from "antd";
-import { UserOutlined, SendOutlined } from "@ant-design/icons";
+import {
+    UserOutlined,
+    SendOutlined,
+    FileImageOutlined,
+} from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Markdown from "react-markdown";
@@ -37,7 +41,7 @@ function grog(example) {
 `;
 exampleMarkdown += "```";
 
-const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
+const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
     return (
         <Markdown
             components={{
@@ -61,7 +65,7 @@ const CMarkdown: React.FC<{ children: string }> = ({ children }) => {
                 },
             }}
         >
-            {children}
+            {content}
         </Markdown>
     );
 };
@@ -72,6 +76,19 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
     const avatar = useMemo(() => {
         return Object.values(avatars).find((a) => a.name === message.from);
     }, [avatars, message]);
+
+    const content = useMemo(() => {
+        // Add images as markdown at the bottom of message.content
+        // Note that each image is a base64 string
+        let content = message.content;
+        if (message.images.length) {
+            content += "\n\n";
+        }
+        for (const img of message.images) {
+            content += `![Image](${img})\n`;
+        }
+        return content;
+    }, [message]);
 
     return (
         <Space direction="vertical" className="c__msg">
@@ -89,7 +106,7 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
                         : "Assistant"}
                 </div>
             </div>
-            <CMarkdown>{message.content}</CMarkdown>
+            <CMarkdown content={content} />
         </Space>
     );
 };
@@ -134,6 +151,7 @@ export const ChatInterface: React.FC = () => {
     const [avatars] = useOuterState(avatarStorage);
 
     const [message, setMessage] = useState("");
+    const [images, setImages] = useState<string[]>([]);
 
     const messages = executor?.sessionMessages ?? [];
 
@@ -148,12 +166,22 @@ export const ChatInterface: React.FC = () => {
                 addUserMessage(
                     chainId,
                     userAvatarId ? avatars[userAvatarId].name : "User",
-                    message
+                    message,
+                    images
                 );
             }
             setMessage("");
+            setImages([]);
         }
-    }, [avatars, blocked, executor, initCondSatisfied, message, userAvatarId]);
+    }, [
+        avatars,
+        blocked,
+        executor,
+        images,
+        initCondSatisfied,
+        message,
+        userAvatarId,
+    ]);
 
     const handleTextboxEnter = useCallback(
         (e: KeyboardEvent) => {
@@ -163,6 +191,36 @@ export const ChatInterface: React.FC = () => {
         },
         [sendMessage]
     );
+
+    const handleAddImage = useCallback(() => {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        // configure to accept only images
+        fileInput.accept = "image/*";
+
+        fileInput.onchange = () => {
+            if (fileInput.files?.length) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result;
+                    if (typeof base64 === "string") {
+                        setImages([...images, base64]);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        const cleanup = () => {
+            fileInput.remove();
+        };
+
+        fileInput.oncancel = cleanup;
+        fileInput.onabort = cleanup;
+
+        fileInput.click();
+    }, [images, setImages]);
 
     useEffect(() => {
         if (listRef.current) {
@@ -196,6 +254,38 @@ export const ChatInterface: React.FC = () => {
                             <SingleMessage key={m.messageId} message={m} />
                         ))}
                     </div>
+
+                    {/* Images list (horizontal scroll) */}
+                    <div
+                        style={{
+                            // display: "flex",
+                            overflowX: "auto",
+                            // height: "110px",
+                            padding: "5px",
+                            whiteSpace: "nowrap",
+                        }}
+                        onWheel={(event) =>
+                            (event.currentTarget.scrollLeft +=
+                                event.deltaY > 0 ? 100 : -100)
+                        }
+                    >
+                        {images.map((img, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    width: "100px",
+                                    height: "100px",
+                                    margin: "5px",
+                                    background: `url(${img})`,
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                    display: "inline-block",
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Input area */}
                     <div
                         style={{
                             display: "flex",
@@ -214,6 +304,15 @@ export const ChatInterface: React.FC = () => {
                             placeholder="Type a message..."
                             autoSize={{ minRows: 2, maxRows: 8 }}
                             style={{ flex: "1" }}
+                            disabled={blocked}
+                        />
+                        <div style={{ width: "5px" }} />
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FileImageOutlined />}
+                            style={{ height: "100%" }}
+                            onClick={handleAddImage}
                             disabled={blocked}
                         />
                         <div style={{ width: "5px" }} />
