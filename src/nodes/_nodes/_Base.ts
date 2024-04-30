@@ -260,6 +260,12 @@ export const makeNode = (
     const { inputs, outputs, controls } = ioConfig;
     const { controlFlow, dataFlow } = flowConfig ?? {};
 
+    const nodeNameClean = nodeName.trim();
+
+    if (!nodeNameClean.length) {
+        throw new Error("Node name cannot be empty");
+    }
+
     return class CustomNode extends ClassicPreset.Node<any, any, any> {
         //
         public static customNodeName = nodeName;
