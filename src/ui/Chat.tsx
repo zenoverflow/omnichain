@@ -13,6 +13,7 @@ import {
     FileAddOutlined,
     FileImageOutlined,
     CloseOutlined,
+    DownloadOutlined,
 } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -56,50 +57,6 @@ const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
     );
 };
 
-const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
-    const [avatars] = useOuterState(avatarStorage);
-
-    const avatar = useMemo(() => {
-        return Object.values(avatars).find((a) => a.name === message.from);
-    }, [avatars, message]);
-
-    const content = useMemo(() => {
-        // Add images as markdown at the bottom of message.content
-        // Note that each image is a base64 string
-        let content = message.content;
-        const images = message.files.filter((f) =>
-            f.mimetype.startsWith("image/")
-        );
-        if (images.length) {
-            content += "\n\n";
-        }
-        for (const img of images) {
-            content += `![Image](${img.content})\n`;
-        }
-        return content;
-    }, [message]);
-
-    return (
-        <Space direction="vertical" className="c__msg">
-            <div style={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                    size={32}
-                    {...(avatar?.imageBase64.length
-                        ? { src: avatar.imageBase64 }
-                        : { icon: <UserOutlined /> })}
-                    style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
-                />
-                <div>
-                    {avatar?.name ?? message.role === "user"
-                        ? "User"
-                        : "Assistant"}
-                </div>
-            </div>
-            <CMarkdown content={content} />
-        </Space>
-    );
-};
-
 export const EmptyChat: React.FC = () => {
     return (
         <div
@@ -136,15 +93,25 @@ export const EmptyChat: React.FC = () => {
 export const FileGrid: React.FC<{
     files: ChatMessage["files"];
     type: "image" | "file";
-    onRemove: (index: number) => any;
-}> = ({ files, onRemove, type }) => {
+    onRemove?: (index: number) => any;
+}> = ({ files, type, onRemove }) => {
+    const handleDownload = useCallback(
+        (index: number) => {
+            const file = files[index];
+            const link = document.createElement("a");
+            link.href = file.content;
+            link.download = file.name;
+            link.click();
+        },
+        [files]
+    );
     return (
         <div
             style={{
                 // display: "flex",
                 overflowX: "auto",
                 // height: "110px",
-                padding: "5px",
+                // padding: "5px",
                 whiteSpace: "nowrap",
                 position: "relative",
             }}
@@ -159,7 +126,7 @@ export const FileGrid: React.FC<{
                     style={{
                         position: "relative",
                         display: "inline-block",
-                        margin: "5px",
+                        marginRight: "5px",
                     }}
                 >
                     {type === "image" ? (
@@ -182,21 +149,94 @@ export const FileGrid: React.FC<{
                             {file.name}
                         </div>
                     )}
-                    <CloseOutlined
-                        style={{
-                            position: "absolute",
-                            top: "0",
-                            right: "0",
-                            color: "red",
-                            cursor: "pointer",
-                        }}
-                        onClick={() => {
-                            onRemove(i);
-                        }}
-                    />
+                    {onRemove ? (
+                        <CloseOutlined
+                            style={{
+                                position: "absolute",
+                                top: "0",
+                                right: "0",
+                                color: "red",
+                                cursor: "pointer",
+                                backgroundColor: "white",
+                            }}
+                            onClick={() => {
+                                onRemove(i);
+                            }}
+                        />
+                    ) : (
+                        <DownloadOutlined
+                            style={{
+                                position: "absolute",
+                                top: "0",
+                                right: "0",
+                                color: "green",
+                                cursor: "pointer",
+                                backgroundColor: "white",
+                            }}
+                            onClick={() => {
+                                handleDownload(i);
+                            }}
+                        />
+                    )}
                 </div>
             ))}
         </div>
+    );
+};
+
+const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
+    const [avatars] = useOuterState(avatarStorage);
+
+    const avatar = useMemo(() => {
+        return Object.values(avatars).find((a) => a.name === message.from);
+    }, [avatars, message]);
+
+    const images = useMemo(() => {
+        return message.files.filter((f) => f.mimetype.startsWith("image/"));
+    }, [message]);
+
+    const files = useMemo(() => {
+        return message.files.filter((f) => !f.mimetype.startsWith("image/"));
+    }, [message]);
+
+    // const content = useMemo(() => {
+    //     // Add images as markdown at the bottom of message.content
+    //     // Note that each image is a base64 string
+    //     let content = message.content;
+    //     const images = message.files.filter((f) =>
+    //         f.mimetype.startsWith("image/")
+    //     );
+    //     if (images.length) {
+    //         content += "\n\n";
+    //     }
+    //     for (const img of images) {
+    //         content += `![Image](${img.content})\n`;
+    //     }
+    //     return content;
+    // }, [message]);
+
+    return (
+        <Space direction="vertical" className="c__msg">
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <Avatar
+                    size={32}
+                    {...(avatar?.imageBase64.length
+                        ? { src: avatar.imageBase64 }
+                        : { icon: <UserOutlined /> })}
+                    style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
+                />
+                <div>
+                    {avatar?.name ?? message.role === "user"
+                        ? "User"
+                        : "Assistant"}
+                </div>
+            </div>
+            <CMarkdown content={message.content} />
+
+            {images.length ? <FileGrid files={images} type="image" /> : null}
+
+            {files.length ? <FileGrid files={files} type="file" /> : null}
+        </Space>
     );
 };
 
@@ -346,30 +386,34 @@ export const ChatInterface: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Images list (horizontal scroll) */}
+                    {/* Images list */}
                     {images.length ? (
-                        <FileGrid
-                            files={images}
-                            type="image"
-                            onRemove={(index) => {
-                                const updatedImages = [...images];
-                                updatedImages.splice(index, 1);
-                                setImages(updatedImages);
-                            }}
-                        />
+                        <div style={{ marginLeft: "5px" }}>
+                            <FileGrid
+                                files={images}
+                                type="image"
+                                onRemove={(index) => {
+                                    const updatedImages = [...images];
+                                    updatedImages.splice(index, 1);
+                                    setImages(updatedImages);
+                                }}
+                            />
+                        </div>
                     ) : null}
 
-                    {/* Files list (horizontal scroll) */}
+                    {/* Files list */}
                     {files.length ? (
-                        <FileGrid
-                            files={files}
-                            type="file"
-                            onRemove={(index) => {
-                                const updatedFiles = [...files];
-                                updatedFiles.splice(index, 1);
-                                setFiles(updatedFiles);
-                            }}
-                        />
+                        <div style={{ marginLeft: "5px" }}>
+                            <FileGrid
+                                files={files}
+                                type="file"
+                                onRemove={(index) => {
+                                    const updatedFiles = [...files];
+                                    updatedFiles.splice(index, 1);
+                                    setFiles(updatedFiles);
+                                }}
+                            />
+                        </div>
                     ) : null}
 
                     {/* Input area */}

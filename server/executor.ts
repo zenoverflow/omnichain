@@ -149,6 +149,9 @@ export const setupExecutorApi = (
             "files:",
             message.files.length
         );
+        // TODO: remove after debug
+        // Add directly to session (for debug only)
+        addMessageToSession(message);
         ctx.body = "OK";
     });
 
