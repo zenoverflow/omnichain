@@ -3,9 +3,10 @@ import { updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { ExecutorUtils } from "../util/ExecutorUtils";
-import { ExecutorInstance } from "../data/types";
+import type { ChatMessage, ExecutorInstance } from "../data/types";
 import { QueueUtils } from "../util/QueueUtils";
 import { MsgUtils } from "../util/MsgUtils";
+import { finishGlobalLoading, startGlobalLoading } from "./loader";
 
 export const executorStorage = new StatefulObservable<ExecutorInstance | null>(
     null
@@ -111,12 +112,13 @@ export const addUserMessage = (
     chainId: string,
     content: string,
     from: string | null = null,
-    images: string[] = []
+    files: ChatMessage["files"] = []
 ) => {
     QueueUtils.addTask(async () => {
-        const created = MsgUtils.freshFromUser(chainId, content, from);
-        created.images = images;
+        const created = MsgUtils.freshFromUser(chainId, content, from, files);
+        startGlobalLoading();
         await ExecutorUtils.sendMessage(created);
+        finishGlobalLoading();
     });
 };
 

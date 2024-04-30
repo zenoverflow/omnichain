@@ -6,7 +6,7 @@ export const MsgUtils = {
         chainId: string,
         content: string,
         from?: string | null,
-        attachments: string[] = []
+        files: ChatMessage["files"] = []
     ): ChatMessage {
         return {
             messageId: uuidv4(),
@@ -15,7 +15,7 @@ export const MsgUtils = {
             from,
             content,
             role: "user",
-            attachments,
+            files,
         };
     },
 
@@ -23,7 +23,7 @@ export const MsgUtils = {
         chainId: string,
         content: string,
         from?: string | null,
-        attachments: string[] = []
+        files: ChatMessage["files"] = []
     ): ChatMessage {
         return {
             messageId: uuidv4(),
@@ -32,7 +32,7 @@ export const MsgUtils = {
             from,
             content,
             role: "assistant",
-            attachments,
+            files,
         };
     },
 };

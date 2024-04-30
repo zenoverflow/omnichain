@@ -143,7 +143,12 @@ export const setupExecutorApi = (
     router.post("/api/executor/message", async (ctx) => {
         const message = ctx.request.body as ChatMessage;
         messageQueue.push(message);
-        console.log("Message Added", message);
+        console.log(
+            "Received message from frontend:",
+            message.content,
+            "files:",
+            message.files.length
+        );
         ctx.body = "OK";
     });
 

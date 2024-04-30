@@ -10,7 +10,9 @@ import { Input, Avatar, Space, Button } from "antd";
 import {
     UserOutlined,
     SendOutlined,
+    FileAddOutlined,
     FileImageOutlined,
+    CloseOutlined,
 } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -21,25 +23,9 @@ import { optionsStorage } from "../state/options";
 import { avatarStorage } from "../state/avatars";
 import { useOuterState } from "../util/ObservableUtilsReact";
 import { addUserMessage, executorStorage } from "../state/executor";
+import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
 
 const { TextArea } = Input;
-
-let exampleMarkdown = `
-- Li 1
-- Li 2
-- Li 3
-`;
-
-exampleMarkdown += "```javascript";
-
-exampleMarkdown += `
-const test = "whatever";
-
-function grog(example) {
-    return example;
-}
-`;
-exampleMarkdown += "```";
 
 const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
     return (
@@ -81,11 +67,14 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
         // Add images as markdown at the bottom of message.content
         // Note that each image is a base64 string
         let content = message.content;
-        if (message.images.length) {
+        const images = message.files.filter((f) =>
+            f.mimetype.startsWith("image/")
+        );
+        if (images.length) {
             content += "\n\n";
         }
-        for (const img of message.images) {
-            content += `![Image](${img})\n`;
+        for (const img of images) {
+            content += `![Image](${img.content})\n`;
         }
         return content;
     }, [message]);
@@ -144,6 +133,73 @@ export const EmptyChat: React.FC = () => {
     );
 };
 
+export const FileGrid: React.FC<{
+    files: ChatMessage["files"];
+    type: "image" | "file";
+    onRemove: (index: number) => any;
+}> = ({ files, onRemove, type }) => {
+    return (
+        <div
+            style={{
+                // display: "flex",
+                overflowX: "auto",
+                // height: "110px",
+                padding: "5px",
+                whiteSpace: "nowrap",
+                position: "relative",
+            }}
+            onWheel={(event) =>
+                (event.currentTarget.scrollLeft +=
+                    event.deltaY > 0 ? 100 : -100)
+            }
+        >
+            {files.map((file, i) => (
+                <div
+                    key={`${files.length.toString()}-${i.toString()}`}
+                    style={{
+                        position: "relative",
+                        display: "inline-block",
+                        margin: "5px",
+                    }}
+                >
+                    {type === "image" ? (
+                        <div
+                            style={{
+                                width: "100px",
+                                height: "100px",
+                                background: `url(${file.content})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                            }}
+                        />
+                    ) : (
+                        <div
+                            style={{
+                                paddingRight: "25px",
+                                textAlign: "center",
+                            }}
+                        >
+                            {file.name}
+                        </div>
+                    )}
+                    <CloseOutlined
+                        style={{
+                            position: "absolute",
+                            top: "0",
+                            right: "0",
+                            color: "red",
+                            cursor: "pointer",
+                        }}
+                        onClick={() => {
+                            onRemove(i);
+                        }}
+                    />
+                </div>
+            ))}
+        </div>
+    );
+};
+
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
     const [{ userAvatarId }] = useOuterState(optionsStorage);
@@ -151,7 +207,8 @@ export const ChatInterface: React.FC = () => {
     const [avatars] = useOuterState(avatarStorage);
 
     const [message, setMessage] = useState("");
-    const [images, setImages] = useState<string[]>([]);
+    const [images, setImages] = useState<ChatMessage["files"]>([]);
+    const [files, setFiles] = useState<ChatMessage["files"]>([]);
 
     const messages = executor?.sessionMessages ?? [];
 
@@ -165,18 +222,20 @@ export const ChatInterface: React.FC = () => {
             if (chainId) {
                 addUserMessage(
                     chainId,
-                    userAvatarId ? avatars[userAvatarId].name : "User",
                     message,
-                    images
+                    userAvatarId ? avatars[userAvatarId].name : "User",
+                    [...images, ...files]
                 );
             }
             setMessage("");
+            setFiles([]);
             setImages([]);
         }
     }, [
         avatars,
         blocked,
-        executor,
+        executor?.graphId,
+        files,
         images,
         initCondSatisfied,
         message,
@@ -192,35 +251,66 @@ export const ChatInterface: React.FC = () => {
         [sendMessage]
     );
 
-    const handleAddImage = useCallback(() => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        // configure to accept only images
-        fileInput.accept = "image/*";
-
-        fileInput.onchange = () => {
-            if (fileInput.files?.length) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result;
-                    if (typeof base64 === "string") {
-                        setImages([...images, base64]);
-                    }
-                };
-                reader.readAsDataURL(file);
+    const handleAddFile = useCallback(
+        (accept?: string) => {
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            if (accept) {
+                fileInput.accept = accept;
             }
-        };
 
-        const cleanup = () => {
-            fileInput.remove();
-        };
+            fileInput.onchange = async () => {
+                if (fileInput.files?.length) {
+                    const file = fileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result;
+                        if (typeof base64 === "string") {
+                            if (accept?.startsWith("image/")) {
+                                setImages([
+                                    ...images,
+                                    {
+                                        mimetype: file.type,
+                                        content: base64,
+                                        name: file.name,
+                                    },
+                                ]);
+                            } else {
+                                setFiles([
+                                    ...files,
+                                    {
+                                        mimetype: file.type,
+                                        content: base64,
+                                        name: file.name,
+                                    },
+                                ]);
+                            }
+                        }
+                        finishGlobalLoading();
+                    };
+                    // Stop loading on errors
+                    reader.onerror = () => {
+                        finishGlobalLoading();
+                    };
+                    reader.onabort = () => {
+                        finishGlobalLoading();
+                    };
+                    startGlobalLoading();
+                    reader.readAsDataURL(file);
+                }
+            };
 
-        fileInput.oncancel = cleanup;
-        fileInput.onabort = cleanup;
+            const cleanup = () => {
+                fileInput.remove();
+            };
 
-        fileInput.click();
-    }, [images, setImages]);
+            fileInput.oncancel = cleanup;
+            fileInput.onabort = cleanup;
+
+            fileInput.click();
+        },
+        [files, images]
+    );
 
     useEffect(() => {
         if (listRef.current) {
@@ -256,34 +346,30 @@ export const ChatInterface: React.FC = () => {
                     </div>
 
                     {/* Images list (horizontal scroll) */}
-                    <div
-                        style={{
-                            // display: "flex",
-                            overflowX: "auto",
-                            // height: "110px",
-                            padding: "5px",
-                            whiteSpace: "nowrap",
-                        }}
-                        onWheel={(event) =>
-                            (event.currentTarget.scrollLeft +=
-                                event.deltaY > 0 ? 100 : -100)
-                        }
-                    >
-                        {images.map((img, i) => (
-                            <div
-                                key={i}
-                                style={{
-                                    width: "100px",
-                                    height: "100px",
-                                    margin: "5px",
-                                    background: `url(${img})`,
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "center",
-                                    display: "inline-block",
-                                }}
-                            />
-                        ))}
-                    </div>
+                    {images.length ? (
+                        <FileGrid
+                            files={images}
+                            type="image"
+                            onRemove={(index) => {
+                                const updatedImages = [...images];
+                                updatedImages.splice(index, 1);
+                                setImages(updatedImages);
+                            }}
+                        />
+                    ) : null}
+
+                    {/* Files list (horizontal scroll) */}
+                    {files.length ? (
+                        <FileGrid
+                            files={files}
+                            type="file"
+                            onRemove={(index) => {
+                                const updatedFiles = [...files];
+                                updatedFiles.splice(index, 1);
+                                setFiles(updatedFiles);
+                            }}
+                        />
+                    ) : null}
 
                     {/* Input area */}
                     <div
@@ -310,9 +396,22 @@ export const ChatInterface: React.FC = () => {
                         <Button
                             type="primary"
                             size="large"
+                            icon={<FileAddOutlined />}
+                            style={{ height: "100%" }}
+                            onClick={() => {
+                                handleAddFile();
+                            }}
+                            disabled={blocked}
+                        />
+                        <div style={{ width: "5px" }} />
+                        <Button
+                            type="primary"
+                            size="large"
                             icon={<FileImageOutlined />}
                             style={{ height: "100%" }}
-                            onClick={handleAddImage}
+                            onClick={() => {
+                                handleAddFile("image/*");
+                            }}
                             disabled={blocked}
                         />
                         <div style={{ width: "5px" }} />
