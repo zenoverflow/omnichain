@@ -245,6 +245,7 @@ export const ChatInterface: React.FC = () => {
     const handleTextboxEnter = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
             }
         },

@@ -115,7 +115,12 @@ export const addUserMessage = (
     files: ChatMessage["files"] = []
 ) => {
     QueueUtils.addTask(async () => {
-        const created = MsgUtils.freshFromUser(chainId, content, from, files);
+        const created = MsgUtils.freshFromUser(
+            chainId,
+            content.trim(),
+            from,
+            files
+        );
         startGlobalLoading();
         await ExecutorUtils.sendMessage(created);
         finishGlobalLoading();
