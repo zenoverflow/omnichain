@@ -6,9 +6,9 @@ import { ClassicPreset, NodeEditor } from "rete";
 import { ControlFlow, Dataflow } from "rete-engine";
 
 import { readJsonFile, buildNodeRegistry } from "./utils.ts";
+import { setupOpenAiCompatibleAPI } from "./openai.ts";
 
 import type { ExternalAction } from "../src/nodes/context.ts";
-
 import { ControlUpdate } from "../src/nodes/context.ts";
 import {
     StatefulObservable,
@@ -85,6 +85,191 @@ const saveCurrentGraph = (dirData: string) => {
     }
 };
 
+const stopCurrentGraph = (dirData: string) => {
+    const storage = executorStorage.get();
+    if (!storage) return;
+    executorStorage.set(null);
+    // Always save graph after execution
+    saveCurrentGraph(dirData);
+    currentGraph = null;
+};
+
+const runGraph = async (
+    graphId: string,
+    dirData: string,
+    dirCustomNodes: string
+) => {
+    // Do nothing if already running
+    if (isGraphActive(graphId)) return;
+
+    // Stop current graph if the id is different
+    stopCurrentGraph(dirData);
+
+    const nodeRegistry = buildNodeRegistry(dirCustomNodes);
+    const saveOption = fs.existsSync(path.join(dirData, "options.json"))
+        ? JSON.parse(
+              fs.readFileSync(path.join(dirData, "options.json"), "utf-8")
+          ).execPersistence || "onChange"
+        : "onChange";
+
+    const graphPath = path.join(dirData, "chains", `${graphId}.json`);
+
+    let execGraph = readJsonFile(graphPath) as SerializedGraph;
+    currentGraph = execGraph;
+
+    // Ensure nodes availability in registry
+    if (execGraph.nodes.find((n) => !nodeRegistry[n.nodeType])) {
+        notificationObservable.next({
+            type: "error",
+            duration: 3,
+            ts: Date.now(),
+            text: "Tried to execute a graph with missing custom nodes!",
+        });
+        return;
+    }
+
+    // Ensure entrypoint presence
+    if (!execGraph.nodes.find((n) => n.nodeType === "StartNode")) {
+        notificationObservable.next({
+            type: "error",
+            duration: 3,
+            ts: Date.now(),
+            text: "The Chain needs an Entrypoint to start execution!",
+        });
+        return;
+    }
+
+    executorStorage.set({
+        graphId: execGraph.graphId,
+        sessionMessages: [],
+        startTs: Date.now(),
+        step: null,
+    });
+
+    // Headless editor
+    const editor = new NodeEditor<any>();
+    const control = new ControlFlow(editor);
+    const dataflow = new Dataflow(editor);
+
+    // Hydrate
+    await GraphUtils.hydrate(
+        execGraph,
+        {
+            headless: true,
+            graphId: execGraph.graphId,
+            editor,
+            control,
+            dataflow,
+            onEvent(event) {
+                const { type, text } = event;
+                notificationObservable.next({
+                    type: type as "info" | "error",
+                    text,
+                    ts: Date.now(),
+                    duration: 3,
+                });
+            },
+            onError(error) {
+                notificationObservable.next({
+                    type: "error",
+                    text: error.message,
+                    ts: Date.now(),
+                    duration: 3,
+                });
+            },
+            onAutoExecute(nodeId) {
+                if (!isGraphActive(execGraph.graphId)) return;
+                control.execute(nodeId);
+            },
+            onFlowNode(nodeId) {
+                if (!isGraphActive(execGraph.graphId)) return;
+                updateActiveNode(execGraph.graphId, nodeId);
+            },
+            onControlChange(graphId, node, control, value) {
+                // updateNodeControl(graphId, node, control, value);
+                // Update current graph
+                if (saveOption === "onChange") {
+                    const update = {
+                        ...execGraph,
+                        nodes: execGraph.nodes.map((n) => {
+                            if (n.nodeId !== node) return n;
+                            return {
+                                ...n,
+                                controls: {
+                                    ...n.controls,
+                                    [control]: value,
+                                },
+                            };
+                        }),
+                    };
+                    execGraph = update;
+                    currentGraph = update;
+                    fs.writeFileSync(graphPath, JSON.stringify(update));
+                }
+                controlObservable.next({ graphId, node, control, value });
+            },
+            async onExternalAction(action) {
+                console.log("External action", action);
+
+                let result: any;
+
+                switch (action.type) {
+                    case "chatBlock":
+                        handleChatBlock(action.args.blocked);
+                        break;
+                    case "terminal":
+                        // TODO: implement via backend
+                        break;
+                    case "readMessage":
+                        result = messageQueue.shift();
+                        break;
+                    case "addMessageToSession":
+                        addMessageToSession(action.args.message);
+                        break;
+                    case "saveGraph":
+                        saveCurrentGraph(dirData);
+                        break;
+                    default:
+                        externalActionObservable.next(action);
+                        break;
+                }
+
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                return result;
+            },
+            getControlObservable() {
+                return controlObservable;
+            },
+            getControlDisabledObservable() {
+                return null;
+            },
+            getControlValue(_graphId, node, control) {
+                // const graph = graphStorage.get()[graphId];
+                return execGraph.nodes.find((n) => n.nodeId === node)?.controls[
+                    control
+                ] as string | number | null;
+            },
+            getControlDisabled(_graphId) {
+                // Always enabled in headless exec
+                return true;
+            },
+            getIsActive() {
+                return isGraphActive(execGraph.graphId);
+            },
+            unselect() {
+                // No selection in headless
+            },
+        },
+        nodeRegistry
+    );
+
+    const entrypoint = editor
+        .getNodes()
+        .find((n: ClassicPreset.Node) => n.label === "StartNode");
+
+    control.execute((entrypoint as ClassicPreset.Node).id);
+};
+
 // Main logic
 
 export const setupExecutorApi = (
@@ -112,13 +297,6 @@ export const setupExecutorApi = (
         });
     });
 
-    const nodeRegistry = buildNodeRegistry(dirCustomNodes);
-    const saveOption = fs.existsSync(path.join(dirData, "options.json"))
-        ? JSON.parse(
-              fs.readFileSync(path.join(dirData, "options.json"), "utf-8")
-          ).execPersistence || "onChange"
-        : "onChange";
-
     router.get("/api/executor/state", async (ctx) => {
         ctx.body = JSON.stringify({ state: executorStorage.get() });
     });
@@ -132,10 +310,7 @@ export const setupExecutorApi = (
 
     // Endpoint to stop graph
     router.post("/api/executor/stop", async (ctx) => {
-        executorStorage.set(null);
-        // Always save graph after execution
         saveCurrentGraph(dirData);
-        currentGraph = null;
         ctx.body = "OK";
     });
 
@@ -155,6 +330,37 @@ export const setupExecutorApi = (
         ctx.body = "OK";
     });
 
+    // Endpoints to receive messages from an OpenAI-compatible client
+    setupOpenAiCompatibleAPI(router, async (message, checkRequestActive) => {
+        messageQueue.push(message);
+        console.log("Received message from OAI API:", message.content);
+
+        // Ensure the correct chain is running
+        await runGraph(message.chainId, dirData, dirCustomNodes);
+
+        // If the graph did not run, something went wrong. Return null.
+        if (!executorStorage.get()) return null;
+
+        // Wait for message with the assistant role to appear in the executor session
+        let result: ChatMessage | null = null;
+        while (checkRequestActive()) {
+            const session = executorStorage.get();
+            if (!session) break;
+
+            const messages = session.sessionMessages;
+            if (messages.length) {
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage.role === "assistant") {
+                    result = lastMessage;
+                    break;
+                }
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        return result;
+    });
+
     // Endpoint to run graph
     router.post("/api/executor/run/:id", async (ctx) => {
         const graphId = ctx.params.id;
@@ -165,159 +371,7 @@ export const setupExecutorApi = (
             return;
         }
 
-        let execGraph = readJsonFile(graphPath) as SerializedGraph;
-        currentGraph = execGraph;
-
-        // Ensure nodes availability in registry
-        if (execGraph.nodes.find((n) => !nodeRegistry[n.nodeType])) {
-            notificationObservable.next({
-                type: "error",
-                duration: 3,
-                ts: Date.now(),
-                text: "Tried to execute a graph with missing custom nodes!",
-            });
-            return;
-        }
-
-        // Ensure entrypoint presence
-        if (!execGraph.nodes.find((n) => n.nodeType === "StartNode")) {
-            notificationObservable.next({
-                type: "error",
-                duration: 3,
-                ts: Date.now(),
-                text: "The Chain needs an Entrypoint to start execution!",
-            });
-            return;
-        }
-
-        executorStorage.set({
-            graphId: execGraph.graphId,
-            sessionMessages: [],
-            startTs: Date.now(),
-            step: null,
-        });
-
-        // Headless editor
-        const editor = new NodeEditor<any>();
-        const control = new ControlFlow(editor);
-        const dataflow = new Dataflow(editor);
-
-        // Hydrate
-        await GraphUtils.hydrate(
-            execGraph,
-            {
-                headless: true,
-                graphId: execGraph.graphId,
-                editor,
-                control,
-                dataflow,
-                onEvent(event) {
-                    const { type, text } = event;
-                    notificationObservable.next({
-                        type: type as "info" | "error",
-                        text,
-                        ts: Date.now(),
-                        duration: 3,
-                    });
-                },
-                onError(error) {
-                    notificationObservable.next({
-                        type: "error",
-                        text: error.message,
-                        ts: Date.now(),
-                        duration: 3,
-                    });
-                },
-                onAutoExecute(nodeId) {
-                    if (!isGraphActive(execGraph.graphId)) return;
-                    control.execute(nodeId);
-                },
-                onFlowNode(nodeId) {
-                    if (!isGraphActive(execGraph.graphId)) return;
-                    updateActiveNode(execGraph.graphId, nodeId);
-                },
-                onControlChange(graphId, node, control, value) {
-                    // updateNodeControl(graphId, node, control, value);
-                    // Update current graph
-                    if (saveOption === "onChange") {
-                        const update = {
-                            ...execGraph,
-                            nodes: execGraph.nodes.map((n) => {
-                                if (n.nodeId !== node) return n;
-                                return {
-                                    ...n,
-                                    controls: {
-                                        ...n.controls,
-                                        [control]: value,
-                                    },
-                                };
-                            }),
-                        };
-                        execGraph = update;
-                        currentGraph = update;
-                        fs.writeFileSync(graphPath, JSON.stringify(update));
-                    }
-                    controlObservable.next({ graphId, node, control, value });
-                },
-                async onExternalAction(action) {
-                    console.log("External action", action);
-
-                    let result: any;
-
-                    switch (action.type) {
-                        case "chatBlock":
-                            handleChatBlock(action.args.blocked);
-                            break;
-                        case "terminal":
-                            // TODO: implement via backend
-                            break;
-                        case "readMessage":
-                            result = messageQueue.shift();
-                            break;
-                        case "addMessageToSession":
-                            addMessageToSession(action.args.message);
-                            break;
-                        case "saveGraph":
-                            saveCurrentGraph(dirData);
-                            break;
-                        default:
-                            externalActionObservable.next(action);
-                            break;
-                    }
-
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                    return result;
-                },
-                getControlObservable() {
-                    return controlObservable;
-                },
-                getControlDisabledObservable() {
-                    return null;
-                },
-                getControlValue(_graphId, node, control) {
-                    // const graph = graphStorage.get()[graphId];
-                    return execGraph.nodes.find((n) => n.nodeId === node)
-                        ?.controls[control] as string | number | null;
-                },
-                getControlDisabled(_graphId) {
-                    // Always enabled in headless exec
-                    return true;
-                },
-                getIsActive() {
-                    return isGraphActive(execGraph.graphId);
-                },
-                unselect() {
-                    // No selection in headless
-                },
-            },
-            nodeRegistry
-        );
-
-        const entrypoint = editor
-            .getNodes()
-            .find((n: ClassicPreset.Node) => n.label === "StartNode");
-
-        control.execute((entrypoint as ClassicPreset.Node).id);
+        await runGraph(graphId, dirData, dirCustomNodes);
 
         ctx.body = JSON.stringify(executorStorage.get());
     });
