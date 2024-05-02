@@ -126,6 +126,8 @@ const runGraph = async (
           ).execPersistence || "onChange"
         : "onChange";
 
+    console.log("Graph save mode", saveOption);
+
     const graphPath = path.join(dirData, "chains", `${graphId}.json`);
 
     let execGraph = readJsonFile(graphPath) as SerializedGraph;
@@ -203,7 +205,7 @@ const runGraph = async (
             onControlChange(graphId, node, control, value) {
                 // updateNodeControl(graphId, node, control, value);
                 // Update current graph
-                if (saveOption === "onChange") {
+                if (saveOption !== "onDemand") {
                     const update = {
                         ...execGraph,
                         nodes: execGraph.nodes.map((n) => {
