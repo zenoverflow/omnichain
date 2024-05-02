@@ -103,6 +103,14 @@ export type NodeContextObj = {
     getControlDisabled: (graphId: string) => boolean;
 
     /**
+     * Allows nodes to read API keys from state/storage.
+     *
+     * @param name name of the API key
+     * @returns the API key string or null if not found
+     */
+    getApiKeyByName: (name: string) => string | null;
+
+    /**
      * For visually tracking graph execution.
      */
     onFlowNode: (nodeId: string) => any;

@@ -1,11 +1,24 @@
+import OpenAI from "openai";
+
 import { makeNode } from "./_Base";
 
-export const OpenAIPrompterNode = makeNode(
+const doc = [
+    "Generate text using OpenAI's basic completions API (/v1/completions).",
+    "This node can be used with a custom backend by setting the",
+    "base url property. Leaving the base url property",
+    "empty will default to the official OpenAI API.",
+    "The API key name property is used to reference an API key set via",
+    "the API key management dialog from the top bar.",
+]
+    .join(" ")
+    .trim();
+
+export const OpenAITextCompletionNode = makeNode(
     {
-        nodeName: "OpenAIPrompterNode",
+        nodeName: "OpenAITextCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [380, 570],
-        doc: "Generate text using OpenAI's basic completions API (/v1/completions).",
+        dimensions: [420, 680],
+        doc,
     },
     {
         inputs: [{ name: "prompt", type: "string" }],
@@ -115,14 +128,77 @@ export const OpenAIPrompterNode = makeNode(
                     },
                 },
             },
+            {
+                name: "apiKeyName",
+                control: {
+                    type: "text",
+                    defaultValue: "",
+                    config: {
+                        label: "API key name",
+                    },
+                },
+            },
+            {
+                name: "baseUrl",
+                control: {
+                    type: "text",
+                    defaultValue: "",
+                    config: {
+                        label: "base_url",
+                    },
+                },
+            },
         ],
     },
     {
         dataFlow: {
             inputs: ["prompt"],
             outputs: ["results"],
-            async logic(_node, _context, _controls, _fetchInputs) {
-                return {};
+            async logic(_node, context, controls, fetchInputs) {
+                const inputs = await fetchInputs();
+                const prompt = (inputs["prompt"] ?? [])[0];
+
+                if (!prompt?.length) {
+                    throw new Error("Missing prompt.");
+                }
+
+                const apiKeyName = (
+                    (controls.apiKeyName as string) || ""
+                ).trim();
+                const apiKey = context.getApiKeyByName(apiKeyName);
+
+                const baseUrl = ((controls.baseUrl as string) || "").trim();
+
+                const model = ((controls.model as string) || "").trim();
+
+                const openAi = new OpenAI({
+                    apiKey: apiKey || undefined,
+                    baseURL: baseUrl || undefined,
+                });
+
+                const textCompletion = await openAi.completions.create(
+                    {
+                        model,
+                        prompt,
+                        max_tokens: controls.maxTokens as number,
+                        temperature: controls.temperature as number,
+                        top_p: controls.topP as number,
+                        frequency_penalty: controls.frequencyPenalty as number,
+                        presence_penalty: controls.presencePenalty as number,
+                        n: controls.numResponses as number,
+                        echo: controls.echo === "true",
+                        seed: controls.seed as number,
+                    },
+                    {
+                        stream: false,
+                    }
+                );
+
+                return {
+                    results: textCompletion.choices.map(
+                        (choice) => choice.text
+                    ),
+                };
             },
         },
     }

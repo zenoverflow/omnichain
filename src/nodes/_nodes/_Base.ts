@@ -349,9 +349,8 @@ export const makeNode = (
                                 forward
                             );
                         } catch (error: any) {
+                            // Will stop exec
                             context.onError(error);
-                            // Rethrow to stop exec
-                            throw error;
                         }
                     },
                 });
@@ -387,9 +386,9 @@ export const makeNode = (
                                 _fetchInputs
                             );
                         } catch (error: any) {
+                            // Will stop exec
                             context.onError(error);
-                            // Rethrow to stop exec
-                            throw error;
+                            return {};
                         }
                     },
                 });

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { exec } from "child_process";
 
 import type Router from "koa-router";
 import { ClassicPreset, NodeEditor } from "rete";
@@ -94,6 +95,19 @@ const stopCurrentGraph = (dirData: string) => {
     currentGraph = null;
 };
 
+const getApiKeyByName = (dirData: string, name: string): string | null => {
+    const apiKeyPath = path.join(dirData, "apiKeys.json");
+    if (!fs.existsSync(apiKeyPath)) return null;
+
+    const apiKeys = JSON.parse(fs.readFileSync(apiKeyPath, "utf-8"));
+
+    const target = Object.values(apiKeys as Record<string, any>).find(
+        (k: Record<string, any>) => k.name === name
+    )?.content as string | null;
+
+    return target || null;
+};
+
 const runGraph = async (
     graphId: string,
     dirData: string,
@@ -176,6 +190,7 @@ const runGraph = async (
                     ts: Date.now(),
                     duration: 3,
                 });
+                stopCurrentGraph(dirData);
             },
             onAutoExecute(nodeId) {
                 if (!isGraphActive(execGraph.graphId)) return;
@@ -218,7 +233,29 @@ const runGraph = async (
                         handleChatBlock(action.args.blocked);
                         break;
                     case "terminal":
-                        // TODO: implement via backend
+                        result = await new Promise((resolve) => {
+                            const { command } = action.args;
+                            exec(command, (error, stdout, stderr) => {
+                                if (error) {
+                                    resolve({
+                                        type: "error",
+                                        message: error.message,
+                                    });
+                                    return;
+                                }
+                                if (stderr) {
+                                    resolve({
+                                        type: "error",
+                                        message: stderr,
+                                    });
+                                    return;
+                                }
+                                resolve({
+                                    type: "stdout",
+                                    message: stdout,
+                                });
+                            });
+                        });
                         break;
                     case "readMessage":
                         result = messageQueue.shift();
@@ -252,6 +289,9 @@ const runGraph = async (
             getControlDisabled(_graphId) {
                 // Always enabled in headless exec
                 return true;
+            },
+            getApiKeyByName(name) {
+                return getApiKeyByName(dirData, name);
             },
             getIsActive() {
                 return isGraphActive(execGraph.graphId);
@@ -310,7 +350,7 @@ export const setupExecutorApi = (
 
     // Endpoint to stop graph
     router.post("/api/executor/stop", async (ctx) => {
-        saveCurrentGraph(dirData);
+        stopCurrentGraph(dirData);
         ctx.body = "OK";
     });
 
@@ -324,9 +364,8 @@ export const setupExecutorApi = (
             "files:",
             message.files.length
         );
-        // TODO: remove after debug
         // Add directly to session (for debug only)
-        addMessageToSession(message);
+        // addMessageToSession(message);
         ctx.body = "OK";
     });
 

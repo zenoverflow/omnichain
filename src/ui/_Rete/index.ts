@@ -110,6 +110,10 @@ export async function createEditor(container: HTMLElement) {
                 control
             ] as string | number | null;
         },
+        getApiKeyByName(_name) {
+            // No API keys in visual editor
+            return null;
+        },
         getControlDisabled(graphId) {
             return isGraphActive(graphId);
         },
