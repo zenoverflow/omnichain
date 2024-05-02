@@ -167,7 +167,13 @@ export const OpenAITextCompletionNode = makeNode(
                 ).trim();
                 const apiKey = context.getApiKeyByName(apiKeyName);
 
-                const baseUrl = ((controls.baseUrl as string) || "").trim();
+                let baseUrl = ((controls.baseUrl as string) || "").trim();
+                if (baseUrl.length) {
+                    if (!baseUrl.endsWith("/")) {
+                        baseUrl += "/";
+                    }
+                    baseUrl += "v1";
+                }
 
                 const model = ((controls.model as string) || "").trim();
 
