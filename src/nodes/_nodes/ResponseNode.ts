@@ -58,11 +58,6 @@ export const ResponseNode = makeNode(
                     (controls.avatarName || undefined) as string | undefined,
                     files
                 );
-                console.log(
-                    "ResponseNode: Adding message to session",
-                    message.content,
-                    message.from
-                );
                 await context.onExternalAction({
                     type: "addMessageToSession",
                     args: { message },
