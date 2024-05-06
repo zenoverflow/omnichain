@@ -226,9 +226,8 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
                     style={{ marginRight: "5px", backgroundColor: "#1677FF" }}
                 />
                 <div>
-                    {avatar?.name ?? message.role === "user"
-                        ? "User"
-                        : "Assistant"}
+                    {avatar?.name ??
+                        (message.role === "user" ? "User" : "Assistant")}
                 </div>
             </div>
             <CMarkdown content={message.content} />

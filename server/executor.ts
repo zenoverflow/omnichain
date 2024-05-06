@@ -56,6 +56,7 @@ let events: { type: string; data: any }[] = [];
 let currentGraph: SerializedGraph | null = null;
 
 const messageQueue: ChatMessage[] = [];
+let currentMessage: ChatMessage | null = null;
 
 const handleChatBlock = (blocked: boolean) => {
     const storage = executorStorage.get();
@@ -93,6 +94,8 @@ const stopCurrentGraph = (dirData: string) => {
     // Always save graph after execution
     saveCurrentGraph(dirData);
     currentGraph = null;
+    currentMessage = null;
+    console.log("Stopped current graph");
 };
 
 const getApiKeyByName = (dirData: string, name: string): string | null => {
@@ -192,6 +195,7 @@ const runGraph = async (
                     ts: Date.now(),
                     duration: 3,
                 });
+                console.error("Error:", error);
                 stopCurrentGraph(dirData);
             },
             onAutoExecute(nodeId) {
@@ -226,7 +230,7 @@ const runGraph = async (
                 controlObservable.next({ graphId, node, control, value });
             },
             async onExternalAction(action) {
-                console.log("External action", action);
+                // console.log("External action", action);
 
                 let result: any;
 
@@ -259,8 +263,15 @@ const runGraph = async (
                             });
                         });
                         break;
-                    case "readMessage":
-                        result = messageQueue.shift();
+                    case "checkQueue":
+                        result = messageQueue;
+                        break;
+                    case "grabNextMessage":
+                        currentMessage =
+                            messageQueue.shift() as ChatMessage | null;
+                        break;
+                    case "readCurrentMessage":
+                        result = currentMessage;
                         break;
                     case "addMessageToSession":
                         addMessageToSession(action.args.message);
@@ -366,14 +377,14 @@ export const setupExecutorApi = (
             "files:",
             message.files.length
         );
-        // Add directly to session (for debug only)
-        // addMessageToSession(message);
+        addMessageToSession(message);
         ctx.body = "OK";
     });
 
     // Endpoints to receive messages from an OpenAI-compatible client
     setupOpenAiCompatibleAPI(router, async (message, checkRequestActive) => {
         messageQueue.push(message);
+        addMessageToSession(message);
         console.log("Received message from OAI API:", message.content);
 
         // Ensure the correct chain is running

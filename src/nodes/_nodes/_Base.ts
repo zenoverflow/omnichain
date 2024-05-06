@@ -10,6 +10,8 @@ import { TextControl, TextControlConfig } from "../_controls/TextControl";
 import { SelectControl, SelectControlConfig } from "../_controls/SelectControl";
 import { TriggerSocket } from "../_sockets/TriggerSocket";
 import { TemplateSlotSocket } from "../_sockets/TemplateSlotSocket";
+import { FileSocket } from "../_sockets/FileSocket";
+import { FileArraySocket } from "../_sockets/FileArraySocket";
 
 type CustomNodeBaseConfig = {
     nodeName: string;
@@ -26,7 +28,13 @@ type CustomNodeIOConfig = {
 
 type CustomIO = {
     name: string;
-    type: "trigger" | "string" | "stringArray" | "templateSlot";
+    type:
+        | "trigger"
+        | "string"
+        | "stringArray"
+        | "templateSlot"
+        | "file"
+        | "fileArray";
     label?: string;
     multi?: boolean;
 };
@@ -56,7 +64,7 @@ type CustomControlFlow = {
         node: any,
         context: NodeContextObj,
         controls: { [x: string]: string | number },
-        fetchInputs: () => Promise<{ [x: string]: any[] }>,
+        fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>,
         forward: (output: string) => void
     ) => Promise<void>;
 };
@@ -68,7 +76,7 @@ type CustomDataFlow = {
         node: any,
         context: NodeContextObj,
         controls: { [x: string]: string | number },
-        fetchInputs: () => Promise<{ [x: string]: any[] }>
+        fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>
     ) => Promise<{ [x: string]: any }>;
 };
 
@@ -87,6 +95,10 @@ const mkSocket = (socket: CustomIO["type"]) => {
             return new StringArraySocket();
         case "templateSlot":
             return new TemplateSlotSocket();
+        case "file":
+            return new FileSocket();
+        case "fileArray":
+            return new FileArraySocket();
         default:
             throw new Error("Invalid socket type " + (socket as string));
     }
@@ -351,6 +363,7 @@ export const makeNode = (
                         } catch (error: any) {
                             // Will stop exec
                             context.onError(error);
+                            throw error;
                         }
                     },
                 });
@@ -388,7 +401,7 @@ export const makeNode = (
                         } catch (error: any) {
                             // Will stop exec
                             context.onError(error);
-                            return {};
+                            throw error;
                         }
                     },
                 });

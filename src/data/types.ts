@@ -17,10 +17,16 @@ export type SerializedGraph = {
     created: number;
 };
 
+export type ChatMessageFile = {
+    name: string;
+    mimetype: string;
+    content: string;
+};
+
 /**
  * The internal representation of a chat message.
- * Does not match the OpenAI specification in order
- * to reduce the data structure complexity.
+ * Does not match the OpenAI specification on purpose
+ * in order to reduce the data structure complexity.
  */
 export type ChatMessage = {
     messageId: string;
@@ -29,7 +35,7 @@ export type ChatMessage = {
     role: "user" | "assistant";
     content: string;
     created: number;
-    files: { name: string; mimetype: string; content: string }[];
+    files: ChatMessageFile[];
 };
 
 export type ChatAvatar = {

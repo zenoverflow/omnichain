@@ -1,5 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import process from "process";
 
 import minimist from "minimist";
 import Koa from "koa";
@@ -10,6 +11,12 @@ import serve from "koa-static";
 import { ensureDirExists } from "./server/utils.ts";
 import { setupResourcesApi } from "./server/resources.ts";
 import { setupExecutorApi } from "./server/executor.ts";
+
+// Catch unhandled exceptions
+
+process.on("uncaughtException", function (err) {
+    console.log("Uncaught Error: " + err.message);
+});
 
 // Base setup
 

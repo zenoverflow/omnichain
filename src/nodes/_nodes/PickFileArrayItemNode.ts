@@ -1,15 +1,15 @@
 import { makeNode } from "./_Base";
 
-export const PickStringArrayItemNode = makeNode(
+export const PickFileArrayItemNode = makeNode(
     {
-        nodeName: "PickStringArrayItemNode",
+        nodeName: "PickFileArrayItemNode",
         nodeIcon: "OrderedListOutlined",
         dimensions: [300, 175],
-        doc: "Pick an item from a string array by index.",
+        doc: "Pick an item from a file array by index.",
     },
     {
-        inputs: [{ name: "array", type: "stringArray", label: "array" }],
-        outputs: [{ name: "string", type: "string", label: "string" }],
+        inputs: [{ name: "array", type: "fileArray", label: "array" }],
+        outputs: [{ name: "file", type: "file", label: "file" }],
         controls: [
             {
                 name: "index",
@@ -27,12 +27,12 @@ export const PickStringArrayItemNode = makeNode(
     {
         dataFlow: {
             inputs: ["array"],
-            outputs: ["string"],
+            outputs: ["file"],
             async logic(_node, _context, controls, fetchInputs) {
                 const inputs = await fetchInputs();
                 const array = (inputs["array"] ?? [])[0] ?? [];
                 return {
-                    string: array[controls.index] || "",
+                    file: array[controls.index],
                 };
             },
         },

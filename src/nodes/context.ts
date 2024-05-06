@@ -15,9 +15,11 @@ type ExecutionEvent = {
 export type ExternalAction =
     | { type: "chatBlock"; args: { blocked: boolean } }
     | { type: "terminal"; args: { command: string } }
-    | { type: "readMessage"; args: never }
+    | { type: "checkQueue"; args?: never }
+    | { type: "grabNextMessage"; args?: never }
+    | { type: "readCurrentMessage"; args?: never }
     | { type: "addMessageToSession"; args: { message: ChatMessage } }
-    | { type: "saveGraph"; args: never };
+    | { type: "saveGraph"; args?: never };
 
 export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
