@@ -12,6 +12,8 @@ import { TriggerSocket } from "../_sockets/TriggerSocket";
 import { TemplateSlotSocket } from "../_sockets/TemplateSlotSocket";
 import { FileSocket } from "../_sockets/FileSocket";
 import { FileArraySocket } from "../_sockets/FileArraySocket";
+import { ChatMessageSocket } from "../_sockets/ChatMessageSocket";
+import { ChatMessageArraySocket } from "../_sockets/ChatMessageArraySocket";
 
 type CustomNodeBaseConfig = {
     nodeName: string;
@@ -34,7 +36,9 @@ type CustomIO = {
         | "stringArray"
         | "templateSlot"
         | "file"
-        | "fileArray";
+        | "fileArray"
+        | "chatMessage"
+        | "chatMessageArray";
     label?: string;
     multi?: boolean;
 };
@@ -99,6 +103,10 @@ const mkSocket = (socket: CustomIO["type"]) => {
             return new FileSocket();
         case "fileArray":
             return new FileArraySocket();
+        case "chatMessage":
+            return new ChatMessageSocket();
+        case "chatMessageArray":
+            return new ChatMessageArraySocket();
         default:
             throw new Error("Invalid socket type " + (socket as string));
     }
@@ -175,7 +183,19 @@ const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
                 type: "object",
                 properties: {
                     name: { type: "string" },
-                    type: { type: "string" },
+                    type: {
+                        type: "string",
+                        enum: [
+                            "trigger",
+                            "string",
+                            "stringArray",
+                            "templateSlot",
+                            "file",
+                            "fileArray",
+                            "chatMessage",
+                            "chatMessageArray",
+                        ],
+                    },
                     label: { type: "string" },
                     multi: { type: "boolean" },
                 },
@@ -189,7 +209,19 @@ const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
                 type: "object",
                 properties: {
                     name: { type: "string" },
-                    type: { type: "string" },
+                    type: {
+                        type: "string",
+                        enum: [
+                            "trigger",
+                            "string",
+                            "stringArray",
+                            "templateSlot",
+                            "file",
+                            "fileArray",
+                            "chatMessage",
+                            "chatMessageArray",
+                        ],
+                    },
                     label: { type: "string" },
                     multi: { type: "boolean" },
                 },
@@ -206,7 +238,10 @@ const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
                     control: {
                         type: "object",
                         properties: {
-                            type: { type: "string" },
+                            type: {
+                                type: "string",
+                                enum: ["text", "number", "select"],
+                            },
                             defaultValue: {
                                 type: ["string", "number", "null"],
                             },

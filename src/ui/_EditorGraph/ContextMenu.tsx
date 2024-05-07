@@ -116,6 +116,7 @@ export const ContextMenu: React.FC = () => {
                     placeholder="Search..."
                     onMouseEnter={haltTimeout}
                     style={{ marginBottom: "10px" }}
+                    autoFocus
                 />
             ) : null}
             {filter.length && !items.length ? (

@@ -266,6 +266,9 @@ const runGraph = async (
                     case "checkQueue":
                         result = messageQueue;
                         break;
+                    case "readSessionMessages":
+                        result = executorStorage.get()?.sessionMessages || [];
+                        break;
                     case "grabNextMessage":
                         currentMessage =
                             messageQueue.shift() as ChatMessage | null;

@@ -249,7 +249,7 @@ export const ChatInterface: React.FC = () => {
     const [images, setImages] = useState<ChatMessage["files"]>([]);
     const [files, setFiles] = useState<ChatMessage["files"]>([]);
 
-    const messages = executor?.sessionMessages ?? [];
+    const messages = useMemo(() => executor?.sessionMessages ?? [], [executor]);
 
     const initCondSatisfied = useMemo(() => !!executor, [executor]);
 
@@ -356,7 +356,7 @@ export const ChatInterface: React.FC = () => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [listRef]);
+    }, [listRef, messages]);
 
     return (
         <div
@@ -378,6 +378,7 @@ export const ChatInterface: React.FC = () => {
                             flexGrow: 1,
                             color: "white",
                             padding: "10px",
+                            overflowY: "auto",
                         }}
                     >
                         {messages.map((m) => (
