@@ -17,7 +17,7 @@ export const OpenAITextCompletionNode = makeNode(
     {
         nodeName: "OpenAITextCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [420, 680],
+        dimensions: [620, 730],
         doc,
     },
     {
@@ -119,6 +119,16 @@ export const OpenAITextCompletionNode = makeNode(
                 },
             },
             {
+                name: "stop",
+                control: {
+                    type: "text",
+                    defaultValue: null,
+                    config: {
+                        label: "stop (comma-separated)",
+                    },
+                },
+            },
+            {
                 name: "seed",
                 control: {
                     type: "number",
@@ -194,6 +204,11 @@ export const OpenAITextCompletionNode = makeNode(
                         n: controls.numResponses as number,
                         echo: controls.echo === "true",
                         seed: controls.seed as number,
+                        stop: controls.stop
+                            ? (controls.stop as string)
+                                  .split(",")
+                                  .map((s) => s.trim())
+                            : undefined,
                     },
                     {
                         stream: false,

@@ -25,7 +25,7 @@ export const OpenAIChatCompletionNode = makeNode(
     {
         nodeName: "OpenAIChatCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [420, 720],
+        dimensions: [620, 770],
         doc,
     },
     {
@@ -139,6 +139,16 @@ export const OpenAIChatCompletionNode = makeNode(
             //         },
             //     },
             // },
+            {
+                name: "stop",
+                control: {
+                    type: "text",
+                    defaultValue: null,
+                    config: {
+                        label: "stop (comma-separated)",
+                    },
+                },
+            },
             {
                 name: "seed",
                 control: {
@@ -261,6 +271,11 @@ export const OpenAIChatCompletionNode = makeNode(
                         n: controls.numResponses as number,
                         // echo: controls.echo === "true",
                         seed: controls.seed as number,
+                        stop: controls.stop
+                            ? (controls.stop as string)
+                                  .split(",")
+                                  .map((s) => s.trim())
+                            : undefined,
                     },
                     {
                         stream: false,
