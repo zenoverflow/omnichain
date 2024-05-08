@@ -9,7 +9,9 @@ export const BlockChatNode = makeNode(
     },
     {
         inputs: [{ name: "triggerIn", type: "trigger", label: "trigger-in" }],
-        outputs: [{ name: "triggerOut", type: "trigger", label: "trigger-in" }],
+        outputs: [
+            { name: "triggerOut", type: "trigger", label: "trigger-out" },
+        ],
         controls: [
             {
                 name: "action",
