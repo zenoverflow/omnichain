@@ -25,11 +25,17 @@ export const OpenAIChatCompletionNode = makeNode(
     {
         nodeName: "OpenAIChatCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 770],
+        dimensions: [620, 810],
         doc,
     },
     {
         inputs: [
+            {
+                //
+                name: "system",
+                type: "string",
+                label: "system message",
+            },
             {
                 //
                 name: "messages",
@@ -197,7 +203,7 @@ export const OpenAIChatCompletionNode = makeNode(
     },
     {
         dataFlow: {
-            inputs: ["messages", "message"],
+            inputs: ["system", "messages", "message"],
             outputs: ["results"],
             async logic(_node, context, controls, fetchInputs) {
                 const inputs = await fetchInputs();
@@ -236,33 +242,48 @@ export const OpenAIChatCompletionNode = makeNode(
                     baseURL: baseUrl || undefined,
                 });
 
+                const systemMessage = (
+                    (inputs["system"] || [])[0] || ""
+                ).trim();
+
                 const chatCompletion = await openAi.chat.completions.create(
                     {
                         model,
-                        messages: messages.map((message) => ({
-                            role: "user",
-                            content:
-                                controls.vision === "true"
-                                    ? [
-                                          {
-                                              type: "text",
-                                              text: message.content,
-                                          },
-                                          ...message.files
-                                              .filter((file) =>
-                                                  file.mimetype.startsWith(
-                                                      "image/"
+                        messages: [
+                            // system message
+                            ...(systemMessage.length
+                                ? [
+                                      {
+                                          role: "system",
+                                          content: systemMessage,
+                                      },
+                                  ]
+                                : []),
+                            ...(messages.map((message) => ({
+                                role: "user",
+                                content:
+                                    controls.vision === "true"
+                                        ? [
+                                              {
+                                                  type: "text",
+                                                  text: message.content,
+                                              },
+                                              ...message.files
+                                                  .filter((file) =>
+                                                      file.mimetype.startsWith(
+                                                          "image/"
+                                                      )
                                                   )
-                                              )
-                                              .map((file) => ({
-                                                  type: "image_url",
-                                                  image_url: {
-                                                      url: `data:${file.mimetype};base64,${file.content}`,
-                                                  },
-                                              })),
-                                      ]
-                                    : message.content,
-                        })) as any[],
+                                                  .map((file) => ({
+                                                      type: "image_url",
+                                                      image_url: {
+                                                          url: `data:${file.mimetype};base64,${file.content}`,
+                                                      },
+                                                  })),
+                                          ]
+                                        : message.content,
+                            })) as any[]),
+                        ],
                         max_tokens: controls.maxTokens as number,
                         temperature: controls.temperature as number,
                         top_p: controls.topP as number,
