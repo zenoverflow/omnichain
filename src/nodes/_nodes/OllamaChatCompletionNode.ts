@@ -1,11 +1,13 @@
 import { Ollama } from "ollama";
+import { v4 as uuid } from "uuid";
+import isUint8Array from "@stdlib/assert-is-uint8array";
 
 import { makeNode } from "./_Base";
-import { ChatMessageFile } from "../../data/types";
+import { ChatMessage, ChatMessageFile } from "../../data/types";
 
 const doc = [
-    "Generate text using Ollama's basic completion API (/api/generate).",
-    "This node supports images as file inputs.",
+    "Generate text using Ollama's chat completion API (/api/chat).",
+    "This node supports images from chat messages.",
     "Non-image files will be filtered out by mime type.",
     "If both a single image and an array of images are passed in,",
     "the single image will be appended to the array.",
@@ -15,9 +17,9 @@ const doc = [
     .join(" ")
     .trim();
 
-export const OllamaTextCompletionNode = makeNode(
+export const OllamaChatCompletionNode = makeNode(
     {
-        nodeName: "OllamaTextCompletionNode",
+        nodeName: "OllamaChatCompletionNode",
         nodeIcon: "LaptopOutlined",
         dimensions: [620, 1090],
         doc,
@@ -32,23 +34,22 @@ export const OllamaTextCompletionNode = makeNode(
             },
             {
                 //
-                name: "prompt",
-                type: "string",
+                name: "messages",
+                type: "chatMessageArray",
+                label: "messages (array)",
             },
             {
                 //
-                name: "images",
-                type: "fileArray",
-                label: "images (array)",
-            },
-            {
-                //
-                name: "image",
-                type: "file",
-                label: "image (single)",
+                name: "message",
+                type: "chatMessage",
+                label: "message (single)",
             },
         ],
-        outputs: [{ name: "result", type: "string" }],
+        outputs: [
+            //
+            { name: "result", type: "string", label: "result" },
+            { name: "resultImages", type: "fileArray", label: "result images" },
+        ],
         controls: [
             {
                 name: "model",
@@ -247,15 +248,21 @@ export const OllamaTextCompletionNode = makeNode(
     },
     {
         dataFlow: {
-            inputs: ["system", "prompt", "images", "image"],
-            outputs: ["result"],
+            inputs: ["system", "messages", "message"],
+            outputs: ["result", "resultImages"],
             async logic(_node, _context, controls, fetchInputs) {
                 const inputs = await fetchInputs();
-                const prompt = (inputs["prompt"] ?? [])[0];
+                const messages: ChatMessage[] = [
+                    ...((inputs["messages"] ?? [])[0] || []),
+                ];
+                const messageSingle = (inputs["message"] ?? [])[0];
+                if (messageSingle) {
+                    messages.push(messageSingle);
+                }
 
-                if (!prompt?.length) {
+                if (!messages.length) {
                     throw new Error(
-                        "OllamaTextCompletionNode: prompt is empty"
+                        "OllamaChatCompletionNode: No messages attached"
                     );
                 }
 
@@ -263,30 +270,42 @@ export const OllamaTextCompletionNode = makeNode(
 
                 if (!model.length) {
                     throw new Error(
-                        "OllamaTextCompletionNode: model is missing"
+                        "OllamaChatCompletionNode: model is missing"
                     );
-                }
-
-                const images: ChatMessageFile[] =
-                    (inputs["images"] || [])[0] || [];
-                const image = (inputs["image"] || [])[0];
-                if (image) {
-                    images.push(image);
                 }
 
                 const ollama = new Ollama({
                     host: (controls.host as string | undefined) || undefined,
                 });
 
-                const textCompletion = await ollama.generate({
+                const systemMessage = (
+                    (inputs["system"] || [])[0] || ""
+                ).trim();
+
+                const chatCompletion = await ollama.chat({
                     model,
-                    prompt,
-                    images: images.length
-                        ? images
-                              .filter((i) => i.mimetype.startsWith("image/"))
-                              .map((i) => i.content)
-                        : undefined,
-                    system: (inputs["system"] || [])[0] || undefined,
+                    messages: [
+                        // system message
+                        ...(systemMessage.length
+                            ? [
+                                  {
+                                      role: "system",
+                                      content: systemMessage,
+                                  },
+                              ]
+                            : []),
+                        ...messages.map((m) => ({
+                            role: m.role,
+                            content: m.content,
+                            images: m.files.length
+                                ? m.files
+                                      .filter((f) =>
+                                          f.mimetype.startsWith("image/")
+                                      )
+                                      .map((f) => f.content)
+                                : undefined,
+                        })),
+                    ],
                     stream: false,
                     keep_alive: controls.keepAlive as number,
                     format:
@@ -316,8 +335,19 @@ export const OllamaTextCompletionNode = makeNode(
                     },
                 });
 
+                const resultImages: ChatMessageFile[] = (
+                    chatCompletion.message.images || []
+                ).map((content) => ({
+                    mimetype: "image/png",
+                    content: isUint8Array(content)
+                        ? Buffer.from(content).toString("base64")
+                        : content,
+                    name: `${uuid()}.png`,
+                }));
+
                 return {
-                    result: textCompletion.response,
+                    result: chatCompletion.message.content,
+                    resultImages,
                 };
             },
         },

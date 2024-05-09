@@ -14,6 +14,7 @@
         "serve": "tsx server.ts"
     },
     "dependencies": {
+        "@stdlib/assert-is-uint8array": "^0.2.1",
         "@types/koa-router": "^7.4.8",
         "@types/koa-static": "^4.0.4",
         "@types/mime-db": "^1.43.5",

@@ -19,3 +19,4 @@ export { ReadCurrentMessageNode } from "./_nodes/ReadCurrentMessageNode";
 export { ReadSessionMessagesNode } from "./_nodes/ReadSessionMessagesNode";
 export { PickChatMessageArrayItemNode } from "./_nodes/PickChatMessageArrayItemNode";
 export { OllamaTextCompletionNode } from "./_nodes/OllamaTextCompletionNode";
+export { OllamaChatCompletionNode } from "./_nodes/OllamaChatCompletionNode";

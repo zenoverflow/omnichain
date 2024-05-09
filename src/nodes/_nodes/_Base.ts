@@ -427,12 +427,16 @@ export const makeNode = (
                         context.onFlowNode(self.id);
 
                         try {
-                            return await dataFlow.logic(
+                            const result = await dataFlow.logic(
                                 self,
                                 context,
                                 _controls,
                                 _fetchInputs
                             );
+                            if (!context.getIsActive()) {
+                                throw new Error("Graph is inactive");
+                            }
+                            return result;
                         } catch (error: any) {
                             // Will stop exec
                             context.onError(error);

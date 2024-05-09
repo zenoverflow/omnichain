@@ -24,8 +24,8 @@ export const BuildMessageNode = makeNode(
     {
         inputs: [
             { name: "content", type: "string", label: "content" },
-            { name: "fileSingle", type: "file", label: "file (single)" },
             { name: "filesArray", type: "fileArray", label: "files (array)" },
+            { name: "fileSingle", type: "file", label: "file (single)" },
         ],
         outputs: [{ name: "message", type: "chatMessage", label: "message" }],
         controls: [
