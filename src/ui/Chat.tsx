@@ -134,7 +134,7 @@ export const FileGrid: React.FC<{
                             style={{
                                 width: "100px",
                                 height: "100px",
-                                background: `url(${file.content})`,
+                                background: `url(data:${file.mimetype};base64,${file.content})`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                             }}
@@ -306,24 +306,33 @@ export const ChatInterface: React.FC = () => {
                     reader.onload = () => {
                         const base64 = reader.result;
                         if (typeof base64 === "string") {
-                            if (accept?.startsWith("image/")) {
-                                setImages([
-                                    ...images,
-                                    {
-                                        mimetype: file.type,
-                                        content: base64,
-                                        name: file.name,
-                                    },
-                                ]);
-                            } else {
-                                setFiles([
-                                    ...files,
-                                    {
-                                        mimetype: file.type,
-                                        content: base64,
-                                        name: file.name,
-                                    },
-                                ]);
+                            // Extract base64 content
+                            const base64Pure = base64.split(",")[1] as
+                                | string
+                                | null;
+                            if (base64Pure?.length) {
+                                // Check if it's an image
+                                if (accept?.startsWith("image/")) {
+                                    setImages([
+                                        ...images,
+                                        {
+                                            mimetype: file.type,
+                                            content: base64Pure,
+                                            name: file.name,
+                                        },
+                                    ]);
+                                }
+                                // Otherwise it's a file
+                                else {
+                                    setFiles([
+                                        ...files,
+                                        {
+                                            mimetype: file.type,
+                                            content: base64Pure,
+                                            name: file.name,
+                                        },
+                                    ]);
+                                }
                             }
                         }
                         finishGlobalLoading();
