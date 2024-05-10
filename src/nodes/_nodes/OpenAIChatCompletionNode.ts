@@ -1,5 +1,3 @@
-import OpenAI from "openai";
-
 import { makeNode } from "./_Base";
 import { ChatMessage } from "../../data/types";
 
@@ -239,80 +237,86 @@ export const OpenAIChatCompletionNode = makeNode(
                 const apiKeyName = (
                     (controls.apiKeyName as string) || ""
                 ).trim();
-                const apiKey = context.getApiKeyByName(apiKeyName);
+
+                const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
 
                 const baseUrl = ((controls.baseUrl as string) || "").trim();
-                const model = ((controls.model as string) || "").trim();
 
-                const openAi = new OpenAI({
-                    apiKey: apiKey || undefined,
-                    baseURL: baseUrl || undefined,
-                });
+                const model = ((controls.model as string) || "").trim();
 
                 const systemMessage = (
                     (inputs["system"] || [])[0] || ""
                 ).trim();
 
-                const chatCompletion = await openAi.chat.completions.create({
-                    model,
-                    messages: [
-                        // system message
-                        ...(systemMessage.length
-                            ? [
-                                  {
-                                      role: "system",
-                                      content: systemMessage,
-                                  },
-                              ]
-                            : []),
-                        ...(messages.map((message) => ({
-                            role: "user",
-                            content:
-                                controls.vision === "true"
-                                    ? [
-                                          {
-                                              type: "text",
-                                              text: message.content,
-                                          },
-                                          ...message.files
-                                              .filter((file) =>
-                                                  file.mimetype.startsWith(
-                                                      "image/"
+                const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                    body: JSON.stringify({
+                        model,
+                        messages: [
+                            // system message
+                            ...(systemMessage.length
+                                ? [
+                                      {
+                                          role: "system",
+                                          content: systemMessage,
+                                      },
+                                  ]
+                                : []),
+                            ...(messages.map((message) => ({
+                                role: "user",
+                                content:
+                                    controls.vision === "true"
+                                        ? [
+                                              {
+                                                  type: "text",
+                                                  text: message.content,
+                                              },
+                                              ...message.files
+                                                  .filter((file) =>
+                                                      file.mimetype.startsWith(
+                                                          "image/"
+                                                      )
                                                   )
-                                              )
-                                              .map((file) => ({
-                                                  type: "image_url",
-                                                  image_url: {
-                                                      url: `data:${file.mimetype};base64,${file.content}`,
-                                                  },
-                                              })),
-                                      ]
-                                    : message.content,
-                        })) as any[]),
-                    ],
-                    max_tokens: controls.maxTokens as number,
-                    temperature: controls.temperature as number,
-                    top_p: controls.topP as number,
-                    frequency_penalty: controls.frequencyPenalty as number,
-                    presence_penalty: controls.presencePenalty as number,
-                    n: controls.numResponses as number,
-                    // echo: controls.echo === "true",
-                    seed: controls.seed as number,
-                    stop: controls.stop
-                        ? (controls.stop as string)
-                              .split(",")
-                              .map((s) => s.trim())
-                        : undefined,
-                    stream: false,
-                    response_format:
-                        controls.json === "true"
-                            ? { type: "json_object" }
+                                                  .map((file) => ({
+                                                      type: "image_url",
+                                                      image_url: {
+                                                          url: `data:${file.mimetype};base64,${file.content}`,
+                                                      },
+                                                  })),
+                                          ]
+                                        : message.content,
+                            })) as any[]),
+                        ],
+                        max_tokens: controls.maxTokens as number,
+                        temperature: controls.temperature as number,
+                        top_p: controls.topP as number,
+                        frequency_penalty: controls.frequencyPenalty as number,
+                        presence_penalty: controls.presencePenalty as number,
+                        n: controls.numResponses as number,
+                        // echo: controls.echo === "true",
+                        seed: (controls.seed as number | null) || undefined,
+                        stop: controls.stop
+                            ? (controls.stop as string)
+                                  .split(",")
+                                  .map((s) => s.trim())
                             : undefined,
+                        stream: false,
+                        response_format:
+                            controls.json === "true"
+                                ? { type: "json_object" }
+                                : undefined,
+                    }),
                 });
+
+                const chatCompletion = await response.json();
 
                 return {
                     results: chatCompletion.choices.map(
-                        (choice) => choice.message.content
+                        (choice: any) => choice.message.content as string
                     ),
                 };
             },

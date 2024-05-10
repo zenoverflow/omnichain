@@ -1,5 +1,3 @@
-import OpenAI from "openai";
-
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -175,45 +173,44 @@ export const OpenAITextCompletionNode = makeNode(
                 const apiKeyName = (
                     (controls.apiKeyName as string) || ""
                 ).trim();
-                const apiKey = context.getApiKeyByName(apiKeyName);
 
-                let baseUrl = ((controls.baseUrl as string) || "").trim();
-                if (baseUrl.length) {
-                    if (!baseUrl.endsWith("/")) {
-                        baseUrl += "/";
-                    }
-                    baseUrl += "v1";
-                }
+                const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
+
+                const baseUrl = ((controls.baseUrl as string) || "").trim();
 
                 const model = ((controls.model as string) || "").trim();
 
-                const openAi = new OpenAI({
-                    apiKey: apiKey || undefined,
-                    baseURL: baseUrl || undefined,
+                const response = await fetch(`${baseUrl}/v1/completions`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                    body: JSON.stringify({
+                        model,
+                        prompt,
+                        max_tokens: controls.maxTokens as number,
+                        temperature: controls.temperature as number,
+                        top_p: controls.topP as number,
+                        frequency_penalty: controls.frequencyPenalty as number,
+                        presence_penalty: controls.presencePenalty as number,
+                        n: controls.numResponses as number,
+                        echo: controls.echo === "true",
+                        seed: (controls.seed as number | null) || undefined,
+                        stop: controls.stop
+                            ? (controls.stop as string)
+                                  .split(",")
+                                  .map((s) => s.trim())
+                            : undefined,
+                        stream: false,
+                    }),
                 });
 
-                const textCompletion = await openAi.completions.create({
-                    model,
-                    prompt,
-                    max_tokens: controls.maxTokens as number,
-                    temperature: controls.temperature as number,
-                    top_p: controls.topP as number,
-                    frequency_penalty: controls.frequencyPenalty as number,
-                    presence_penalty: controls.presencePenalty as number,
-                    n: controls.numResponses as number,
-                    echo: controls.echo === "true",
-                    seed: controls.seed as number,
-                    stop: controls.stop
-                        ? (controls.stop as string)
-                              .split(",")
-                              .map((s) => s.trim())
-                        : undefined,
-                    stream: false,
-                });
+                const textCompletion = await response.json();
 
                 return {
                     results: textCompletion.choices.map(
-                        (choice) => choice.text
+                        (choice: any) => choice.text as string
                     ),
                 };
             },
