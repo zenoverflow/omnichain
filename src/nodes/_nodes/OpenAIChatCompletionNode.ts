@@ -25,7 +25,7 @@ export const OpenAIChatCompletionNode = makeNode(
     {
         nodeName: "OpenAIChatCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 810],
+        dimensions: [620, 850],
         doc,
     },
     {
@@ -199,6 +199,20 @@ export const OpenAIChatCompletionNode = makeNode(
                     },
                 },
             },
+            {
+                name: "json",
+                control: {
+                    type: "select",
+                    defaultValue: "false",
+                    config: {
+                        label: "json",
+                        values: [
+                            { value: "true", label: "true" },
+                            { value: "false", label: "false" },
+                        ],
+                    },
+                },
+            },
         ],
     },
     {
@@ -227,14 +241,7 @@ export const OpenAIChatCompletionNode = makeNode(
                 ).trim();
                 const apiKey = context.getApiKeyByName(apiKeyName);
 
-                let baseUrl = ((controls.baseUrl as string) || "").trim();
-                if (baseUrl.length) {
-                    if (!baseUrl.endsWith("/")) {
-                        baseUrl += "/";
-                    }
-                    baseUrl += "v1";
-                }
-
+                const baseUrl = ((controls.baseUrl as string) || "").trim();
                 const model = ((controls.model as string) || "").trim();
 
                 const openAi = new OpenAI({
@@ -246,62 +253,62 @@ export const OpenAIChatCompletionNode = makeNode(
                     (inputs["system"] || [])[0] || ""
                 ).trim();
 
-                const chatCompletion = await openAi.chat.completions.create(
-                    {
-                        model,
-                        messages: [
-                            // system message
-                            ...(systemMessage.length
-                                ? [
-                                      {
-                                          role: "system",
-                                          content: systemMessage,
-                                      },
-                                  ]
-                                : []),
-                            ...(messages.map((message) => ({
-                                role: "user",
-                                content:
-                                    controls.vision === "true"
-                                        ? [
-                                              {
-                                                  type: "text",
-                                                  text: message.content,
-                                              },
-                                              ...message.files
-                                                  .filter((file) =>
-                                                      file.mimetype.startsWith(
-                                                          "image/"
-                                                      )
+                const chatCompletion = await openAi.chat.completions.create({
+                    model,
+                    messages: [
+                        // system message
+                        ...(systemMessage.length
+                            ? [
+                                  {
+                                      role: "system",
+                                      content: systemMessage,
+                                  },
+                              ]
+                            : []),
+                        ...(messages.map((message) => ({
+                            role: "user",
+                            content:
+                                controls.vision === "true"
+                                    ? [
+                                          {
+                                              type: "text",
+                                              text: message.content,
+                                          },
+                                          ...message.files
+                                              .filter((file) =>
+                                                  file.mimetype.startsWith(
+                                                      "image/"
                                                   )
-                                                  .map((file) => ({
-                                                      type: "image_url",
-                                                      image_url: {
-                                                          url: `data:${file.mimetype};base64,${file.content}`,
-                                                      },
-                                                  })),
-                                          ]
-                                        : message.content,
-                            })) as any[]),
-                        ],
-                        max_tokens: controls.maxTokens as number,
-                        temperature: controls.temperature as number,
-                        top_p: controls.topP as number,
-                        frequency_penalty: controls.frequencyPenalty as number,
-                        presence_penalty: controls.presencePenalty as number,
-                        n: controls.numResponses as number,
-                        // echo: controls.echo === "true",
-                        seed: controls.seed as number,
-                        stop: controls.stop
-                            ? (controls.stop as string)
-                                  .split(",")
-                                  .map((s) => s.trim())
+                                              )
+                                              .map((file) => ({
+                                                  type: "image_url",
+                                                  image_url: {
+                                                      url: `data:${file.mimetype};base64,${file.content}`,
+                                                  },
+                                              })),
+                                      ]
+                                    : message.content,
+                        })) as any[]),
+                    ],
+                    max_tokens: controls.maxTokens as number,
+                    temperature: controls.temperature as number,
+                    top_p: controls.topP as number,
+                    frequency_penalty: controls.frequencyPenalty as number,
+                    presence_penalty: controls.presencePenalty as number,
+                    n: controls.numResponses as number,
+                    // echo: controls.echo === "true",
+                    seed: controls.seed as number,
+                    stop: controls.stop
+                        ? (controls.stop as string)
+                              .split(",")
+                              .map((s) => s.trim())
+                        : undefined,
+                    stream: false,
+                    response_format:
+                        controls.json === "true"
+                            ? { type: "json_object" }
                             : undefined,
-                    },
-                    {
-                        stream: false,
-                    }
-                );
+                });
 
                 return {
                     results: chatCompletion.choices.map(
