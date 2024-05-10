@@ -99,54 +99,48 @@ export const updateGraphName = (graphId: string, name: string) => {
     });
 };
 
-export const updateNodeControl = (
+export const updateNodeControl = async (
     graphId: string,
     nodeId: string,
     controlKey: string,
     controlValue: string | number,
     saveToBackend = true
 ) => {
-    QueueUtils.addTask(async () => {
-        const graph = graphStorage.get()[graphId];
-        const update = {
-            ...graph,
-            nodes: graph.nodes.map((n) => {
-                if (n.nodeId !== nodeId) return n;
-                return {
-                    ...n,
-                    controls: {
-                        ...n.controls,
-                        [controlKey]: controlValue,
-                    },
-                };
-            }),
-        };
+    const graph = graphStorage.get()[graphId];
+    const update = {
+        ...graph,
+        nodes: graph.nodes.map((n) => {
+            if (n.nodeId !== nodeId) return n;
+            return {
+                ...n,
+                controls: {
+                    ...n.controls,
+                    [controlKey]: controlValue,
+                },
+            };
+        }),
+    };
 
-        if (saveToBackend) {
-            await backendSetGraph(graphId, update);
-        }
-        graphStorage.set({
-            ...graphStorage.get(),
-            [graphId]: update,
-        });
+    if (saveToBackend) {
+        await backendSetGraph(graphId, update);
+    }
+    graphStorage.set({
+        ...graphStorage.get(),
+        [graphId]: update,
     });
 };
 
-export const deleteGraph = (graphId: string) => {
+export const deleteGraph = async (graphId: string) => {
     // Cannot delete active graph
     if (executorStorage.get()?.graphId === graphId) {
         return;
     }
 
-    QueueUtils.addTask(async () => {
-        await backendDeleteGraph(graphId);
-        graphStorage.set(
-            Object.fromEntries(
-                Object.entries(graphStorage.get()).filter(
-                    ([id]) => id !== graphId
-                )
-            )
-        );
-        await clearRedundantOptions();
-    });
+    await backendDeleteGraph(graphId);
+    graphStorage.set(
+        Object.fromEntries(
+            Object.entries(graphStorage.get()).filter(([id]) => id !== graphId)
+        )
+    );
+    await clearRedundantOptions();
 };

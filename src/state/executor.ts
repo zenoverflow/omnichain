@@ -26,7 +26,7 @@ const updateChecker = async () => {
                     showNotification(message.data);
                     break;
                 case "controlUpdate":
-                    updateNodeControl(
+                    await updateNodeControl(
                         message.data.graphId,
                         message.data.node,
                         message.data.control,

@@ -213,7 +213,7 @@ export const EditorGraph: React.FC = () => {
                             title="Deleting graph"
                             description="Are you sure?"
                             onConfirm={() => {
-                                deleteGraph(editorTarget);
+                                void deleteGraph(editorTarget);
                             }}
                             okText="Yes"
                             cancelText="No"

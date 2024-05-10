@@ -92,7 +92,7 @@ export async function createEditor(container: HTMLElement) {
             // No exec from visual editor
         },
         async onControlChange(graphId, node, control, value) {
-            updateNodeControl(graphId, node, control, value);
+            await updateNodeControl(graphId, node, control, value);
             controlObservable.next({ graphId, node, control, value });
         },
         async onExternalAction(_action) {
