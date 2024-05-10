@@ -192,28 +192,24 @@ export const OpenAITextCompletionNode = makeNode(
                     baseURL: baseUrl || undefined,
                 });
 
-                const textCompletion = await openAi.completions.create(
-                    {
-                        model,
-                        prompt,
-                        max_tokens: controls.maxTokens as number,
-                        temperature: controls.temperature as number,
-                        top_p: controls.topP as number,
-                        frequency_penalty: controls.frequencyPenalty as number,
-                        presence_penalty: controls.presencePenalty as number,
-                        n: controls.numResponses as number,
-                        echo: controls.echo === "true",
-                        seed: controls.seed as number,
-                        stop: controls.stop
-                            ? (controls.stop as string)
-                                  .split(",")
-                                  .map((s) => s.trim())
-                            : undefined,
-                    },
-                    {
-                        stream: false,
-                    }
-                );
+                const textCompletion = await openAi.completions.create({
+                    model,
+                    prompt,
+                    max_tokens: controls.maxTokens as number,
+                    temperature: controls.temperature as number,
+                    top_p: controls.topP as number,
+                    frequency_penalty: controls.frequencyPenalty as number,
+                    presence_penalty: controls.presencePenalty as number,
+                    n: controls.numResponses as number,
+                    echo: controls.echo === "true",
+                    seed: controls.seed as number,
+                    stop: controls.stop
+                        ? (controls.stop as string)
+                              .split(",")
+                              .map((s) => s.trim())
+                        : undefined,
+                    stream: false,
+                });
 
                 return {
                     results: textCompletion.choices.map(
