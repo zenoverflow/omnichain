@@ -101,6 +101,12 @@ export const stopGraph = () => {
 };
 
 export const runGraph = async (graphId: string) => {
+    // Wait for all queued tasks to finish
+    // This ensures updates are complete before running the graph
+    while (QueueUtils.busy()) {
+        await new Promise((r) => setTimeout(r, 100));
+    }
+
     const executorUpdate = await ExecutorUtils.runGraph(graphId);
     executorStorage.set(executorUpdate as any);
     markActiveNode();

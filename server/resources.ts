@@ -49,11 +49,17 @@ export const setupResourcesApi = (
         }
     });
 
-    router.post("/api/resource/single/:resource", (ctx) => {
-        fs.writeFileSync(
-            path.join(dirData, `${ctx.params.resource}.json`),
-            JSON.stringify(ctx.request.body)
-        );
+    router.post("/api/resource/single/:resource", async (ctx) => {
+        await new Promise((resolve, reject) => {
+            fs.writeFile(
+                path.join(dirData, `${ctx.params.resource}.json`),
+                JSON.stringify(ctx.request.body),
+                (err) => {
+                    if (err) reject(err);
+                    else resolve(null);
+                }
+            );
+        });
         ctx.body = "OK";
     });
 
@@ -121,14 +127,19 @@ export const setupResourcesApi = (
         }
     });
 
-    router.post("/api/resource/multi/single/:resource/:id", (ctx) => {
+    router.post("/api/resource/multi/single/:resource/:id", async (ctx) => {
         const resourceDir = path.join(dirData, ctx.params.resource);
         ensureDirExists(resourceDir);
-
-        fs.writeFileSync(
-            path.join(resourceDir, `${ctx.params.id}.json`),
-            JSON.stringify(ctx.request.body)
-        );
+        await new Promise((resolve, reject) => {
+            fs.writeFile(
+                path.join(resourceDir, `${ctx.params.id}.json`),
+                JSON.stringify(ctx.request.body),
+                (err) => {
+                    if (err) reject(err);
+                    else resolve(null);
+                }
+            );
+        });
         ctx.body = "OK";
     });
 

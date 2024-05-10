@@ -63,7 +63,7 @@ export type NodeContextObj = {
         node: string,
         control: string,
         value: string | number
-    ) => void;
+    ) => Promise<void>;
 
     /**
      * Allows nodes to trigger external actions such as

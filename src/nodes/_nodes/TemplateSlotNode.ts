@@ -58,7 +58,7 @@ export const TemplateSlotNode = makeNode(
                 valControl.value = (inputs.in || [""])[0] || valControl.value;
 
                 // Update graph
-                context.onControlChange(
+                await context.onControlChange(
                     context.graphId,
                     node.id,
                     "val",

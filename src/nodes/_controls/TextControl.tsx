@@ -36,7 +36,7 @@ export class TextControl extends ClassicPreset.Control {
         // Allow user to change the value
         // But prevent dual updates during exec
         if (!this.context.getIsActive()) {
-            this.context.onControlChange(
+            void this.context.onControlChange(
                 this.context.graphId,
                 this.nodeId,
                 this.nodeControl,

@@ -52,11 +52,8 @@ const updateActiveNode = (graphId: string, nodeId: string) => {
     });
 };
 
-let events: { type: string; data: any }[] = [];
-let currentGraph: SerializedGraph | null = null;
-
+const events: { type: string; data: any }[] = [];
 const messageQueue: ChatMessage[] = [];
-let currentMessage: ChatMessage | null = null;
 
 const handleChatBlock = (blocked: boolean) => {
     const storage = executorStorage.get();
@@ -76,25 +73,18 @@ const addMessageToSession = (message: ChatMessage) => {
     });
 };
 
-const saveCurrentGraph = (dirData: string) => {
-    if (currentGraph) {
-        const graphPath = path.join(
-            dirData,
-            "chains",
-            `${currentGraph.graphId}.json`
-        );
-        fs.writeFileSync(graphPath, JSON.stringify(currentGraph));
-    }
+const saveGraph = async (dirData: string, graph: SerializedGraph) => {
+    const graphPath = path.join(dirData, "chains", `${graph.graphId}.json`);
+    await new Promise((resolve, reject) => {
+        fs.writeFile(graphPath, JSON.stringify(graph), (err) => {
+            if (err) reject(err);
+            else resolve(null);
+        });
+    });
 };
 
-const stopCurrentGraph = (dirData: string) => {
-    const storage = executorStorage.get();
-    if (!storage) return;
+const stopCurrentGraph = () => {
     executorStorage.set(null);
-    // Always save graph after execution
-    saveCurrentGraph(dirData);
-    currentGraph = null;
-    currentMessage = null;
     console.log("Stopped current graph");
 };
 
@@ -119,8 +109,8 @@ const runGraph = async (
     // Do nothing if already running
     if (isGraphActive(graphId)) return;
 
-    // Stop current graph if the id is different
-    stopCurrentGraph(dirData);
+    // Ensure other graph is stopped
+    stopCurrentGraph();
 
     const nodeRegistry = buildNodeRegistry(dirCustomNodes);
     const saveOption = fs.existsSync(path.join(dirData, "options.json"))
@@ -133,11 +123,16 @@ const runGraph = async (
 
     const graphPath = path.join(dirData, "chains", `${graphId}.json`);
 
-    let execGraph = readJsonFile(graphPath) as SerializedGraph;
-    currentGraph = execGraph;
+    const _exec: {
+        graph: SerializedGraph;
+        currentMessage?: ChatMessage | null;
+    } = {
+        graph: readJsonFile(graphPath) as SerializedGraph,
+        currentMessage: null,
+    };
 
     // Ensure nodes availability in registry
-    if (execGraph.nodes.find((n) => !nodeRegistry[n.nodeType])) {
+    if (_exec.graph.nodes.find((n) => !nodeRegistry[n.nodeType])) {
         notificationObservable.next({
             type: "error",
             duration: 3,
@@ -148,7 +143,7 @@ const runGraph = async (
     }
 
     // Ensure entrypoint presence
-    if (!execGraph.nodes.find((n) => n.nodeType === "StartNode")) {
+    if (!_exec.graph.nodes.find((n) => n.nodeType === "StartNode")) {
         notificationObservable.next({
             type: "error",
             duration: 3,
@@ -159,7 +154,7 @@ const runGraph = async (
     }
 
     executorStorage.set({
-        graphId: execGraph.graphId,
+        graphId: _exec.graph.graphId,
         sessionMessages: [],
         startTs: Date.now(),
         step: null,
@@ -172,10 +167,10 @@ const runGraph = async (
 
     // Hydrate
     await GraphUtils.hydrate(
-        execGraph,
+        _exec.graph,
         {
             headless: true,
-            graphId: execGraph.graphId,
+            graphId: _exec.graph.graphId,
             editor,
             control,
             dataflow,
@@ -196,37 +191,46 @@ const runGraph = async (
                     duration: 3,
                 });
                 console.error("Error:", error);
-                stopCurrentGraph(dirData);
+                stopCurrentGraph();
             },
             onAutoExecute(nodeId) {
-                if (!isGraphActive(execGraph.graphId)) return;
+                if (!isGraphActive(_exec.graph.graphId)) return;
                 control.execute(nodeId);
             },
             onFlowNode(nodeId) {
-                if (!isGraphActive(execGraph.graphId)) return;
-                updateActiveNode(execGraph.graphId, nodeId);
+                if (!isGraphActive(_exec.graph.graphId)) return;
+                updateActiveNode(_exec.graph.graphId, nodeId);
             },
-            onControlChange(graphId, node, control, value) {
-                // updateNodeControl(graphId, node, control, value);
+            async onControlChange(graphId, node, control, value) {
                 // Update current graph
+                const update = {
+                    ..._exec.graph,
+                    nodes: _exec.graph.nodes.map((n) => {
+                        if (n.nodeId !== node) return n;
+                        return {
+                            ...n,
+                            controls: {
+                                ...n.controls,
+                                [control]: value,
+                            },
+                        };
+                    }),
+                };
+                _exec.graph = update;
+                // Save to disk if needed
                 if (saveOption !== "onDemand") {
-                    const update = {
-                        ...execGraph,
-                        nodes: execGraph.nodes.map((n) => {
-                            if (n.nodeId !== node) return n;
-                            return {
-                                ...n,
-                                controls: {
-                                    ...n.controls,
-                                    [control]: value,
-                                },
-                            };
-                        }),
-                    };
-                    execGraph = update;
-                    currentGraph = update;
-                    fs.writeFileSync(graphPath, JSON.stringify(update));
+                    await new Promise((resolve, reject) => {
+                        fs.writeFile(
+                            graphPath,
+                            JSON.stringify(update),
+                            (err) => {
+                                if (err) reject(err);
+                                else resolve(null);
+                            }
+                        );
+                    });
                 }
+                // Notify frontend
                 controlObservable.next({ graphId, node, control, value });
             },
             async onExternalAction(action) {
@@ -270,17 +274,17 @@ const runGraph = async (
                         result = executorStorage.get()?.sessionMessages || [];
                         break;
                     case "grabNextMessage":
-                        currentMessage =
+                        _exec.currentMessage =
                             messageQueue.shift() as ChatMessage | null;
                         break;
                     case "readCurrentMessage":
-                        result = currentMessage;
+                        result = _exec.currentMessage;
                         break;
                     case "addMessageToSession":
                         addMessageToSession(action.args.message);
                         break;
                     case "saveGraph":
-                        saveCurrentGraph(dirData);
+                        await saveGraph(dirData, _exec.graph);
                         break;
                     default:
                         externalActionObservable.next(action);
@@ -298,9 +302,8 @@ const runGraph = async (
             },
             getControlValue(_graphId, node, control) {
                 // const graph = graphStorage.get()[graphId];
-                return execGraph.nodes.find((n) => n.nodeId === node)?.controls[
-                    control
-                ] as string | number | null;
+                return _exec.graph.nodes.find((n) => n.nodeId === node)
+                    ?.controls[control] as string | number | null;
             },
             getControlDisabled(_graphId) {
                 // Always enabled in headless exec
@@ -310,7 +313,7 @@ const runGraph = async (
                 return getApiKeyByName(dirData, name);
             },
             getIsActive() {
-                return isGraphActive(execGraph.graphId);
+                return isGraphActive(_exec.graph.graphId);
             },
             unselect() {
                 // No selection in headless
@@ -358,15 +361,18 @@ export const setupExecutorApi = (
     });
 
     router.get("/api/executor/ping", async (ctx) => {
-        const toSend = JSON.stringify(events);
+        const toSend: typeof events = [];
+        while (events.length) {
+            const ev = events.shift();
+            if (ev) toSend.push(ev);
+        }
         // console.log("Ping", toSend);
-        ctx.body = toSend;
-        events = [];
+        ctx.body = JSON.stringify(toSend);
     });
 
     // Endpoint to stop graph
     router.post("/api/executor/stop", async (ctx) => {
-        stopCurrentGraph(dirData);
+        stopCurrentGraph();
         ctx.body = "OK";
     });
 

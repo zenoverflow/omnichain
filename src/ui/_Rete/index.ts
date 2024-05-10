@@ -91,7 +91,7 @@ export async function createEditor(container: HTMLElement) {
         onFlowNode(_) {
             // No exec from visual editor
         },
-        onControlChange(graphId, node, control, value) {
+        async onControlChange(graphId, node, control, value) {
             updateNodeControl(graphId, node, control, value);
             controlObservable.next({ graphId, node, control, value });
         },
