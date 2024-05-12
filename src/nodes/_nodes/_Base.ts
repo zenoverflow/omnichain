@@ -240,26 +240,8 @@ const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
 const flowConfigSchema = ajv.compile<CustomFlowConfig>({
     type: "object",
     properties: {
-        controlFlow: {
-            type: "object",
-            properties: {
-                inputs: { type: "array" },
-                outputs: { type: "array" },
-                logic: { instanceof: "Function" },
-            },
-            required: ["inputs", "outputs", "logic"],
-            additionalProperties: false,
-        },
-        dataFlow: {
-            type: "object",
-            properties: {
-                inputs: { type: "array" },
-                outputs: { type: "array" },
-                logic: { instanceof: "Function" },
-            },
-            required: ["inputs", "outputs", "logic"],
-            additionalProperties: false,
-        },
+        controlFlow: { instanceof: "Function" },
+        dataFlow: { instanceof: "Function" },
     },
     additionalProperties: false,
 });
