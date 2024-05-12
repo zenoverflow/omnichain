@@ -23,17 +23,13 @@ export const ReadCurrentMessageTextNode = makeNode(
         controls: [],
     },
     {
-        dataFlow: {
-            inputs: [],
-            outputs: ["content"],
-            async logic(_node, context, _controls, _fetchInputs) {
-                const msg: ChatMessage | null = await context.onExternalAction({
-                    type: "readCurrentMessage",
-                });
-                return {
-                    content: msg?.content || "",
-                };
-            },
+        async dataFlow(_node, context) {
+            const msg: ChatMessage | null = await context.onExternalAction({
+                type: "readCurrentMessage",
+            });
+            return {
+                content: msg?.content || "",
+            };
         },
     }
 );

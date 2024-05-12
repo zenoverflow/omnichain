@@ -1,6 +1,5 @@
 import { NumberControl } from "./_controls/NumberControl";
 import { TextControl } from "./_controls/TextControl";
-import { ButtonControl } from "./_controls/ButtonControl";
 import { SelectControl } from "./_controls/SelectControl";
 
 export const renderControl = (payload: any) => {
@@ -8,7 +7,6 @@ export const renderControl = (payload: any) => {
         //
         NumberControl,
         TextControl,
-        ButtonControl,
         SelectControl,
     ];
 

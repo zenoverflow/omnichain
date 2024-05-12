@@ -25,18 +25,17 @@ export const DelayOutputNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["dataIn"],
-            outputs: ["dataOut"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = (await fetchInputs()) as {
-                    dataIn?: string[];
-                };
-                await new Promise((r) =>
-                    setTimeout(r, controls["millis"] as number)
-                );
-                return { dataOut: (inputs.dataIn || [""])[0] };
-            },
+        async dataFlow(node, context) {
+            const inputs = (await context.fetchInputs!(node.id)) as {
+                dataIn?: string[];
+            };
+            await new Promise((r) =>
+                setTimeout(
+                    r,
+                    context.getAllControls(node.id)["millis"] as number
+                )
+            );
+            return { dataOut: (inputs.dataIn || [""])[0] };
         },
     }
 );

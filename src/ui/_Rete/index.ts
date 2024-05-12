@@ -4,7 +4,6 @@ import { AreaPlugin, AreaExtensions } from "rete-area-plugin";
 import { ConnectionPlugin } from "rete-connection-plugin";
 import { ReactPlugin } from "rete-react-plugin";
 import { ReadonlyPlugin } from "rete-readonly-plugin";
-import { ControlFlow, Dataflow } from "rete-engine";
 // import {
 //     AutoArrangePlugin,
 //     Presets as ArrangePresets,
@@ -26,7 +25,6 @@ import { AreaExtra, NodeContextObj } from "../../nodes/context";
 
 import { GraphWatcher } from "./GraphWatcher";
 import { AreaSelectionWatcher } from "./AreaSelectionWatcher";
-import { FlowWatcher } from "./FlowWatcher";
 import { NodeCustomizer } from "./NodeCustomizer";
 import { FlowCustomizer } from "./FlowCustomizer";
 import { GraphTemplate } from "./GraphTemplate";
@@ -42,8 +40,6 @@ export async function createEditor(container: HTMLElement) {
     }
 
     const editor = new NodeEditor<any>();
-    const control = new ControlFlow(editor);
-    const dataflow = new Dataflow(editor);
     const area = new AreaPlugin<any, AreaExtra>(container);
     const connection = new ConnectionPlugin<any, AreaExtra>();
     const readonly = new ReadonlyPlugin<any>();
@@ -65,9 +61,10 @@ export async function createEditor(container: HTMLElement) {
         headless: false,
         graphId,
         editor,
-        control,
-        dataflow,
         area,
+        getGraph() {
+            return graphStorage.get()[graphId];
+        },
         onEvent(event) {
             const { type, text } = event;
             showNotification({
@@ -85,13 +82,10 @@ export async function createEditor(container: HTMLElement) {
                 duration: 3,
             });
         },
-        onAutoExecute(_) {
-            // No exec from visual editor
-        },
         onFlowNode(_) {
             // No exec from visual editor
         },
-        async onControlChange(graphId, node, control, value) {
+        async onControlChange(node, control, value) {
             await updateNodeControl(graphId, node, control, value);
             controlObservable.next({ graphId, node, control, value });
         },
@@ -104,18 +98,22 @@ export async function createEditor(container: HTMLElement) {
         getControlDisabledObservable() {
             return controlDisabledObservable;
         },
-        getControlValue(graphId, node, control) {
+        getControlValue(node, control) {
             const graph = graphStorage.get()[graphId];
             return graph.nodes.find((n) => n.nodeId === node)?.controls[
                 control
             ] as string | number | null;
         },
+        getAllControls(nodeId) {
+            const graph = graphStorage.get()[graphId];
+            const controls = graph.nodes.find(
+                (n) => n.nodeId === nodeId
+            )?.controls;
+            return controls || {};
+        },
         getApiKeyByName(_name) {
             // No API keys in visual editor
             return null;
-        },
-        getControlDisabled(graphId) {
-            return isGraphActive(graphId);
         },
         getIsActive() {
             return isGraphActive(graphId);
@@ -152,7 +150,6 @@ export async function createEditor(container: HTMLElement) {
         await initGraph(nodeContext);
 
         AreaSelectionWatcher.observe(nodeContext);
-        FlowWatcher.observe(nodeContext);
         GraphWatcher.observe(nodeContext);
 
         // Default content for new graphs

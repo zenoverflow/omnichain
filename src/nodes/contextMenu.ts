@@ -25,11 +25,11 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
             }
             return true;
         })
-        .map(([key, Maker]) => ({
+        .map(([key, customNode]) => ({
             key,
             label: key.replace(/Node$/, "").trim(),
             handler: async () => {
-                const n = new Maker(nodeContext);
+                const n = customNode.editorNode(nodeContext);
                 await editor.addNode(n);
                 await area.translate(n.id, { x, y });
             },

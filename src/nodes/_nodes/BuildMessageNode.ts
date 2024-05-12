@@ -42,24 +42,22 @@ export const BuildMessageNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["content", "fileSingle", "filesArray"],
-            outputs: [],
-            async logic(_node, context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const files = [...((inputs.filesArray || [])[0] || [])];
-                const fileSingle = (inputs.fileSingle || [])[0];
-                if (fileSingle) {
-                    files.push(fileSingle);
-                }
-                const message = MsgUtils.freshFromAssistant(
-                    context.graphId,
-                    (inputs.content || [])[0] || "",
-                    (controls.avatarName || undefined) as string | undefined,
-                    files
-                );
-                return { message };
-            },
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const files = [...((inputs.filesArray || [])[0] || [])];
+            const fileSingle = (inputs.fileSingle || [])[0];
+            if (fileSingle) {
+                files.push(fileSingle);
+            }
+            const message = MsgUtils.freshFromAssistant(
+                context.graphId,
+                (inputs.content || [])[0] || "",
+                (context.getAllControls(node.id).avatarName || undefined) as
+                    | string
+                    | undefined,
+                files
+            );
+            return { message };
         },
     }
 );

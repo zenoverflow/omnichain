@@ -25,33 +25,19 @@ export const LogOutputNode = makeNode(
         ],
     },
     {
-        controlFlow: {
-            inputs: ["trigger"],
-            outputs: [],
-            async logic(node, context, _controls, fetchInputs, _forward) {
-                const inputs = (await fetchInputs()) as {
-                    data?: any[];
-                };
+        async controlFlow(node, context) {
+            const inputs = (await context.fetchInputs!(node.id)) as {
+                data?: any[];
+            };
 
-                const valControl = node.controls.val;
+            const valControl = node.controls.val as any;
 
-                valControl.value = (inputs.data || [])[0] ?? valControl.value;
+            valControl.value = (inputs.data || [])[0] ?? valControl.value;
 
-                // Update graph
-                node.context.onControlChange(
-                    context.graphId,
-                    node.id,
-                    "val",
-                    valControl.value
-                );
-            },
-        },
-        dataFlow: {
-            inputs: ["data"],
-            outputs: [],
-            async logic(_node, _context, _controls, _fetchInputs) {
-                return {};
-            },
+            // Update graph
+            await context.onControlChange(node.id, "val", valControl.value);
+
+            return null;
         },
     }
 );

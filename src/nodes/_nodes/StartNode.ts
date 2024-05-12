@@ -19,12 +19,8 @@ export const StartNode = makeNode(
         controls: [],
     },
     {
-        controlFlow: {
-            inputs: ["triggerIn"],
-            outputs: ["triggerOut"],
-            async logic(_node, _context, _controls, _fetchInputs, forward) {
-                forward("triggerOut");
-            },
+        async controlFlow(_node, _context) {
+            return "triggerOut";
         },
     }
 );

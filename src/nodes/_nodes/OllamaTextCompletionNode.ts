@@ -246,80 +246,69 @@ export const OllamaTextCompletionNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["system", "prompt", "images", "image"],
-            outputs: ["result"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const prompt = (inputs["prompt"] ?? [])[0];
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
 
-                if (!prompt?.length) {
-                    throw new Error(
-                        "OllamaTextCompletionNode: prompt is empty"
-                    );
-                }
+            const prompt = (inputs["prompt"] ?? [])[0];
 
-                const model = ((controls.model as string) || "").trim();
+            if (!prompt?.length) {
+                throw new Error("OllamaTextCompletionNode: prompt is empty");
+            }
 
-                if (!model.length) {
-                    throw new Error(
-                        "OllamaTextCompletionNode: model is missing"
-                    );
-                }
+            const model = ((controls.model as string) || "").trim();
 
-                const images: ChatMessageFile[] =
-                    (inputs["images"] || [])[0] || [];
-                const image = (inputs["image"] || [])[0];
-                if (image) {
-                    images.push(image);
-                }
+            if (!model.length) {
+                throw new Error("OllamaTextCompletionNode: model is missing");
+            }
 
-                const ollama = new Ollama({
-                    host: (controls.host as string | undefined) || undefined,
-                });
+            const images: ChatMessageFile[] = (inputs["images"] || [])[0] || [];
+            const image = (inputs["image"] || [])[0];
+            if (image) {
+                images.push(image);
+            }
 
-                const textCompletion = await ollama.generate({
-                    model,
-                    prompt,
-                    images: images.length
-                        ? images
-                              .filter((i) => i.mimetype.startsWith("image/"))
-                              .map((i) => i.content)
+            const ollama = new Ollama({
+                host: (controls.host as string | undefined) || undefined,
+            });
+
+            const textCompletion = await ollama.generate({
+                model,
+                prompt,
+                images: images.length
+                    ? images
+                          .filter((i) => i.mimetype.startsWith("image/"))
+                          .map((i) => i.content)
+                    : undefined,
+                system: (inputs["system"] || [])[0] || undefined,
+                stream: false,
+                keep_alive: controls.keepAlive as number,
+                format:
+                    (controls.json as string) === "true" ? "json" : undefined,
+                options: {
+                    mirostat: Number.parseInt(controls.mirostat as string),
+                    mirostat_eta: controls.mirostatEta as number,
+                    mirostat_tau: controls.mirostatTau as number,
+                    num_ctx: controls.numCtx as number,
+                    repeat_last_n: controls.repeatLastN as number,
+                    repeat_penalty: controls.repeatPenalty as number,
+                    temperature: controls.temperature as number,
+                    seed: controls.seed ? (controls.seed as number) : undefined,
+                    stop: controls.stop
+                        ? (controls.stop as string)
+                              .split(",")
+                              .map((s) => s.trim())
                         : undefined,
-                    system: (inputs["system"] || [])[0] || undefined,
-                    stream: false,
-                    keep_alive: controls.keepAlive as number,
-                    format:
-                        (controls.json as string) === "true"
-                            ? "json"
-                            : undefined,
-                    options: {
-                        mirostat: Number.parseInt(controls.mirostat as string),
-                        mirostat_eta: controls.mirostatEta as number,
-                        mirostat_tau: controls.mirostatTau as number,
-                        num_ctx: controls.numCtx as number,
-                        repeat_last_n: controls.repeatLastN as number,
-                        repeat_penalty: controls.repeatPenalty as number,
-                        temperature: controls.temperature as number,
-                        seed: controls.seed
-                            ? (controls.seed as number)
-                            : undefined,
-                        stop: controls.stop
-                            ? (controls.stop as string)
-                                  .split(",")
-                                  .map((s) => s.trim())
-                            : undefined,
-                        tfs_z: controls.tfsZ as number,
-                        num_predict: controls.numPredict as number,
-                        top_k: controls.topK as number,
-                        top_p: controls.topP as number,
-                    },
-                });
+                    tfs_z: controls.tfsZ as number,
+                    num_predict: controls.numPredict as number,
+                    top_k: controls.topK as number,
+                    top_p: controls.topP as number,
+                },
+            });
 
-                return {
-                    result: textCompletion.response,
-                };
-            },
+            return {
+                result: textCompletion.response,
+            };
         },
     }
 );

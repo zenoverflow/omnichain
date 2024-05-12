@@ -27,30 +27,27 @@ export const AwaitNextMessageNode = makeNode(
         controls: [],
     },
     {
-        controlFlow: {
-            inputs: ["triggerIn"],
-            outputs: ["triggerOut"],
-            async logic(_node, context, _controls, _fetchInputs, forward) {
-                const check = async () => {
-                    const messages = (await context.onExternalAction({
-                        type: "checkQueue",
-                    })) as ChatMessage[];
-                    if (messages.length) {
-                        const last = messages[messages.length - 1];
-                        if (last.role === "user") {
-                            return true;
-                        }
+        async controlFlow(_node, context) {
+            const check = async () => {
+                const messages = (await context.onExternalAction({
+                    type: "checkQueue",
+                })) as ChatMessage[];
+                if (messages.length) {
+                    const last = messages[messages.length - 1];
+                    if (last.role === "user") {
+                        return true;
                     }
-                    return false;
-                };
-                while (!(await check())) {
-                    await new Promise((resolve) => setTimeout(resolve, 100));
                 }
-                await context.onExternalAction({
-                    type: "grabNextMessage",
-                });
-                forward("triggerOut");
-            },
+                return false;
+            };
+            while (!(await check())) {
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+            await context.onExternalAction({
+                type: "grabNextMessage",
+            });
+
+            return "triggerOut";
         },
     }
 );

@@ -1,9 +1,10 @@
 import { StatefulObservable } from "../util/ObservableUtils";
 import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
-import { NodeContextObj } from "../nodes/context";
+import type { NodeContextObj } from "../nodes/context";
 import { nodeRegistryStorage } from "./nodeRegistry";
 import { graphStorage } from "./graphs";
 import { complexErrorObservable } from "./watcher";
+import type { CustomNode } from "../nodes/_nodes/_Base";
 
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
@@ -14,7 +15,8 @@ export const openEditor = (graphId: string) => {
 
     // Missing nodes check
     const missingNodes = targetGraph.nodes.filter(
-        (n) => !nodeRegistryStorage.get()[n.nodeType]
+        (n) =>
+            !(nodeRegistryStorage.get()[n.nodeType] as CustomNode | undefined)
     );
     if (missingNodes.length > 0) {
         complexErrorObservable.next([
@@ -52,10 +54,12 @@ export const duplicateNode = async (
         const nodeView = area.nodeViews.get(id);
         if (!nodeView) return;
 
-        const Maker = nodeRegistryStorage.get()[original.label];
-        if (!Maker) return;
+        const customNode = nodeRegistryStorage.get()[original.label] as
+            | CustomNode
+            | undefined;
+        if (!customNode) return;
 
-        const duplicate = new Maker(nodeContext);
+        const duplicate = customNode.editorNode(nodeContext);
         // Copy control values
         for (const [key, control] of Object.entries<any>(original.controls)) {
             duplicate.controls[key].value = control.value;

@@ -30,11 +30,8 @@ export class SelectControl extends ClassicPreset.Control {
     }
 
     private grabValue() {
-        return (this.context.getControlValue(
-            this.context.graphId,
-            this.nodeId,
-            this.nodeControl
-        ) ?? this.defaultValue) as string | null;
+        const val = this.context.getControlValue(this.nodeId, this.nodeControl);
+        return (val ?? this.defaultValue) as string | null;
     }
 
     private handleChange(value: string) {
@@ -43,7 +40,6 @@ export class SelectControl extends ClassicPreset.Control {
         // But prevent dual updates during exec
         if (!this.context.getIsActive()) {
             void this.context.onControlChange(
-                this.context.graphId,
                 this.nodeId,
                 this.nodeControl,
                 value
@@ -64,7 +60,7 @@ export class SelectControl extends ClassicPreset.Control {
                 findValueMatch(this.grabValue())
             );
             const [disabled, setDisabled] = useState(
-                this.context.getControlDisabled(this.context.graphId)
+                this.context.getIsActive()
             );
 
             useEffect(() => {

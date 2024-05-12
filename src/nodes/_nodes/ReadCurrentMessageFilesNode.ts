@@ -46,23 +46,21 @@ export const ReadCurrentMessageFilesNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: [],
-            outputs: ["files"],
-            async logic(_node, context, controls, _fetchInputs) {
-                const msg: ChatMessage | null = await context.onExternalAction({
-                    type: "readCurrentMessage",
-                });
-                return {
-                    files:
-                        msg?.files.filter((file) => {
-                            if (controls.type === "*/*") {
-                                return true;
-                            }
-                            return file.mimetype === controls.type;
-                        }) ?? [],
-                };
-            },
+        async dataFlow(node, context) {
+            const controls = context.getAllControls(node.id);
+
+            const msg: ChatMessage | null = await context.onExternalAction({
+                type: "readCurrentMessage",
+            });
+            return {
+                files:
+                    msg?.files.filter((file) => {
+                        if (controls.type === "*/*") {
+                            return true;
+                        }
+                        return file.mimetype === controls.type;
+                    }) ?? [],
+            };
         },
     }
 );

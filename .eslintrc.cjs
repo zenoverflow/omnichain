@@ -37,6 +37,7 @@ module.exports = {
                 "@typescript-eslint/no-unsafe-argument": "off",
                 "@typescript-eslint/no-unsafe-call": "off",
                 "@typescript-eslint/require-await": "off",
+                "@typescript-eslint/no-non-null-assertion": "off",
                 "react/prop-types": "off",
             },
             files: ["./src/**/*.{ts,tsx}"],

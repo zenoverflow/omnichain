@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-import * as NODE_MAKERS from "../src/nodes/index.tsx";
-
+import type { CustomNode } from "../src/nodes/_nodes/_Base.ts";
 import { CustomNodeUtils } from "../src/util/CustomNodeUtils.ts";
+import * as NODE_MAKERS from "../src/nodes/index.tsx";
 
 export const readJsonFile = (path: string) =>
     JSON.parse(fs.readFileSync(path, "utf-8")) as Record<string, any>;
@@ -44,5 +44,5 @@ export const buildNodeRegistry = (dirCustomNodes: string) => {
         ...CustomNodeUtils.buildCustomNodeRegistry(
             customNodes.map((file) => [file, fs.readFileSync(file, "utf-8")])
         ),
-    } as Record<string, any>;
+    } as Record<string, CustomNode>;
 };

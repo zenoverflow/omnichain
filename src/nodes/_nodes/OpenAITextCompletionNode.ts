@@ -159,61 +159,57 @@ export const OpenAITextCompletionNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["prompt"],
-            outputs: ["results"],
-            async logic(_node, context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const prompt = (inputs["prompt"] ?? [])[0];
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
 
-                if (!prompt?.length) {
-                    throw new Error("Missing prompt.");
-                }
+            const prompt = (inputs["prompt"] ?? [])[0];
 
-                const apiKeyName = (
-                    (controls.apiKeyName as string) || ""
-                ).trim();
+            if (!prompt?.length) {
+                throw new Error("Missing prompt.");
+            }
 
-                const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
+            const apiKeyName = ((controls.apiKeyName as string) || "").trim();
 
-                const baseUrl = ((controls.baseUrl as string) || "").trim();
+            const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
 
-                const model = ((controls.model as string) || "").trim();
+            const baseUrl = ((controls.baseUrl as string) || "").trim();
 
-                const response = await fetch(`${baseUrl}/v1/completions`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${apiKey}`,
-                    },
-                    body: JSON.stringify({
-                        model,
-                        prompt,
-                        max_tokens: controls.maxTokens as number,
-                        temperature: controls.temperature as number,
-                        top_p: controls.topP as number,
-                        frequency_penalty: controls.frequencyPenalty as number,
-                        presence_penalty: controls.presencePenalty as number,
-                        n: controls.numResponses as number,
-                        echo: controls.echo === "true",
-                        seed: (controls.seed as number | null) || undefined,
-                        stop: controls.stop
-                            ? (controls.stop as string)
-                                  .split(",")
-                                  .map((s) => s.trim())
-                            : undefined,
-                        stream: false,
-                    }),
-                });
+            const model = ((controls.model as string) || "").trim();
 
-                const textCompletion = await response.json();
+            const response = await fetch(`${baseUrl}/v1/completions`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    model,
+                    prompt,
+                    max_tokens: controls.maxTokens as number,
+                    temperature: controls.temperature as number,
+                    top_p: controls.topP as number,
+                    frequency_penalty: controls.frequencyPenalty as number,
+                    presence_penalty: controls.presencePenalty as number,
+                    n: controls.numResponses as number,
+                    echo: controls.echo === "true",
+                    seed: (controls.seed as number | null) || undefined,
+                    stop: controls.stop
+                        ? (controls.stop as string)
+                              .split(",")
+                              .map((s) => s.trim())
+                        : undefined,
+                    stream: false,
+                }),
+            });
 
-                return {
-                    results: textCompletion.choices.map(
-                        (choice: any) => choice.text as string
-                    ),
-                };
-            },
+            const textCompletion = await response.json();
+
+            return {
+                results: textCompletion.choices.map(
+                    (choice: any) => choice.text as string
+                ),
+            };
         },
     }
 );

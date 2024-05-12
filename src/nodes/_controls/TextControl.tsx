@@ -24,11 +24,8 @@ export class TextControl extends ClassicPreset.Control {
     }
 
     private grabValue() {
-        return (this.context.getControlValue(
-            this.context.graphId,
-            this.nodeId,
-            this.nodeControl
-        ) ?? this.defaultValue) as string;
+        const val = this.context.getControlValue(this.nodeId, this.nodeControl);
+        return (val ?? this.defaultValue) as string;
     }
 
     private handleChange(value: string) {
@@ -37,7 +34,6 @@ export class TextControl extends ClassicPreset.Control {
         // But prevent dual updates during exec
         if (!this.context.getIsActive()) {
             void this.context.onControlChange(
-                this.context.graphId,
                 this.nodeId,
                 this.nodeControl,
                 value
@@ -51,7 +47,7 @@ export class TextControl extends ClassicPreset.Control {
         const _Component: React.FC = () => {
             const [value, setValue] = useState(this.grabValue());
             const [disabled, setDisabled] = useState(
-                this.context.getControlDisabled(this.context.graphId)
+                this.context.getIsActive()
             );
 
             useEffect(() => {

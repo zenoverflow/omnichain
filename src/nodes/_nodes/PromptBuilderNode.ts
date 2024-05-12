@@ -22,25 +22,22 @@ export const PromptBuilderNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["parts"],
-            outputs: ["prompt"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = (await fetchInputs()) as {
-                    parts?: {
-                        name: string;
-                        value: string;
-                    }[];
-                };
+        async dataFlow(node, context) {
+            const inputs = (await context.fetchInputs!(node.id)) as {
+                parts?: {
+                    name: string;
+                    value: string;
+                }[];
+            };
+            const controls = context.getAllControls(node.id);
 
-                let prompt = controls["val"] as string;
+            let prompt = controls["val"] as string;
 
-                for (const { name, value } of inputs.parts ?? []) {
-                    prompt = prompt.replace("{" + name + "}", value);
-                }
+            for (const { name, value } of inputs.parts ?? []) {
+                prompt = prompt.replace("{" + name + "}", value);
+            }
 
-                return { prompt };
-            },
+            return { prompt };
         },
     }
 );

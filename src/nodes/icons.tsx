@@ -16,7 +16,7 @@ export const getMenuIcon = (itemName: string) => {
         // Node makers (root menu) icons
         ...Object.fromEntries(
             Object.values(nodeRegistryStorage.get()).map((M) => [
-                M.customNodeName,
+                M.config.baseConfig.nodeName,
                 M.icon || BorderOutlined,
             ])
         ),

@@ -25,16 +25,14 @@ export const PickFileArrayItemNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["array"],
-            outputs: ["file"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const array = (inputs["array"] ?? [])[0] ?? [];
-                return {
-                    file: array[controls.index],
-                };
-            },
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
+
+            const array = (inputs["array"] ?? [])[0] ?? [];
+            return {
+                file: array[controls.index as number],
+            };
         },
     }
 );

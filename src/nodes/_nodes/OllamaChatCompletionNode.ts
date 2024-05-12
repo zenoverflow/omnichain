@@ -247,109 +247,99 @@ export const OllamaChatCompletionNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["system", "messages", "message"],
-            outputs: ["result", "resultImages"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const messages: ChatMessage[] = [
-                    ...((inputs["messages"] ?? [])[0] || []),
-                ];
-                const messageSingle = (inputs["message"] ?? [])[0];
-                if (messageSingle) {
-                    messages.push(messageSingle);
-                }
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
 
-                if (!messages.length) {
-                    throw new Error(
-                        "OllamaChatCompletionNode: No messages attached"
-                    );
-                }
+            const messages: ChatMessage[] = [
+                ...((inputs["messages"] ?? [])[0] || []),
+            ];
+            const messageSingle = (inputs["message"] ?? [])[0];
+            if (messageSingle) {
+                messages.push(messageSingle);
+            }
 
-                const model = ((controls.model as string) || "").trim();
+            if (!messages.length) {
+                throw new Error(
+                    "OllamaChatCompletionNode: No messages attached"
+                );
+            }
 
-                if (!model.length) {
-                    throw new Error(
-                        "OllamaChatCompletionNode: model is missing"
-                    );
-                }
+            const model = ((controls.model as string) || "").trim();
 
-                const ollama = new Ollama({
-                    host: (controls.host as string | undefined) || undefined,
-                });
+            if (!model.length) {
+                throw new Error("OllamaChatCompletionNode: model is missing");
+            }
 
-                const systemMessage = (
-                    (inputs["system"] || [])[0] || ""
-                ).trim();
+            const ollama = new Ollama({
+                host: (controls.host as string | undefined) || undefined,
+            });
 
-                const chatCompletion = await ollama.chat({
-                    model,
-                    messages: [
-                        // system message
-                        ...(systemMessage.length
-                            ? [
-                                  {
-                                      role: "system",
-                                      content: systemMessage,
-                                  },
-                              ]
-                            : []),
-                        ...messages.map((m) => ({
-                            role: m.role,
-                            content: m.content,
-                            images: m.files.length
-                                ? m.files
-                                      .filter((f) =>
-                                          f.mimetype.startsWith("image/")
-                                      )
-                                      .map((f) => f.content)
-                                : undefined,
-                        })),
-                    ],
-                    stream: false,
-                    keep_alive: controls.keepAlive as number,
-                    format:
-                        (controls.json as string) === "true"
-                            ? "json"
+            const systemMessage = ((inputs["system"] || [])[0] || "").trim();
+
+            const chatCompletion = await ollama.chat({
+                model,
+                messages: [
+                    // system message
+                    ...(systemMessage.length
+                        ? [
+                              {
+                                  role: "system",
+                                  content: systemMessage,
+                              },
+                          ]
+                        : []),
+                    ...messages.map((m) => ({
+                        role: m.role,
+                        content: m.content,
+                        images: m.files.length
+                            ? m.files
+                                  .filter((f) =>
+                                      f.mimetype.startsWith("image/")
+                                  )
+                                  .map((f) => f.content)
                             : undefined,
-                    options: {
-                        mirostat: Number.parseInt(controls.mirostat as string),
-                        mirostat_eta: controls.mirostatEta as number,
-                        mirostat_tau: controls.mirostatTau as number,
-                        num_ctx: controls.numCtx as number,
-                        repeat_last_n: controls.repeatLastN as number,
-                        repeat_penalty: controls.repeatPenalty as number,
-                        temperature: controls.temperature as number,
-                        seed: controls.seed
-                            ? (controls.seed as number)
-                            : undefined,
-                        stop: controls.stop
-                            ? (controls.stop as string)
-                                  .split(",")
-                                  .map((s) => s.trim())
-                            : undefined,
-                        tfs_z: controls.tfsZ as number,
-                        num_predict: controls.numPredict as number,
-                        top_k: controls.topK as number,
-                        top_p: controls.topP as number,
-                    },
-                });
+                    })),
+                ],
+                stream: false,
+                keep_alive: controls.keepAlive as number,
+                format:
+                    (controls.json as string) === "true" ? "json" : undefined,
+                options: {
+                    mirostat: Number.parseInt(controls.mirostat as string),
+                    mirostat_eta: controls.mirostatEta as number,
+                    mirostat_tau: controls.mirostatTau as number,
+                    num_ctx: controls.numCtx as number,
+                    repeat_last_n: controls.repeatLastN as number,
+                    repeat_penalty: controls.repeatPenalty as number,
+                    temperature: controls.temperature as number,
+                    seed: controls.seed ? (controls.seed as number) : undefined,
+                    stop: controls.stop
+                        ? (controls.stop as string)
+                              .split(",")
+                              .map((s) => s.trim())
+                        : undefined,
+                    tfs_z: controls.tfsZ as number,
+                    num_predict: controls.numPredict as number,
+                    top_k: controls.topK as number,
+                    top_p: controls.topP as number,
+                },
+            });
 
-                const resultImages: ChatMessageFile[] = (
-                    chatCompletion.message.images || []
-                ).map((content) => ({
-                    mimetype: "image/png",
-                    content: isUint8Array(content)
-                        ? Buffer.from(content).toString("base64")
-                        : content,
-                    name: `${uuid()}.png`,
-                }));
+            const resultImages: ChatMessageFile[] = (
+                chatCompletion.message.images || []
+            ).map((content) => ({
+                mimetype: "image/png",
+                content: isUint8Array(content)
+                    ? Buffer.from(content).toString("base64")
+                    : content,
+                name: `${uuid()}.png`,
+            }));
 
-                return {
-                    result: chatCompletion.message.content,
-                    resultImages,
-                };
-            },
+            return {
+                result: chatCompletion.message.content,
+                resultImages,
+            };
         },
     }
 );

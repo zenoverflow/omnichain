@@ -1,11 +1,10 @@
-import type { NodeEditor } from "rete";
-import type { ControlFlow, Dataflow } from "rete-engine";
+import type { ClassicPreset, NodeEditor } from "rete";
 import type { AreaPlugin } from "rete-area-plugin";
 import type { ReactArea2D } from "rete-react-plugin";
 import type { ContextMenuExtra } from "rete-context-menu-plugin";
 
 import type { SimpleObservable } from "../util/ObservableUtils";
-import { ChatMessage } from "../data/types";
+import type { ChatMessage, SerializedGraph } from "../data/types";
 
 type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
@@ -33,11 +32,21 @@ export type ControlUpdate = {
 
 export type NodeContextObj = {
     headless: boolean;
+
     graphId: string;
-    editor: NodeEditor<any>;
-    control: ControlFlow<any>;
-    dataflow: Dataflow<any>;
+
+    editor?: NodeEditor<any>;
+
     area?: AreaPlugin<any, AreaExtra>;
+
+    getGraph: () => SerializedGraph;
+
+    /**
+     * Used during execution. Will not be used in the visual editor.
+     */
+    fetchInputs?: (
+        nodeId: string
+    ) => Promise<{ [x: string]: any[] | undefined }>;
 
     /**
      * Use for logging.
@@ -50,16 +59,10 @@ export type NodeContextObj = {
     onError: (error: Error) => any;
 
     /**
-     * For event-driven graph execution, via interval, poll, etc.
-     */
-    onAutoExecute: (nodeId: string) => any;
-
-    /**
-     * For handling control updates, either from the UI, or from
+     * For signalling control updates, either from the UI, or from
      * changes during graph execution.
      */
     onControlChange: (
-        graphId: string,
         node: string,
         control: string,
         value: string | number
@@ -93,17 +96,16 @@ export type NodeContextObj = {
      * @returns The value of the control.
      */
     getControlValue: (
-        graphId: string,
-        node: string,
+        nodeId: string,
         control: string
     ) => string | number | null;
 
     /**
-     * Allows a node's controls to grab their disabled state from state/storage.
+     * Allows a node to grab all of its control values from state/storage.
      *
-     * @returns The disabled state of the control.
+     * @returns The values of all the controls.
      */
-    getControlDisabled: (graphId: string) => boolean;
+    getAllControls: (nodeId: string) => { [x: string]: string | number | null };
 
     /**
      * Allows nodes to read API keys from state/storage.
@@ -130,3 +132,17 @@ export type NodeContextObj = {
      */
     unselect: (id: string) => any;
 };
+
+export type CustomControlFlow = (
+    node: ClassicPreset.Node,
+    context: NodeContextObj
+    // controls: { [x: string]: string | number }
+    // fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>
+) => Promise<string | null>;
+
+export type CustomDataFlow = (
+    node: ClassicPreset.Node,
+    context: NodeContextObj
+    // controls: { [x: string]: string | number }
+    // fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>
+) => Promise<{ [x: string]: any }>;

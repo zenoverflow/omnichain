@@ -1,5 +1,5 @@
 import { EnvUtils } from "./EnvUtils";
-import { makeNode } from "../nodes/_nodes/_Base";
+import { CustomNode, makeNode } from "../nodes/_nodes/_Base";
 import * as NODE_MAKERS from "../nodes";
 
 export const CustomNodeUtils = {
@@ -21,31 +21,42 @@ export const CustomNodeUtils = {
      * @param registry list of [filename, rawJS]
      * @returns custom node registry
      */
-    buildCustomNodeRegistry(registry: [string, string][]): Record<string, any> {
+    buildCustomNodeRegistry(
+        registry: [string, string][]
+    ): Record<string, CustomNode> {
         try {
             const internalNodes = Object.keys(NODE_MAKERS);
             const customNodeRegistry: Record<string, any> = {};
 
             for (const [name, rawJS] of registry) {
                 try {
-                    const NodeClass = eval(rawJS)();
+                    const customNodeObj = eval(rawJS)() as
+                        | CustomNode
+                        | null
+                        | undefined;
 
-                    if (!NodeClass) {
+                    if (!customNodeObj) {
                         console.error(
                             `Custom node eval failed for ${name}. Skipping.`
                         );
                         continue;
                     }
 
-                    if (internalNodes.includes(NodeClass.customNodeName)) {
-                        const n = NodeClass.customNodeName as string;
+                    if (
+                        internalNodes.includes(
+                            customNodeObj.config.baseConfig.nodeName
+                        )
+                    ) {
+                        const n = customNodeObj.config.baseConfig.nodeName;
                         console.error(
                             `${n} already exists. Cannot add to custom nodes.`
                         );
                         continue;
                     }
 
-                    customNodeRegistry[NodeClass.customNodeName] = NodeClass;
+                    customNodeRegistry[
+                        customNodeObj.config.baseConfig.nodeName
+                    ] = customNodeObj;
                 } catch (error) {
                     console.error(error);
                     console.error(
@@ -65,7 +76,7 @@ export const CustomNodeUtils = {
      * Download the raw js logic for all custom nodes from the backend.
      * Meant to be used from the frontend only.
      */
-    async consumeBackendRegistry(): Promise<Record<string, any>> {
+    async consumeBackendRegistry(): Promise<Record<string, CustomNode>> {
         try {
             const res = await fetch(`${EnvUtils.baseUrl()}/api/custom_nodes`);
             const data = (await res.json()) as [string, string][];

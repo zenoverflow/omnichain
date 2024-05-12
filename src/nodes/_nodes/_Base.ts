@@ -2,7 +2,7 @@ import { ClassicPreset } from "rete";
 import * as ICONS from "@ant-design/icons";
 import Ajv from "ajv";
 
-import { NodeContextObj } from "../context";
+import { CustomControlFlow, CustomDataFlow, NodeContextObj } from "../context";
 import { StringSocket } from "../_sockets/StringSocket";
 import { NumberControl, NumberControlConfig } from "../_controls/NumberControl";
 import { StringArraySocket } from "../_sockets/StringArraySocket";
@@ -20,12 +20,6 @@ type CustomNodeBaseConfig = {
     nodeIcon: string;
     dimensions: [number, number];
     doc: string;
-};
-
-type CustomNodeIOConfig = {
-    inputs: CustomIO[];
-    outputs: CustomIO[];
-    controls: CustomNodeControl[];
 };
 
 type CustomIO = {
@@ -61,32 +55,15 @@ type CustomNodeControl = {
     control: CustomControlConfig;
 };
 
-type CustomControlFlow = {
-    inputs: string[];
-    outputs: string[];
-    logic: (
-        node: any,
-        context: NodeContextObj,
-        controls: { [x: string]: string | number },
-        fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>,
-        forward: (output: string) => void
-    ) => Promise<void>;
-};
-
-type CustomDataFlow = {
-    inputs: string[];
-    outputs: string[];
-    logic: (
-        node: any,
-        context: NodeContextObj,
-        controls: { [x: string]: string | number },
-        fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>
-    ) => Promise<{ [x: string]: any }>;
-};
-
 type CustomFlowConfig = {
     dataFlow?: CustomDataFlow;
     controlFlow?: CustomControlFlow;
+};
+
+type CustomNodeIOConfig = {
+    inputs: CustomIO[];
+    outputs: CustomIO[];
+    controls: CustomNodeControl[];
 };
 
 const mkSocket = (socket: CustomIO["type"]) => {
@@ -287,11 +264,24 @@ const flowConfigSchema = ajv.compile<CustomFlowConfig>({
     additionalProperties: false,
 });
 
+export type CustomNode = {
+    config: {
+        baseConfig: CustomNodeBaseConfig;
+        ioConfig: CustomNodeIOConfig;
+        flowConfig: CustomFlowConfig | null;
+    };
+    icon: any;
+    editorNode: (
+        context: NodeContextObj,
+        id?: string | null
+    ) => ClassicPreset.Node<any, any, any>;
+};
+
 export const makeNode = (
     baseConfig: CustomNodeBaseConfig,
     ioConfig: CustomNodeIOConfig,
     flowConfig: CustomFlowConfig | null = null
-) => {
+): CustomNode => {
     // Validation
     if (!baseConfigSchema(baseConfig)) {
         throw new Error("Invalid node base config: " + ajv.errorsText());
@@ -305,7 +295,7 @@ export const makeNode = (
 
     const { nodeName, nodeIcon, dimensions } = baseConfig;
     const { inputs, outputs, controls } = ioConfig;
-    const { controlFlow, dataFlow } = flowConfig ?? {};
+    // const { controlFlow, dataFlow } = flowConfig ?? {};
 
     const nodeNameClean = nodeName.trim();
 
@@ -313,138 +303,58 @@ export const makeNode = (
         throw new Error("Node name cannot be empty");
     }
 
-    return class CustomNode extends ClassicPreset.Node<any, any, any> {
-        //
-        public static customNodeName = nodeName;
-        public static icon = (ICONS as any)[nodeIcon] ?? ICONS.BorderOutlined;
-        public static staticDoc = baseConfig.doc;
-        doc = baseConfig.doc;
-        width = dimensions[0];
-        height = dimensions[1];
+    return {
+        config: { baseConfig, ioConfig, flowConfig },
+        icon: (ICONS as any)[nodeIcon] ?? ICONS.BorderOutlined,
+        editorNode: (context, id) => {
+            class _NodeMaker extends ClassicPreset.Node<any, any, any> {
+                doc = baseConfig.doc;
+                width = dimensions[0];
+                height = dimensions[1];
 
-        constructor(
-            public context: NodeContextObj,
-            id: string | null = null // for deserialization
-        ) {
-            super(nodeName);
-            const self = this;
-            self.id = id ?? self.id;
+                constructor(
+                    public context: NodeContextObj,
+                    id: string | null = null // for deserialization
+                ) {
+                    super(nodeName);
+                    const self = this;
+                    self.id = id ?? self.id;
 
-            // Inputs
-            for (const { name, label, type: socket, multi } of inputs) {
-                self.addInput(
-                    //
-                    name,
-                    new ClassicPreset.Input(
-                        mkSocket(socket),
-                        label ?? name,
-                        multi ?? false
-                    )
-                );
-            }
-            // Outputs
-            for (const { name, label, type, multi } of outputs) {
-                self.addOutput(
-                    //
-                    name,
-                    new ClassicPreset.Output(
-                        mkSocket(type),
-                        label ?? name,
-                        multi ?? false
-                    )
-                );
-            }
-            // Controls
-            for (const { name, control } of controls) {
-                self.addControl(
-                    //
-                    name,
-                    mkControl(self.id, name, context, control)
-                );
-            }
-            // Control flow setup
-            if (controlFlow) {
-                context.control.add(self, {
-                    inputs: () => controlFlow.inputs,
-                    outputs: () => controlFlow.outputs,
-                    async execute(_: never, forward): Promise<void> {
-                        if (!context.getIsActive()) return;
-
-                        const _controls = Object.fromEntries(
-                            controls.map(({ name }) => [
-                                name,
-                                self.controls[name].value,
-                            ])
+                    // Inputs
+                    for (const { name, label, type: socket, multi } of inputs) {
+                        self.addInput(
+                            //
+                            name,
+                            new ClassicPreset.Input(
+                                mkSocket(socket),
+                                label ?? name,
+                                multi ?? false
+                            )
                         );
-
-                        const _fetchInputs = async () => {
-                            const result = await context.dataflow.fetchInputs(
-                                self.id
-                            );
-                            context.onFlowNode(self.id);
-                            return result;
-                        };
-
-                        context.onFlowNode(self.id);
-
-                        try {
-                            await controlFlow.logic(
-                                self,
-                                context,
-                                _controls,
-                                _fetchInputs,
-                                forward
-                            );
-                        } catch (error: any) {
-                            // Will stop exec
-                            context.onError(error);
-                            throw error;
-                        }
-                    },
-                });
-            }
-            // Data flow setup
-            if (dataFlow) {
-                context.dataflow.add(self, {
-                    inputs: () => dataFlow.inputs,
-                    outputs: () => dataFlow.outputs,
-                    async data(fetchInputs): Promise<{ [x: string]: any }> {
-                        if (!context.getIsActive()) return {};
-
-                        const _controls = Object.fromEntries(
-                            controls.map(({ name }) => [
-                                name,
-                                self.controls[name].value,
-                            ])
+                    }
+                    // Outputs
+                    for (const { name, label, type, multi } of outputs) {
+                        self.addOutput(
+                            //
+                            name,
+                            new ClassicPreset.Output(
+                                mkSocket(type),
+                                label ?? name,
+                                multi ?? false
+                            )
                         );
-
-                        const _fetchInputs = async () => {
-                            const result = await fetchInputs();
-                            context.onFlowNode(self.id);
-                            return result;
-                        };
-
-                        context.onFlowNode(self.id);
-
-                        try {
-                            const result = await dataFlow.logic(
-                                self,
-                                context,
-                                _controls,
-                                _fetchInputs
-                            );
-                            if (!context.getIsActive()) {
-                                throw new Error("Graph is inactive");
-                            }
-                            return result;
-                        } catch (error: any) {
-                            // Will stop exec
-                            context.onError(error);
-                            throw error;
-                        }
-                    },
-                });
+                    }
+                    // Controls
+                    for (const { name, control } of controls) {
+                        self.addControl(
+                            //
+                            name,
+                            mkControl(self.id, name, context, control)
+                        );
+                    }
+                }
             }
-        }
+            return new _NodeMaker(context, id);
+        },
     };
 };

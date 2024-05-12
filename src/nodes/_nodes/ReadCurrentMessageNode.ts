@@ -22,20 +22,14 @@ export const ReadCurrentMessageNode = makeNode(
         controls: [],
     },
     {
-        dataFlow: {
-            inputs: [],
-            outputs: ["message"],
-            async logic(_node, context, _controls, _fetchInputs) {
-                const message = await context.onExternalAction({
-                    type: "readCurrentMessage",
-                });
-                if (!message) {
-                    throw new Error(
-                        "ReadCurrentMessageNode: No message available"
-                    );
-                }
-                return { message };
-            },
+        async dataFlow(_node, context) {
+            const message = await context.onExternalAction({
+                type: "readCurrentMessage",
+            });
+            if (!message) {
+                throw new Error("ReadCurrentMessageNode: No message available");
+            }
+            return { message };
         },
     }
 );

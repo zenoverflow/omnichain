@@ -25,20 +25,16 @@ export const PickChatMessageArrayItemNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["array"],
-            outputs: ["message"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const array = (inputs["array"] || [])[0] ?? [];
-                const message = array[controls.index];
-                if (!message) {
-                    throw new Error(
-                        "PickChatMessageArrayItemNode: Invalid index"
-                    );
-                }
-                return { message };
-            },
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
+
+            const array = (inputs["array"] || [])[0] ?? [];
+            const message = array[controls.index as number];
+            if (!message) {
+                throw new Error("PickChatMessageArrayItemNode: Invalid index");
+            }
+            return { message };
         },
     }
 );

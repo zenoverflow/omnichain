@@ -24,28 +24,19 @@ export const TextNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["in"],
-            outputs: ["out"],
-            async logic(node, context, _controls, fetchInputs) {
-                const inputs = (await fetchInputs()) as {
-                    in?: string[];
-                };
+        async dataFlow(node, context) {
+            const inputs = (await context.fetchInputs!(node.id)) as {
+                in?: string[];
+            };
 
-                const valControl = node.controls.val;
+            const valControl = node.controls.val as any;
 
-                valControl.value = (inputs.in || [])[0] ?? valControl.value;
+            valControl.value = (inputs.in || [])[0] ?? valControl.value;
 
-                // Update graph
-                await context.onControlChange(
-                    context.graphId,
-                    node.id,
-                    "val",
-                    valControl.value
-                );
+            // Update graph
+            await context.onControlChange(node.id, "val", valControl.value);
 
-                return { out: valControl.value };
-            },
+            return { out: valControl.value };
         },
     }
 );

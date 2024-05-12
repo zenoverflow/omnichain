@@ -25,16 +25,14 @@ export const PickStringArrayItemNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["array"],
-            outputs: ["string"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                const array = (inputs["array"] ?? [])[0] ?? [];
-                return {
-                    string: array[controls.index] || "",
-                };
-            },
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
+
+            const array = (inputs["array"] ?? [])[0] ?? [];
+            return {
+                string: array[controls.index as number],
+            };
         },
     }
 );

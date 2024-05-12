@@ -10,7 +10,12 @@ export type SerializedGraph = {
     name: string;
     graphId: string;
     nodes: SerializedNode[];
-    connections: any[];
+    connections: {
+        source: string;
+        sourceOutput: string;
+        target: string;
+        targetInput: string;
+    }[];
     zoom: number;
     areaX: number;
     areaY: number;

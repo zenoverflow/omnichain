@@ -3,24 +3,23 @@ import path from "path";
 import { exec } from "child_process";
 
 import type Router from "koa-router";
-import { ClassicPreset, NodeEditor } from "rete";
-import { ControlFlow, Dataflow } from "rete-engine";
 
 import { readJsonFile, buildNodeRegistry } from "./utils.ts";
 import { setupOpenAiCompatibleAPI } from "./openai.ts";
 
 import type { ExternalAction } from "../src/nodes/context.ts";
-import { ControlUpdate } from "../src/nodes/context.ts";
+import type { ControlUpdate } from "../src/nodes/context.ts";
 import {
     StatefulObservable,
     SimpleObservable,
 } from "../src/util/ObservableUtils.ts";
-import { GraphUtils } from "../src/util/GraphUtils.ts";
-import {
+import type {
     ChatMessage,
     ExecutorInstance,
     SerializedGraph,
 } from "../src/data/types.ts";
+import type { CustomNode } from "../src/nodes/_nodes/_Base.ts";
+import { EngineUtils } from "../src/util/EngineUtils.ts";
 
 // State
 
@@ -132,7 +131,11 @@ const runGraph = async (
     };
 
     // Ensure nodes availability in registry
-    if (_exec.graph.nodes.find((n) => !nodeRegistry[n.nodeType])) {
+    if (
+        _exec.graph.nodes.find(
+            (n) => !(nodeRegistry[n.nodeType] as CustomNode | undefined)
+        )
+    ) {
         notificationObservable.next({
             type: "error",
             duration: 3,
@@ -160,20 +163,12 @@ const runGraph = async (
         step: null,
     });
 
-    // Headless editor
-    const editor = new NodeEditor<any>();
-    const control = new ControlFlow(editor);
-    const dataflow = new Dataflow(editor);
-
-    // Hydrate
-    await GraphUtils.hydrate(
-        _exec.graph,
+    // Execute
+    void EngineUtils.runGraph(
         {
             headless: true,
             graphId: _exec.graph.graphId,
-            editor,
-            control,
-            dataflow,
+            getGraph: () => _exec.graph,
             onEvent(event) {
                 const { type, text } = event;
                 notificationObservable.next({
@@ -193,15 +188,15 @@ const runGraph = async (
                 console.error("Error:", error);
                 stopCurrentGraph();
             },
-            onAutoExecute(nodeId) {
-                if (!isGraphActive(_exec.graph.graphId)) return;
-                control.execute(nodeId);
-            },
+            // onAutoExecute(nodeId) {
+            //     if (!isGraphActive(_exec.graph.graphId)) return;
+            //     control.execute(nodeId);
+            // },
             onFlowNode(nodeId) {
                 if (!isGraphActive(_exec.graph.graphId)) return;
                 updateActiveNode(_exec.graph.graphId, nodeId);
             },
-            async onControlChange(graphId, node, control, value) {
+            async onControlChange(node, control, value) {
                 // Update current graph
                 const update = {
                     ..._exec.graph,
@@ -300,14 +295,15 @@ const runGraph = async (
             getControlDisabledObservable() {
                 return null;
             },
-            getControlValue(_graphId, node, control) {
-                // const graph = graphStorage.get()[graphId];
+            getControlValue(node, control) {
                 return _exec.graph.nodes.find((n) => n.nodeId === node)
                     ?.controls[control] as string | number | null;
             },
-            getControlDisabled(_graphId) {
-                // Always enabled in headless exec
-                return true;
+            getAllControls(nodeId) {
+                const controls = _exec.graph.nodes.find(
+                    (n) => n.nodeId === nodeId
+                )?.controls;
+                return controls || {};
             },
             getApiKeyByName(name) {
                 return getApiKeyByName(dirData, name);
@@ -321,12 +317,6 @@ const runGraph = async (
         },
         nodeRegistry
     );
-
-    const entrypoint = editor
-        .getNodes()
-        .find((n: ClassicPreset.Node) => n.label === "StartNode");
-
-    control.execute((entrypoint as ClassicPreset.Node).id);
 };
 
 // Main logic

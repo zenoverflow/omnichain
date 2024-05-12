@@ -29,19 +29,17 @@ export const BlockChatNode = makeNode(
         ],
     },
     {
-        controlFlow: {
-            inputs: ["triggerIn"],
-            outputs: ["triggerOut"],
-            async logic(_node, context, controls, _fetchInputs, forward) {
-                const action = controls["action"] as "block" | "unblock";
+        async controlFlow(node, context) {
+            const action = context.getAllControls(node.id)["action"] as
+                | "block"
+                | "unblock";
 
-                await context.onExternalAction({
-                    type: "chatBlock",
-                    args: { blocked: action === "block" },
-                });
+            await context.onExternalAction({
+                type: "chatBlock",
+                args: { blocked: action === "block" },
+            });
 
-                forward("triggerOut");
-            },
+            return "triggerOut";
         },
     }
 );

@@ -25,28 +25,19 @@ export const ResponseNode = makeNode(
         controls: [],
     },
     {
-        controlFlow: {
-            inputs: ["triggerIn"],
-            outputs: ["triggerOut"],
-            async logic(_node, context, _controls, fetchInputs, forward) {
-                const inputs = await fetchInputs();
-                const message = (inputs["message"] || [])[0];
-                if (!message) {
-                    throw new Error("ResponseNode: Missing message input");
-                }
-                await context.onExternalAction({
-                    type: "addMessageToSession",
-                    args: { message },
-                });
-                forward("triggerOut");
-            },
-        },
-        dataFlow: {
-            inputs: ["message"],
-            outputs: [],
-            async logic(_node, _context, _controls, _fetchInputs) {
-                return {};
-            },
+        async controlFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+
+            const message = (inputs["message"] || [])[0];
+            if (!message) {
+                throw new Error("ResponseNode: Missing message input");
+            }
+            await context.onExternalAction({
+                type: "addMessageToSession",
+                args: { message },
+            });
+
+            return "triggerOut";
         },
     }
 );

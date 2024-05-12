@@ -103,29 +103,27 @@ export const AutoTextSlicerNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["dataIn"],
-            outputs: ["dataOut"],
-            async logic(_node, _context, controls, fetchInputs) {
-                const inputs = (await fetchInputs()) as {
-                    dataIn?: string[];
-                };
-                const text = (inputs.dataIn ?? [""])[0];
-                const chunkLimit = controls["chunkCharacters"] as number;
+        async dataFlow(node, context) {
+            const inputs = (await context.fetchInputs!(node.id)) as {
+                dataIn?: string[];
+            };
+            const text = (inputs.dataIn ?? [""])[0];
+            const chunkLimit = context.getAllControls(node.id)[
+                "chunkCharacters"
+            ] as number;
 
-                let output: string[] | null = [];
+            let output: string[] | null = [];
 
-                // try roughest split by \n\n
-                output = _roughSplit(text, chunkLimit);
-                // if it fails, try a finer split by \n
-                if (!output) {
-                    output = _roughSplit(text, chunkLimit, "\n");
-                }
-                // if that also fails, do granular splitting (always gives results)
-                output = _granularSplit(text, chunkLimit);
+            // try roughest split by \n\n
+            output = _roughSplit(text, chunkLimit);
+            // if it fails, try a finer split by \n
+            if (!output) {
+                output = _roughSplit(text, chunkLimit, "\n");
+            }
+            // if that also fails, do granular splitting (always gives results)
+            output = _granularSplit(text, chunkLimit);
 
-                return { dataOut: output };
-            },
+            return { dataOut: output };
         },
     }
 );

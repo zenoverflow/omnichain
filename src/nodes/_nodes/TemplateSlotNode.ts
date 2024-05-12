@@ -41,37 +41,30 @@ export const TemplateSlotNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["in"],
-            outputs: ["templateSlot"],
-            async logic(node, context, controls, fetchInputs) {
-                if (!(controls["slotName"] as string).length) {
-                    throw new Error("Missing slot name in TemplateSlot!");
-                }
+        async dataFlow(node, context) {
+            const controls = context.getAllControls(node.id);
 
-                const inputs = (await fetchInputs()) as {
-                    in?: string[];
-                };
+            if (!(controls["slotName"] as string).length) {
+                throw new Error("Missing slot name in TemplateSlot!");
+            }
 
-                const valControl = node.controls.val;
+            const inputs = (await context.fetchInputs!(node.id)) as {
+                in?: string[];
+            };
 
-                valControl.value = (inputs.in || [""])[0] || valControl.value;
+            const valControl = node.controls.val as any;
 
-                // Update graph
-                await context.onControlChange(
-                    context.graphId,
-                    node.id,
-                    "val",
-                    valControl.value
-                );
+            valControl.value = (inputs.in || [""])[0] || valControl.value;
 
-                return {
-                    templateSlot: {
-                        name: controls["slotName"],
-                        value: valControl.value,
-                    },
-                };
-            },
+            // Update graph
+            await context.onControlChange(node.id, "val", valControl.value);
+
+            return {
+                templateSlot: {
+                    name: controls["slotName"],
+                    value: valControl.value,
+                },
+            };
         },
     }
 );

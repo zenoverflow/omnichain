@@ -37,18 +37,16 @@ export const ReadSessionMessagesNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: [],
-            outputs: ["messages"],
-            async logic(_node, context, controls, _fetchInputs) {
-                const messages: ChatMessage[] = await context.onExternalAction({
-                    type: "readSessionMessages",
-                });
-                const limit = controls.limit as number;
-                return {
-                    messages: limit === -1 ? messages : messages.slice(-limit),
-                };
-            },
+        async dataFlow(node, context) {
+            const controls = context.getAllControls(node.id);
+
+            const messages: ChatMessage[] = await context.onExternalAction({
+                type: "readSessionMessages",
+            });
+            const limit = controls.limit as number;
+            return {
+                messages: limit === -1 ? messages : messages.slice(-limit),
+            };
         },
     }
 );

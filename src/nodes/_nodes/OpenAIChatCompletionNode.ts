@@ -214,112 +214,105 @@ export const OpenAIChatCompletionNode = makeNode(
         ],
     },
     {
-        dataFlow: {
-            inputs: ["system", "messages", "message"],
-            outputs: ["results"],
-            async logic(_node, context, controls, fetchInputs) {
-                const inputs = await fetchInputs();
-                // const prompt = (inputs["prompt"] ?? [])[0];
-                const messages: ChatMessage[] = [
-                    ...((inputs["messages"] ?? [])[0] || []),
-                ];
-                const messageSingle = (inputs["message"] ?? [])[0];
-                if (messageSingle) {
-                    messages.push(messageSingle);
-                }
+        async dataFlow(node, context) {
+            const inputs = await context.fetchInputs!(node.id);
+            const controls = context.getAllControls(node.id);
 
-                if (!messages.length) {
-                    throw new Error(
-                        "OpenAIChatCompletionNode: No messages attached"
-                    );
-                }
+            const messages: ChatMessage[] = [
+                ...((inputs["messages"] ?? [])[0] || []),
+            ];
+            const messageSingle = (inputs["message"] ?? [])[0];
+            if (messageSingle) {
+                messages.push(messageSingle);
+            }
 
-                const apiKeyName = (
-                    (controls.apiKeyName as string) || ""
-                ).trim();
+            if (!messages.length) {
+                throw new Error(
+                    "OpenAIChatCompletionNode: No messages attached"
+                );
+            }
 
-                const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
+            const apiKeyName = ((controls.apiKeyName as string) || "").trim();
 
-                const baseUrl = ((controls.baseUrl as string) || "").trim();
+            const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
 
-                const model = ((controls.model as string) || "").trim();
+            const baseUrl = ((controls.baseUrl as string) || "").trim();
 
-                const systemMessage = (
-                    (inputs["system"] || [])[0] || ""
-                ).trim();
+            const model = ((controls.model as string) || "").trim();
 
-                const response = await fetch(`${baseUrl}/v1/chat/completions`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${apiKey}`,
-                    },
-                    body: JSON.stringify({
-                        model,
-                        messages: [
-                            // system message
-                            ...(systemMessage.length
-                                ? [
-                                      {
-                                          role: "system",
-                                          content: systemMessage,
-                                      },
-                                  ]
-                                : []),
-                            ...(messages.map((message) => ({
-                                role: "user",
-                                content:
-                                    controls.vision === "true"
-                                        ? [
-                                              {
-                                                  type: "text",
-                                                  text: message.content,
-                                              },
-                                              ...message.files
-                                                  .filter((file) =>
-                                                      file.mimetype.startsWith(
-                                                          "image/"
-                                                      )
+            const systemMessage = ((inputs["system"] || [])[0] || "").trim();
+
+            const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        // system message
+                        ...(systemMessage.length
+                            ? [
+                                  {
+                                      role: "system",
+                                      content: systemMessage,
+                                  },
+                              ]
+                            : []),
+                        ...(messages.map((message) => ({
+                            role: "user",
+                            content:
+                                controls.vision === "true"
+                                    ? [
+                                          {
+                                              type: "text",
+                                              text: message.content,
+                                          },
+                                          ...message.files
+                                              .filter((file) =>
+                                                  file.mimetype.startsWith(
+                                                      "image/"
                                                   )
-                                                  .map((file) => ({
-                                                      type: "image_url",
-                                                      image_url: {
-                                                          url: `data:${file.mimetype};base64,${file.content}`,
-                                                      },
-                                                  })),
-                                          ]
-                                        : message.content,
-                            })) as any[]),
-                        ],
-                        max_tokens: controls.maxTokens as number,
-                        temperature: controls.temperature as number,
-                        top_p: controls.topP as number,
-                        frequency_penalty: controls.frequencyPenalty as number,
-                        presence_penalty: controls.presencePenalty as number,
-                        n: controls.numResponses as number,
-                        // echo: controls.echo === "true",
-                        seed: (controls.seed as number | null) || undefined,
-                        stop: controls.stop
-                            ? (controls.stop as string)
-                                  .split(",")
-                                  .map((s) => s.trim())
+                                              )
+                                              .map((file) => ({
+                                                  type: "image_url",
+                                                  image_url: {
+                                                      url: `data:${file.mimetype};base64,${file.content}`,
+                                                  },
+                                              })),
+                                      ]
+                                    : message.content,
+                        })) as any[]),
+                    ],
+                    max_tokens: controls.maxTokens as number,
+                    temperature: controls.temperature as number,
+                    top_p: controls.topP as number,
+                    frequency_penalty: controls.frequencyPenalty as number,
+                    presence_penalty: controls.presencePenalty as number,
+                    n: controls.numResponses as number,
+                    // echo: controls.echo === "true",
+                    seed: (controls.seed as number | null) || undefined,
+                    stop: controls.stop
+                        ? (controls.stop as string)
+                              .split(",")
+                              .map((s) => s.trim())
+                        : undefined,
+                    stream: false,
+                    response_format:
+                        controls.json === "true"
+                            ? { type: "json_object" }
                             : undefined,
-                        stream: false,
-                        response_format:
-                            controls.json === "true"
-                                ? { type: "json_object" }
-                                : undefined,
-                    }),
-                });
+                }),
+            });
 
-                const chatCompletion = await response.json();
+            const chatCompletion = await response.json();
 
-                return {
-                    results: chatCompletion.choices.map(
-                        (choice: any) => choice.message.content as string
-                    ),
-                };
-            },
+            return {
+                results: chatCompletion.choices.map(
+                    (choice: any) => choice.message.content as string
+                ),
+            };
         },
     }
 );

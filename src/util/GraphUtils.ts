@@ -5,6 +5,7 @@ import type { AreaPlugin } from "rete-area-plugin";
 
 import type { NodeContextObj } from "../nodes/context";
 import type { SerializedGraph, SerializedNode } from "../data/types";
+import { CustomNode } from "../nodes/_nodes/_Base";
 
 export const GraphUtils = {
     empty(name = "New Chain"): SerializedGraph {
@@ -41,9 +42,9 @@ export const GraphUtils = {
                 .getConnections()
                 .map((c: ClassicPreset.Connection<any, any>) => ({
                     source: c.source,
-                    sourceOutput: c.sourceOutput,
+                    sourceOutput: c.sourceOutput as string,
                     target: c.target,
-                    targetInput: c.targetInput,
+                    targetInput: c.targetInput as string,
                 }))
                 .filter(
                     (c) =>
@@ -58,12 +59,12 @@ export const GraphUtils = {
     async hydrate(
         graph: SerializedGraph,
         context: NodeContextObj,
-        nodeRegistry: Record<string, any>
+        nodeRegistry: Record<string, CustomNode>
     ): Promise<void> {
         const { editor } = context;
         // Missing nodes check
         const missingNodes = graph.nodes.filter(
-            (n) => !nodeRegistry[n.nodeType]
+            (n) => !(nodeRegistry[n.nodeType] as CustomNode | undefined)
         );
         if (missingNodes.length > 0) {
             throw new Error(
@@ -137,14 +138,12 @@ export const GraphUtils = {
     deserializeNode(
         nodeObj: SerializedNode,
         context: NodeContextObj,
-        nodeRegistry: Record<string, any>
+        nodeRegistry: Record<string, CustomNode>
     ) {
         const { nodeType, nodeId } = nodeObj;
 
-        const Maker = nodeRegistry[nodeType];
+        const customNode = nodeRegistry[nodeType];
 
-        const node = new Maker(context, nodeId) as ClassicPreset.Node;
-
-        return node;
+        return customNode.editorNode(context, nodeId);
     },
 };
