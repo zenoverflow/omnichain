@@ -178,24 +178,24 @@ const runGraph = async (
                     duration: 3,
                 });
             },
-            onError(error) {
-                notificationObservable.next({
-                    type: "error",
-                    text: error.message,
-                    ts: Date.now(),
-                    duration: 3,
-                });
-                console.error("Error:", error);
-                stopCurrentGraph();
-            },
+            // onError(error) {
+            //     notificationObservable.next({
+            //         type: "error",
+            //         text: error.message,
+            //         ts: Date.now(),
+            //         duration: 3,
+            //     });
+            //     console.error("Error:", error);
+            //     stopCurrentGraph();
+            // },
             // onAutoExecute(nodeId) {
             //     if (!isGraphActive(_exec.graph.graphId)) return;
             //     control.execute(nodeId);
             // },
-            onFlowNode(nodeId) {
-                if (!isGraphActive(_exec.graph.graphId)) return;
-                updateActiveNode(_exec.graph.graphId, nodeId);
-            },
+            // onFlowNode(nodeId) {
+            //     if (!isGraphActive(_exec.graph.graphId)) return;
+            //     updateActiveNode(_exec.graph.graphId, nodeId);
+            // },
             async onControlChange(node, control, value) {
                 // Update current graph
                 const update = {
@@ -315,7 +315,23 @@ const runGraph = async (
                 // No selection in headless
             },
         },
-        nodeRegistry
+        nodeRegistry,
+        {
+            onFlowNode(nodeId) {
+                if (!isGraphActive(_exec.graph.graphId)) return;
+                updateActiveNode(_exec.graph.graphId, nodeId);
+            },
+            onError(error) {
+                notificationObservable.next({
+                    type: "error",
+                    text: error.message,
+                    ts: Date.now(),
+                    duration: 3,
+                });
+                console.error("Error:", error);
+                stopCurrentGraph();
+            },
+        }
     );
 };
 

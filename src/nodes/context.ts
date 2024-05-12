@@ -54,11 +54,6 @@ export type NodeContextObj = {
     onEvent: (event: ExecutionEvent) => any;
 
     /**
-     * Use for error logging.
-     */
-    onError: (error: Error) => any;
-
-    /**
      * For signalling control updates, either from the UI, or from
      * changes during graph execution.
      */
@@ -114,11 +109,6 @@ export type NodeContextObj = {
      * @returns the API key string or null if not found
      */
     getApiKeyByName: (name: string) => string | null;
-
-    /**
-     * For visually tracking graph execution.
-     */
-    onFlowNode: (nodeId: string) => any;
 
     /**
      * For tracking and stopping graph execution.

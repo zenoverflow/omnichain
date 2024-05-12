@@ -6,10 +6,16 @@ type _RuntimeInstance = { node: CustomNode; instance: ClassicPreset.Node };
 
 type _InstanceMap = Record<string, _RuntimeInstance>;
 
+type _EventHandlers = {
+    onFlowNode: (nodeId: string) => any;
+    onError: (error: Error) => any;
+};
+
 export const EngineUtils = {
     async runGraph(
         context: NodeContextObj,
-        nodeRegistry: Record<string, CustomNode>
+        nodeRegistry: Record<string, CustomNode>,
+        eventHandlers: _EventHandlers
     ): Promise<void> {
         // Missing nodes check
         const missingNodes = context
@@ -47,6 +53,9 @@ export const EngineUtils = {
 
         // Enable nodes to fetch inputs by triggering dataflows
         context.fetchInputs = async (nodeId: string) => {
+            // Signal node activity
+            eventHandlers.onFlowNode(nodeId);
+
             const targetNode = nodeInstances[nodeId];
 
             // Use connections to fetch inputs
@@ -100,15 +109,19 @@ export const EngineUtils = {
                     );
                 }
 
-                context.onFlowNode(sourceInstance.instance.id);
+                // Pass node activity signal to the target dataflow
+                eventHandlers.onFlowNode(sourceInstance.instance.id);
+
                 const output = await sourceDataFlow(
                     sourceInstance.instance,
                     context
                 );
-
                 if (!context.getIsActive()) {
                     throw new Error("Execution aborted by user");
                 }
+
+                // Pass node activity signal back to the current node
+                eventHandlers.onFlowNode(nodeId);
 
                 for (const key of Object.keys(output)) {
                     const relatedConnection = connections.find(
@@ -145,16 +158,14 @@ export const EngineUtils = {
 
                 if (!controlFlow) break;
 
-                context.onFlowNode(currentControl);
+                eventHandlers.onFlowNode(currentControl);
                 const sourceOutput = await controlFlow(
                     nodeInstance.instance,
                     context,
                     trigger
                 );
-
-                if (!context.getIsActive()) break;
-
-                if (!sourceOutput) break;
+                if (!sourceOutput || !context.getIsActive()) break;
+                eventHandlers.onFlowNode(currentControl);
 
                 // Find next node via connections
                 const connection = context
@@ -175,7 +186,7 @@ export const EngineUtils = {
                 currentControl = connection.target;
                 trigger = connection.targetInput;
             } catch (error: any) {
-                context.onError(error);
+                eventHandlers.onError(error);
                 break;
             }
         }

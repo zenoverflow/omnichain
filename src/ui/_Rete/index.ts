@@ -16,7 +16,6 @@ import {
     controlObservable,
     controlDisabledObservable,
 } from "../../state/watcher";
-import { showNotification } from "../../state/notifications";
 import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
 
@@ -55,7 +54,6 @@ export async function createEditor(container: HTMLElement) {
             accumulating: AreaExtensions.accumulateOnCtrl(),
         }
     );
-    // nodeContext.unselect = nodeSelectorPlugin.unselect;
 
     const nodeContext: NodeContextObj = {
         headless: false,
@@ -65,25 +63,8 @@ export async function createEditor(container: HTMLElement) {
         getGraph() {
             return graphStorage.get()[graphId];
         },
-        onEvent(event) {
-            const { type, text } = event;
-            showNotification({
-                type,
-                text,
-                ts: Date.now(),
-                duration: 3,
-            });
-        },
-        onError(error) {
-            showNotification({
-                type: "error",
-                text: error.message,
-                ts: Date.now(),
-                duration: 3,
-            });
-        },
-        onFlowNode(_) {
-            // No exec from visual editor
+        onEvent(_event) {
+            // No events from visual editor
         },
         async onControlChange(node, control, value) {
             await updateNodeControl(graphId, node, control, value);
