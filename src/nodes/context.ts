@@ -135,14 +135,11 @@ export type NodeContextObj = {
 
 export type CustomControlFlow = (
     node: ClassicPreset.Node,
-    context: NodeContextObj
-    // controls: { [x: string]: string | number }
-    // fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>
+    context: NodeContextObj,
+    trigger: string
 ) => Promise<string | null>;
 
 export type CustomDataFlow = (
     node: ClassicPreset.Node,
     context: NodeContextObj
-    // controls: { [x: string]: string | number }
-    // fetchInputs: () => Promise<{ [x: string]: any[] | undefined }>
 ) => Promise<{ [x: string]: any }>;

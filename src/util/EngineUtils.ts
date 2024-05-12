@@ -131,6 +131,7 @@ export const EngineUtils = {
 
         // Control flow run target
         let currentControl = startNode.nodeId;
+        let trigger = "triggerIn";
 
         // Run control flow
         while (currentControl) {
@@ -149,7 +150,8 @@ export const EngineUtils = {
                 context.onFlowNode(currentControl);
                 const sourceOutput = await controlFlow(
                     nodeInstance.instance,
-                    context
+                    context,
+                    trigger
                 );
 
                 if (!context.getIsActive()) break;
@@ -165,9 +167,15 @@ export const EngineUtils = {
                             c.sourceOutput === sourceOutput
                     );
 
-                if (!connection || !connection.target) break;
+                if (
+                    !connection ||
+                    !connection.target ||
+                    !connection.targetInput
+                )
+                    break;
 
                 currentControl = connection.target;
+                trigger = connection.targetInput;
             } catch (error: any) {
                 context.onError(error);
                 break;
