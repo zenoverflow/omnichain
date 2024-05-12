@@ -49,19 +49,11 @@ export const EngineUtils = {
         context.fetchInputs = async (nodeId: string) => {
             const targetNode = nodeInstances[nodeId];
 
-            // Dataflow config is required for fetching inputs
-            const targetDataFlow = targetNode.node.config.flowConfig?.dataFlow;
-            if (!targetDataFlow) {
-                const name = targetNode.node.config.baseConfig.nodeName;
-                throw new Error(
-                    `Error in fetchInputs()! ${name} does not have a data flow`
-                );
-            }
-
             // Use connections to fetch inputs
             const dataInputs = targetNode.node.config.ioConfig.inputs
                 .filter((i) => i.type !== "trigger")
                 .map((i) => i.name);
+            // These are the connections that are data inputs to the target node
             const connections = context
                 .getGraph()
                 .connections.filter(
@@ -119,10 +111,16 @@ export const EngineUtils = {
                 }
 
                 for (const key of Object.keys(output)) {
-                    if (!inputs[key]) {
-                        inputs[key] = [];
+                    const relatedConnection = connections.find(
+                        (c) => c.sourceOutput === key
+                    );
+                    if (!relatedConnection) continue;
+
+                    const targetInput = relatedConnection.targetInput;
+                    if (!inputs[targetInput]) {
+                        inputs[targetInput] = [];
                     }
-                    inputs[key]!.push(output[key]);
+                    inputs[targetInput]!.push(output[key]);
                 }
             }
 
