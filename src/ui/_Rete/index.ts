@@ -11,7 +11,11 @@ import { v4 as uuid } from "uuid";
 //     ArrangeAppliers,
 // } from "rete-auto-arrange-plugin";
 
-import { editorTargetStorage } from "../../state/editor";
+import {
+    clearEditorState,
+    editorTargetStorage,
+    setEditorState,
+} from "../../state/editor";
 import { initGraph, updateNodeControl, graphStorage } from "../../state/graphs";
 import {
     controlObservable,
@@ -20,9 +24,9 @@ import {
 import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
 
-import { makeContextMenu } from "../../nodes/contextMenu";
-import { AreaExtra, NodeContextObj } from "../../nodes/context";
+import { NodeContextObj } from "../../nodes/context";
 
+import { makeContextMenu } from "./ContextMenu";
 import { GraphWatcher } from "./GraphWatcher";
 import { AreaSelectionWatcher } from "./AreaSelectionWatcher";
 import { NodeCustomizer } from "./NodeCustomizer";
@@ -40,10 +44,10 @@ export async function createEditor(container: HTMLElement) {
     }
 
     const editor = new NodeEditor<any>();
-    const area = new AreaPlugin<any, AreaExtra>(container);
-    const connection = new ConnectionPlugin<any, AreaExtra>();
+    const area = new AreaPlugin<any, any>(container);
+    const connection = new ConnectionPlugin<any, any>();
     const readonly = new ReadonlyPlugin<any>();
-    const render = new ReactPlugin<any, AreaExtra>({
+    const render = new ReactPlugin<any, any>({
         createRoot,
     });
 
@@ -62,8 +66,6 @@ export async function createEditor(container: HTMLElement) {
         headless: false,
         graphId,
         instanceId,
-        editor,
-        area,
         getGraph() {
             return graphStorage.get()[graphId];
         },
@@ -103,11 +105,10 @@ export async function createEditor(container: HTMLElement) {
         getFlowActive() {
             return isGraphActive(graphId);
         },
-        unselect: nodeSelectorPlugin.unselect,
     };
 
     // const arrange = new AutoArrangePlugin<any>();
-    makeContextMenu(nodeContext);
+    makeContextMenu(editor, area, nodeContext);
     // const applier = new TransitionApplier<any, never>({
     //     duration: 120,
     //     timingFunction: (t) => t,
@@ -122,24 +123,24 @@ export async function createEditor(container: HTMLElement) {
 
     editor.use(area);
     area.use(render);
-    render.addPreset(NodeCustomizer.presetForNodes(nodeContext));
+    render.addPreset(NodeCustomizer.presetForNodes(editor));
 
     area.use(connection);
-    integrateMagCon(nodeContext, connection);
+    integrateMagCon(editor, area, connection);
     // area.use(arrange);
 
     connection.addPreset(FlowCustomizer.getFlowBuilder(connection));
     // arrange.addPreset(ArrangePresets.classic.setup());
 
     try {
-        await initGraph(nodeContext);
+        await initGraph(graphId, editor, area, nodeContext);
 
-        AreaSelectionWatcher.observe(nodeContext);
-        GraphWatcher.observe(nodeContext);
+        AreaSelectionWatcher.observe(editor, area);
+        GraphWatcher.observe(graphId, editor, area);
 
         // Default content for new graphs
         if (editor.getNodes().length === 0) {
-            await GraphTemplate.empty(nodeContext);
+            await GraphTemplate.empty(editor, nodeContext);
             await AreaExtensions.zoomAt(area, editor.getNodes());
             // Use of the ordering extension, unused
             // await arrange.layout({ applier });
@@ -149,10 +150,14 @@ export async function createEditor(container: HTMLElement) {
         console.error(error);
     }
 
+    setEditorState(editor, area, nodeSelectorPlugin.unselect);
+
     return {
-        nodeContext,
+        // nodeContext,
         readonly,
         destroy: () => {
+            // Cleanup editor
+            clearEditorState();
             // Clear selection
             const selectedNodes = editor
                 .getNodes()
@@ -160,7 +165,7 @@ export async function createEditor(container: HTMLElement) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 .map((n) => n.id);
             for (const id of selectedNodes) {
-                nodeContext.unselect(id);
+                nodeSelectorPlugin.unselect(id);
             }
             updateNodeSelection([]);
             // Cleanup area

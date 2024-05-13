@@ -25,8 +25,8 @@ export const ResponseNode = makeNode(
         controls: [],
     },
     {
-        async controlFlow(node, context) {
-            const inputs = await context.fetchInputs!(node.id);
+        async controlFlow(nodeId, context) {
+            const inputs = await context.fetchInputs!(nodeId);
 
             const message = (inputs["message"] || [])[0];
             if (!message) {

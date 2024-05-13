@@ -6,6 +6,7 @@ import type { AreaPlugin } from "rete-area-plugin";
 import type { NodeContextObj } from "../nodes/context";
 import type { SerializedGraph, SerializedNode } from "../data/types";
 import { CustomNode } from "../nodes/_nodes/_Base";
+import { CAreaPlugin, CNodeEditor } from "../data/typesRete";
 
 export const GraphUtils = {
     empty(name = "New Chain"): SerializedGraph {
@@ -58,10 +59,11 @@ export const GraphUtils = {
 
     async hydrate(
         graph: SerializedGraph,
+        editor: CNodeEditor,
+        area: CAreaPlugin,
         context: NodeContextObj,
         nodeRegistry: Record<string, CustomNode>
     ): Promise<void> {
-        const { editor } = context;
         // Missing nodes check
         const missingNodes = graph.nodes.filter(
             (n) => !(nodeRegistry[n.nodeType] as CustomNode | undefined)
@@ -80,7 +82,7 @@ export const GraphUtils = {
                 this.deserializeNode(n, context, nodeRegistry)
             );
             // Positions
-            await context.area?.nodeViews
+            await area.nodeViews
                 .get(n.nodeId)
                 //
                 ?.translate(n.positionX, n.positionY);
@@ -99,11 +101,9 @@ export const GraphUtils = {
             );
         }
         // Area zoom and pos
-        if (context.area) {
-            const a = context.area.area;
-            await a.zoom(graph.zoom);
-            await a.translate(graph.areaX, graph.areaY);
-        }
+        const a = area.area;
+        await a.zoom(graph.zoom);
+        await a.translate(graph.areaX, graph.areaY);
     },
 
     //

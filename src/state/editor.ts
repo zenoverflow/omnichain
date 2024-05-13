@@ -1,14 +1,34 @@
+import type { NodeContextObj } from "../nodes/context";
+import type { CustomNode } from "../nodes/_nodes/_Base";
+import type { CNodeEditor, CAreaPlugin } from "../data/typesRete";
+
 import { StatefulObservable } from "../util/ObservableUtils";
 import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
-import type { NodeContextObj } from "../nodes/context";
 import { nodeRegistryStorage } from "./nodeRegistry";
 import { graphStorage } from "./graphs";
 import { complexErrorObservable } from "./watcher";
-import type { CustomNode } from "../nodes/_nodes/_Base";
 
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
+export const editorStateStorage = new StatefulObservable<{
+    editor: CNodeEditor;
+    area: CAreaPlugin;
+    unselect: (id: string) => any;
+} | null>(null);
+
 // ACTIONS //
+
+export const setEditorState = (
+    editor: CNodeEditor,
+    area: CAreaPlugin,
+    unselect: (id: string) => any
+) => {
+    editorStateStorage.set({ editor, area, unselect });
+};
+
+export const clearEditorState = () => {
+    editorStateStorage.set(null);
+};
 
 export const openEditor = (graphId: string) => {
     const targetGraph = graphStorage.get()[graphId];
@@ -43,8 +63,10 @@ export const duplicateNode = async (
     id: string,
     nodeContext: NodeContextObj
 ) => {
-    const { editor, area } = nodeContext;
-    if (!area) return;
+    const editorState = editorStateStorage.get();
+    if (!editorState) return;
+
+    const { editor, area } = editorState;
 
     const original = editor.getNode(id);
     if (!original) return;
@@ -71,8 +93,8 @@ export const duplicateNode = async (
         const duplicateView = area.nodeViews.get(duplicate.id);
         if (duplicateView) {
             await duplicateView.translate(
-                nodeView.position.x + 50,
-                nodeView.position.y + 50
+                (nodeView.position.x as number) + 50,
+                (nodeView.position.y as number) + 50
             );
         }
     }
@@ -82,8 +104,11 @@ export const duplicateNode = async (
  * Delete a single node.
  * Unselects any selected nodes.
  */
-export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
-    const { editor, unselect } = nodeContext;
+export const deleteNode = async (id: string) => {
+    const editorState = editorStateStorage.get();
+    if (!editorState) return;
+
+    const { editor, unselect } = editorState;
 
     const selectedNodes = nodeSelectionStorage.get();
 
@@ -116,9 +141,9 @@ export const deleteNode = async (id: string, nodeContext: NodeContextObj) => {
 /**
  * Delete all selected nodes.
  */
-export const deleteSelectedNodes = async (nodeContext: NodeContextObj) => {
+export const deleteSelectedNodes = async () => {
     const selectedNodes = nodeSelectionStorage.get();
     for (const id of selectedNodes) {
-        await deleteNode(id, nodeContext);
+        await deleteNode(id);
     }
 };

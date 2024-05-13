@@ -16,15 +16,11 @@ import { graphStorage, updateGraphName, deleteGraph } from "../state/graphs";
 import { deleteSelectedNodes, editorTargetStorage } from "../state/editor";
 import { nodeSelectionStorage } from "../state/nodeSelection";
 import { executorStorage, stopGraph, runGraph } from "../state/executor";
-import { NodeContextObj } from "../nodes/context";
 import { controlDisabledObservable } from "../state/watcher";
 
-type DeleteButtonProps = {
-    nodeContext: NodeContextObj;
+const NodeDeleteButton: React.FC<{
     disabled?: boolean;
-};
-
-const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
+}> = (props) => {
     const [targets] = useOuterState(nodeSelectionStorage);
 
     useEffect(() => {
@@ -33,7 +29,7 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
                 // Prevent deletions on active graph
                 const executorState = executorStorage.get();
                 if (!executorState) {
-                    void deleteSelectedNodes(props.nodeContext);
+                    void deleteSelectedNodes();
                 }
             }
         };
@@ -43,7 +39,7 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
         return () => {
             window.removeEventListener("keyup", listener);
         };
-    }, [targets, props.nodeContext]);
+    }, [targets]);
 
     if (!targets.length) return null;
 
@@ -55,7 +51,7 @@ const NodeDeleteButton: React.FC<DeleteButtonProps> = (props) => {
             }
             description="Are you sure?"
             onConfirm={() => {
-                void deleteSelectedNodes(props.nodeContext);
+                void deleteSelectedNodes();
             }}
             okText="Yes"
             cancelText="No"
@@ -111,7 +107,7 @@ const GraphRunButton: React.FC = () => {
 };
 
 export const EditorGraph: React.FC = () => {
-    const [ref, editor] = useRete(createEditor);
+    const [ref, editorData] = useRete(createEditor);
 
     const [propertiesOpen, setPropertiesOpen] = useState(false);
 
@@ -134,16 +130,16 @@ export const EditorGraph: React.FC = () => {
 
     // Disable/enable controls manually
     useEffect(() => {
-        if (editorTarget && editor) {
-            if (editingDisabled && !editor.readonly.enabled) {
-                editor.readonly.enable();
+        if (editorTarget && editorData) {
+            if (editingDisabled && !editorData.readonly.enabled) {
+                editorData.readonly.enable();
                 controlDisabledObservable.next([editorTarget, true]);
-            } else if (!editingDisabled && editor.readonly.enabled) {
-                editor.readonly.disable();
+            } else if (!editingDisabled && editorData.readonly.enabled) {
+                editorData.readonly.disable();
                 controlDisabledObservable.next([editorTarget, false]);
             }
         }
-    }, [editorTarget, editor, editingDisabled]);
+    }, [editorTarget, editorData, editingDisabled]);
 
     if (!editorTarget) return null;
 
@@ -191,11 +187,8 @@ export const EditorGraph: React.FC = () => {
                         />
                         <GraphRunButton />
                     </Space>
-                    {editor ? (
-                        <NodeDeleteButton
-                            nodeContext={editor.nodeContext}
-                            disabled={editingDisabled}
-                        />
+                    {editorData ? (
+                        <NodeDeleteButton disabled={editingDisabled} />
                     ) : null}
                 </div>
             </div>

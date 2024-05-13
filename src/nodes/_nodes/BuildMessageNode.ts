@@ -42,8 +42,8 @@ export const BuildMessageNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = await context.fetchInputs!(node.id);
+        async dataFlow(nodeId, context) {
+            const inputs = await context.fetchInputs!(nodeId);
             const files = [...((inputs.filesArray || [])[0] || [])];
             const fileSingle = (inputs.fileSingle || [])[0];
             if (fileSingle) {
@@ -52,7 +52,7 @@ export const BuildMessageNode = makeNode(
             const message = MsgUtils.freshFromAssistant(
                 context.graphId,
                 (inputs.content || [])[0] || "",
-                (context.getAllControls(node.id).avatarName || undefined) as
+                (context.getAllControls(nodeId).avatarName || undefined) as
                     | string
                     | undefined,
                 files

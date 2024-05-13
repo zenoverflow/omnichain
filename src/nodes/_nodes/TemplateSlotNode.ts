@@ -41,14 +41,14 @@ export const TemplateSlotNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const controls = context.getAllControls(node.id);
+        async dataFlow(nodeId, context) {
+            const controls = context.getAllControls(nodeId);
 
             if (!(controls["slotName"] as string).length) {
                 throw new Error("Missing slot name in TemplateSlot!");
             }
 
-            const inputs = (await context.fetchInputs!(node.id)) as {
+            const inputs = (await context.fetchInputs!(nodeId)) as {
                 in?: string[];
             };
 
@@ -56,7 +56,7 @@ export const TemplateSlotNode = makeNode(
             const update = (inputs.in || [])[0] || oldValue;
 
             // Update graph
-            await context.onControlChange(node.id, "val", update);
+            await context.onControlChange(nodeId, "val", update);
 
             return {
                 templateSlot: {

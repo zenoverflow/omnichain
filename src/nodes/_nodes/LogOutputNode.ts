@@ -25,16 +25,16 @@ export const LogOutputNode = makeNode(
         ],
     },
     {
-        async controlFlow(node, context) {
-            const inputs = (await context.fetchInputs!(node.id)) as {
+        async controlFlow(nodeId, context) {
+            const inputs = (await context.fetchInputs!(nodeId)) as {
                 data?: any[];
             };
 
-            const oldValue = context.getAllControls(node.id).val as string;
+            const oldValue = context.getAllControls(nodeId).val as string;
             const update = (inputs.data || [])[0] || oldValue;
 
             // Update graph
-            await context.onControlChange(node.id, "val", update);
+            await context.onControlChange(nodeId, "val", update);
 
             return null;
         },

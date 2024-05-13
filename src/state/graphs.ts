@@ -1,12 +1,14 @@
 import { NodeEditor } from "rete";
 import { AreaPlugin } from "rete-area-plugin";
 
+import type { CAreaPlugin, CNodeEditor } from "../data/typesRete";
+import type { SerializedGraph } from "../data/types";
+import type { NodeContextObj } from "../nodes/context";
+
 import { StatefulObservable } from "../util/ObservableUtils";
 import { GraphUtils } from "../util/GraphUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { BackendResourceUtils } from "../util/BackendResourceUtils";
-import { SerializedGraph } from "../data/types";
-import { NodeContextObj } from "../nodes/context";
 import { openEditor } from "./editor";
 import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
@@ -43,10 +45,21 @@ export const createGraph = (name = "New Chain") => {
     });
 };
 
-export const initGraph = async (context: NodeContextObj) => {
-    const graph = graphStorage.get()[context.graphId];
+export const initGraph = async (
+    graphId: string,
+    editor: CNodeEditor,
+    area: CAreaPlugin,
+    context: NodeContextObj
+) => {
+    const graph = graphStorage.get()[graphId];
     try {
-        await GraphUtils.hydrate(graph, context, nodeRegistryStorage.get());
+        await GraphUtils.hydrate(
+            graph,
+            editor,
+            area,
+            context,
+            nodeRegistryStorage.get()
+        );
     } catch (error: any) {
         complexErrorObservable.next(["Hydration error!", error.message]);
     }

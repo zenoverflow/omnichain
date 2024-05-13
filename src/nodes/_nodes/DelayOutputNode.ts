@@ -25,14 +25,14 @@ export const DelayOutputNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = (await context.fetchInputs!(node.id)) as {
+        async dataFlow(nodeId, context) {
+            const inputs = (await context.fetchInputs!(nodeId)) as {
                 dataIn?: string[];
             };
             await new Promise((r) =>
                 setTimeout(
                     r,
-                    context.getAllControls(node.id)["millis"] as number
+                    context.getAllControls(nodeId)["millis"] as number
                 )
             );
             return { dataOut: (inputs.dataIn || [""])[0] };

@@ -1,8 +1,8 @@
 import type { NodeContextObj } from "../nodes/context";
-import type { ClassicPreset } from "rete";
 import type { CustomNode } from "../nodes/_nodes/_Base";
+import type { SerializedNode } from "../data/types";
 
-type _RuntimeInstance = { node: CustomNode; instance: ClassicPreset.Node };
+type _RuntimeInstance = { node: CustomNode; instance: SerializedNode };
 
 type _InstanceMap = Record<string, _RuntimeInstance>;
 
@@ -46,8 +46,7 @@ export const EngineUtils = {
         const nodeInstances: _InstanceMap = Object.fromEntries(
             context.getGraph().nodes.map((n) => {
                 const node = nodeRegistry[n.nodeType];
-                const instance = node.editorNode(context, n.nodeId);
-                return [n.nodeId, { node, instance }];
+                return [n.nodeId, { node, instance: n }];
             })
         );
 
@@ -100,7 +99,7 @@ export const EngineUtils = {
                 const controls = context
                     .getGraph()
                     .nodes.find(
-                        (n) => n.nodeId === sourceInstance.instance.id
+                        (n) => n.nodeId === sourceInstance.instance.nodeId
                     )?.controls;
 
                 if (!controls) {
@@ -110,10 +109,10 @@ export const EngineUtils = {
                 }
 
                 // Pass node activity signal to the target dataflow
-                eventHandlers.onFlowNode(sourceInstance.instance.id);
+                eventHandlers.onFlowNode(sourceInstance.instance.nodeId);
 
                 const output = await sourceDataFlow(
-                    sourceInstance.instance,
+                    sourceInstance.instance.nodeId,
                     context
                 );
                 if (!context.getFlowActive()) {
@@ -160,7 +159,7 @@ export const EngineUtils = {
 
                 eventHandlers.onFlowNode(currentControl);
                 const sourceOutput = await controlFlow(
-                    nodeInstance.instance,
+                    nodeInstance.instance.nodeId,
                     context,
                     trigger
                 );

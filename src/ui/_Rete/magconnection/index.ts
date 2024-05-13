@@ -1,3 +1,4 @@
+import { ClassicPreset } from "rete";
 import {
     ConnectionPlugin,
     SocketData,
@@ -5,11 +6,10 @@ import {
 } from "rete-connection-plugin";
 import { getElementCenter } from "rete-render-utils";
 
+import type { CAreaPlugin, CNodeEditor } from "../../../data/typesRete";
 import { Position, findNearestPoint, isInsideRect } from "./math";
 import { getNodeRect } from "./utils";
-import { NodeContextObj } from "../../../nodes/context";
 import { FlowCustomizer } from "../FlowCustomizer";
-import { ClassicPreset } from "rete";
 
 export { MagneticConnection } from "./MagneticConnection";
 
@@ -21,16 +21,12 @@ type Props = {
     distance?: number;
 };
 
-export const configureMagCon = (
-    nodeContext: NodeContextObj,
+const _configureMagCon = (
+    editor: CNodeEditor,
+    area: CAreaPlugin,
     connection: ConnectionPlugin<any, any>,
     props: Props
 ) => {
-    const { area, editor } = nodeContext;
-    if (!area) return;
-    // const area =
-    //     connection.parentScope<AreaPlugin<any, Area2D<any>>>(AreaPlugin);
-    // const editor = area.parentScope<NodeEditor<any>>(NodeEditor);
     const sockets = new Map<HTMLElement, SocketData>();
     const magneticConnection = createPseudoconnection<any, any>({
         isMagnetic: true,
@@ -90,8 +86,8 @@ export const configureMagCon = (
 
                     return {
                         ...socket,
-                        x: x + nodeView.position.x,
-                        y: y + nodeView.position.y,
+                        x: x + (nodeView.position.x as number),
+                        y: y + (nodeView.position.y as number),
                     };
                 })
             );
@@ -127,12 +123,11 @@ export const configureMagCon = (
 };
 
 export const integrateMagCon = (
-    nodeContext: NodeContextObj,
+    editor: CNodeEditor,
+    area: CAreaPlugin,
     connection: ConnectionPlugin<any, any>
 ) => {
-    const { editor } = nodeContext;
-
-    configureMagCon(nodeContext, connection, {
+    _configureMagCon(editor, area, connection, {
         async createConnection(from, to) {
             if (from.side === to.side) return;
             const [source, target] =

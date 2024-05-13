@@ -247,9 +247,9 @@ export const OllamaChatCompletionNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = await context.fetchInputs!(node.id);
-            const controls = context.getAllControls(node.id);
+        async dataFlow(nodeId, context) {
+            const inputs = await context.fetchInputs!(nodeId);
+            const controls = context.getAllControls(nodeId);
 
             const messages: ChatMessage[] = [
                 ...((inputs["messages"] ?? [])[0] || []),

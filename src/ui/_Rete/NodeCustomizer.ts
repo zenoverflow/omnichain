@@ -1,16 +1,34 @@
+import type { NodeEditor } from "rete";
 import { Presets } from "rete-react-plugin";
 
 import { CustomNode, StyledSocket } from "./CustomNode";
 import { makeColoredConnection } from "./CustomConnection";
 
-import { renderControl } from "../../nodes/controls";
-import { NodeContextObj } from "../../nodes/context";
 import { MagneticConnection } from "./magconnection";
 
-export const NodeCustomizer = {
-    presetForNodes(nodeContext: NodeContextObj) {
-        const { editor } = nodeContext;
+import { NumberControl } from "../../nodes/_controls/NumberControl";
+import { TextControl } from "../../nodes/_controls/TextControl";
+import { SelectControl } from "../../nodes/_controls/SelectControl";
 
+export const renderControl = (payload: any) => {
+    const makers = [
+        //
+        NumberControl,
+        TextControl,
+        SelectControl,
+    ];
+
+    for (const Maker of makers) {
+        if (payload instanceof Maker) {
+            return payload.component();
+        }
+    }
+
+    throw new Error(`Invalid renderControl payload ${JSON.stringify(payload)}`);
+};
+
+export const NodeCustomizer = {
+    presetForNodes(editor: NodeEditor<any>) {
         return Presets.classic.setup({
             customize: {
                 node() {

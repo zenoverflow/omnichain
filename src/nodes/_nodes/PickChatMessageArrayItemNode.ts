@@ -25,9 +25,9 @@ export const PickChatMessageArrayItemNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = await context.fetchInputs!(node.id);
-            const controls = context.getAllControls(node.id);
+        async dataFlow(nodeId, context) {
+            const inputs = await context.fetchInputs!(nodeId);
+            const controls = context.getAllControls(nodeId);
 
             const array = (inputs["array"] || [])[0] ?? [];
             const message = array[controls.index as number];

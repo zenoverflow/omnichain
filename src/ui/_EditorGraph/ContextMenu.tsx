@@ -12,7 +12,7 @@ import {
     menuStateStorage,
 } from "../../state/editorContextMenu";
 import { useOuterState } from "../../util/ObservableUtilsReact";
-import { getMenuIcon } from "../../nodes/icons";
+import { getMenuIcon } from "../_Rete/NodeIcons";
 
 export const ContextMenu: React.FC = () => {
     const [menu] = useOuterState(menuStateStorage);

@@ -37,8 +37,8 @@ export const ReadSessionMessagesNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const controls = context.getAllControls(node.id);
+        async dataFlow(nodeId, context) {
+            const controls = context.getAllControls(nodeId);
 
             const messages: ChatMessage[] = await context.onExternalAction({
                 type: "readSessionMessages",

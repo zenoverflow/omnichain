@@ -24,16 +24,16 @@ export const TextNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = (await context.fetchInputs!(node.id)) as {
+        async dataFlow(nodeId, context) {
+            const inputs = (await context.fetchInputs!(nodeId)) as {
                 in?: string[];
             };
 
-            const oldValue = context.getAllControls(node.id).val as string;
+            const oldValue = context.getAllControls(nodeId).val as string;
             const update = (inputs.in || [])[0] || oldValue;
 
             // Update graph
-            await context.onControlChange(node.id, "val", update);
+            await context.onControlChange(nodeId, "val", update);
 
             return { out: update };
         },

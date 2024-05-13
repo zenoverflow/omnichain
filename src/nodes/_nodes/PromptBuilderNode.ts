@@ -22,14 +22,14 @@ export const PromptBuilderNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = (await context.fetchInputs!(node.id)) as {
+        async dataFlow(nodeId, context) {
+            const inputs = (await context.fetchInputs!(nodeId)) as {
                 parts?: {
                     name: string;
                     value: string;
                 }[];
             };
-            const controls = context.getAllControls(node.id);
+            const controls = context.getAllControls(nodeId);
 
             let prompt = controls["val"] as string;
 

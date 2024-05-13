@@ -4,7 +4,7 @@ import {
     CopyOutlined,
 } from "@ant-design/icons";
 
-import { nodeRegistryStorage } from "../state/nodeRegistry";
+import { nodeRegistryStorage } from "../../state/nodeRegistry";
 
 /*
 Note: the node registry from state can be freely be used here,

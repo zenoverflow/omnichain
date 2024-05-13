@@ -103,12 +103,12 @@ export const AutoTextSlicerNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const inputs = (await context.fetchInputs!(node.id)) as {
+        async dataFlow(nodeId, context) {
+            const inputs = (await context.fetchInputs!(nodeId)) as {
                 dataIn?: string[];
             };
             const text = (inputs.dataIn ?? [""])[0];
-            const chunkLimit = context.getAllControls(node.id)[
+            const chunkLimit = context.getAllControls(nodeId)[
                 "chunkCharacters"
             ] as number;
 

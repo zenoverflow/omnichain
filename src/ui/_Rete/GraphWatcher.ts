@@ -1,4 +1,4 @@
-import { NodeContextObj } from "../../nodes/context";
+import type { CNodeEditor, CAreaPlugin } from "../../data/typesRete";
 
 import { updateGraph } from "../../state/graphs";
 
@@ -13,10 +13,8 @@ let debouncerAreaReorder: NodeJS.Timeout | null = null;
 let debouncerAreaZoom: NodeJS.Timeout | null = null;
 
 export const GraphWatcher = {
-    observe(nodeContext: NodeContextObj) {
-        const { editor, area, graphId } = nodeContext;
-
-        if (!area || !graphId) return;
+    observe(graphId: string, editor: CNodeEditor, area: CAreaPlugin) {
+        if (!editor || !area || !graphId) return;
 
         editor.addPipe((context) => {
             if (
@@ -32,6 +30,7 @@ export const GraphWatcher = {
             ) {
                 updateGraph(editor, area, graphId, "pipe 1");
             }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
 
@@ -47,6 +46,7 @@ export const GraphWatcher = {
                 ].includes(context.type)
             ) {
                 updateGraph(editor, area, graphId, "pipe 2");
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return context;
             }
             // DEBOUNCED EVENTS
@@ -99,6 +99,7 @@ export const GraphWatcher = {
                     }, 50);
                     break;
             }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
     },

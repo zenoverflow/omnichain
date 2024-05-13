@@ -29,8 +29,8 @@ export const BlockChatNode = makeNode(
         ],
     },
     {
-        async controlFlow(node, context) {
-            const action = context.getAllControls(node.id)["action"] as
+        async controlFlow(nodeId, context) {
+            const action = context.getAllControls(nodeId)["action"] as
                 | "block"
                 | "unblock";
 

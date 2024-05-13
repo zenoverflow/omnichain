@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import styled, { css } from "styled-components";
 import { ClassicScheme, RenderEmit, Presets } from "rete-react-plugin";
 
-import { getMenuIcon } from "../../nodes/icons";
+import { getMenuIcon } from "./NodeIcons";
 import { BtnDoc } from "./BtnDoc";
 
 const SOCKET_MARGIN = 6;

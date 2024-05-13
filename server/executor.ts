@@ -217,10 +217,6 @@ const runGraph = async (
                 _exec.graph = update;
                 // Save to disk if needed
                 if (saveOption !== "onDemand") {
-                    console.log(
-                        "SAVE: onControlChange",
-                        JSON.stringify(_exec.graph, null, 2)
-                    );
                     await saveGraph(dirData, _exec.graph);
                 }
                 // Notify frontend
@@ -313,9 +309,6 @@ const runGraph = async (
                 return getApiKeyByName(dirData, name);
             },
             getFlowActive,
-            unselect() {
-                // No selection in headless
-            },
         },
         nodeRegistry,
         {

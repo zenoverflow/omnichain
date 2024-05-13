@@ -1,12 +1,7 @@
-import type { ClassicPreset, NodeEditor } from "rete";
-import type { AreaPlugin } from "rete-area-plugin";
-import type { ReactArea2D } from "rete-react-plugin";
-import type { ContextMenuExtra } from "rete-context-menu-plugin";
-
 import type { SimpleObservable } from "../util/ObservableUtils";
 import type { ChatMessage, SerializedGraph } from "../data/types";
 
-type ExecutionEvent = {
+export type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
     text: string;
 };
@@ -21,8 +16,6 @@ export type ExternalAction =
     | { type: "addMessageToSession"; args: { message: ChatMessage } }
     | { type: "saveGraph"; args?: never };
 
-export type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
-
 export type ControlUpdate = {
     graphId: string;
     node: string;
@@ -34,10 +27,6 @@ export type NodeContextObj = {
     headless: boolean;
 
     graphId: string;
-
-    editor?: NodeEditor<any>;
-
-    area?: AreaPlugin<any, AreaExtra>;
 
     getGraph: () => SerializedGraph;
 
@@ -133,20 +122,15 @@ export type NodeContextObj = {
      * @returns Whether the graph is active
      */
     getFlowActive: () => boolean;
-
-    /**
-     * For node unselection in the plugin's internal state.
-     */
-    unselect: (id: string) => any;
 };
 
 export type CustomControlFlow = (
-    node: ClassicPreset.Node,
+    nodeId: string,
     context: NodeContextObj,
     trigger: string
 ) => Promise<string | null>;
 
 export type CustomDataFlow = (
-    node: ClassicPreset.Node,
+    nodeId: string,
     context: NodeContextObj
 ) => Promise<{ [x: string]: any }>;

@@ -1,4 +1,4 @@
-import { NodeContextObj } from "../../nodes/context";
+import type { CAreaPlugin, CNodeEditor } from "../../data/typesRete";
 
 import { updateNodeSelection } from "../../state/nodeSelection";
 
@@ -9,17 +9,14 @@ export const AreaSelectionWatcher = {
      *
      * @param nodeContext
      */
-    observe(nodeContext: NodeContextObj): void {
-        const { editor, area } = nodeContext;
-
+    observe(editor: CNodeEditor, area: CAreaPlugin): void {
         if (!area) return;
 
         const syncSelection = () => {
             const sel = editor
                 .getNodes()
-                .filter((n) => n.selected)
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                .map((n) => n.id);
+                .filter((n) => n.selected as boolean)
+                .map((n) => n.id as string);
             updateNodeSelection(sel);
         };
 
@@ -35,6 +32,7 @@ export const AreaSelectionWatcher = {
             ) {
                 syncSelection();
             }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
 
@@ -50,6 +48,7 @@ export const AreaSelectionWatcher = {
             ) {
                 syncSelection();
             }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
     },

@@ -46,8 +46,8 @@ export const ReadCurrentMessageFilesNode = makeNode(
         ],
     },
     {
-        async dataFlow(node, context) {
-            const controls = context.getAllControls(node.id);
+        async dataFlow(nodeId, context) {
+            const controls = context.getAllControls(nodeId);
 
             const msg: ChatMessage | null = await context.onExternalAction({
                 type: "readCurrentMessage",
