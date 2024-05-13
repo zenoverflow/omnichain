@@ -93,8 +93,8 @@ export const duplicateNode = async (
         const duplicateView = area.nodeViews.get(duplicate.id);
         if (duplicateView) {
             await duplicateView.translate(
-                (nodeView.position.x as number) + 50,
-                (nodeView.position.y as number) + 50
+                nodeView.position.x + 50,
+                nodeView.position.y + 50
             );
         }
     }

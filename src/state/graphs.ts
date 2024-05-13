@@ -9,7 +9,7 @@ import { StatefulObservable } from "../util/ObservableUtils";
 import { GraphUtils } from "../util/GraphUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { BackendResourceUtils } from "../util/BackendResourceUtils";
-import { openEditor } from "./editor";
+import { closeEditor, openEditor } from "./editor";
 import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
 import { nodeRegistryStorage } from "./nodeRegistry";
@@ -148,6 +148,8 @@ export const deleteGraph = async (graphId: string) => {
     if (executorStorage.get()?.graphId === graphId) {
         return;
     }
+
+    closeEditor();
 
     await backendDeleteGraph(graphId);
     graphStorage.set(
