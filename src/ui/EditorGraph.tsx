@@ -141,6 +141,13 @@ export const EditorGraph: React.FC = () => {
         }
     }, [editorTarget, editorData, editingDisabled]);
 
+    // Cleanup after unmount
+    useEffect(() => {
+        return () => {
+            if (editorData) editorData.destroy();
+        };
+    }, [editorData]);
+
     if (!editorTarget) return null;
 
     return (
@@ -206,6 +213,7 @@ export const EditorGraph: React.FC = () => {
                             title="Deleting graph"
                             description="Are you sure?"
                             onConfirm={() => {
+                                setPropertiesOpen(false);
                                 void deleteGraph(editorTarget);
                             }}
                             okText="Yes"
