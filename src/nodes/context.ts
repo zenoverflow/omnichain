@@ -42,6 +42,12 @@ export type NodeContextObj = {
     getGraph: () => SerializedGraph;
 
     /**
+     * Used for both the editor and the executor.
+     * During execution, this will be the executor's instance ID.
+     */
+    instanceId: string;
+
+    /**
      * Used during execution. Will not be used in the visual editor.
      */
     fetchInputs?: (
@@ -54,8 +60,8 @@ export type NodeContextObj = {
     onEvent: (event: ExecutionEvent) => any;
 
     /**
-     * For signalling control updates, either from the UI, or from
-     * changes during graph execution.
+     * For signalling control updates, either from controls in the
+     * visual editor, or from changes during graph flow execution.
      */
     onControlChange: (
         node: string,
@@ -86,7 +92,8 @@ export type NodeContextObj = {
     > | null;
 
     /**
-     * Allows a node's controls to grab their values from state/storage.
+     * Used to allow a node's controls to grab their values from state/storage.
+     * May also be used inside flow logic to grab single control values.
      *
      * @returns The value of the control.
      */
@@ -111,11 +118,21 @@ export type NodeContextObj = {
     getApiKeyByName: (name: string) => string | null;
 
     /**
-     * For tracking and stopping graph execution.
+     * For tracking graph flow execution.
+     * Should have slightly different implementations for the
+     * editor and the executor.
+     *
+     * The editor implementation should return whether the graph
+     * itself is active, in order to lock controls, the context menu, etc.
+     *
+     * The executor implementation should return whether the graph
+     * is active, but also whether the context's instanceId matches
+     * the executor's execId, because nodes may need to know if they
+     * need to stop execution of their own logic in flow code.
      *
      * @returns Whether the graph is active
      */
-    getIsActive: () => boolean;
+    getFlowActive: () => boolean;
 
     /**
      * For node unselection in the plugin's internal state.

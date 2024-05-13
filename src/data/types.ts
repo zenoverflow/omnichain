@@ -61,6 +61,9 @@ export type ExecutorInstance = {
     /** ID of the graph (chain) the executor is running. */
     graphId: string;
 
+    /** ID of the executor instance. */
+    execId: string;
+
     /** Messages for the frontend chat. Does not concern the API. */
     sessionMessages: ChatMessage[];
 

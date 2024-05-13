@@ -3,6 +3,7 @@ import path from "path";
 import { exec } from "child_process";
 
 import type Router from "koa-router";
+import { v4 as uuid } from "uuid";
 
 import { readJsonFile, buildNodeRegistry } from "./utils.ts";
 import { setupOpenAiCompatibleAPI } from "./openai.ts";
@@ -83,6 +84,7 @@ const saveGraph = async (dirData: string, graph: SerializedGraph) => {
 };
 
 const stopCurrentGraph = () => {
+    if (!executorStorage.get()) return;
     executorStorage.set(null);
     console.log("Stopped current graph");
 };
@@ -156,20 +158,33 @@ const runGraph = async (
         return;
     }
 
+    const instanceId = uuid();
+
     executorStorage.set({
         graphId: _exec.graph.graphId,
+        execId: instanceId,
         sessionMessages: [],
         startTs: Date.now(),
         step: null,
     });
+
+    const getFlowActive = () => {
+        return (
+            isGraphActive(_exec.graph.graphId) &&
+            instanceId === executorStorage.get()?.execId
+        );
+    };
 
     // Execute
     void EngineUtils.runGraph(
         {
             headless: true,
             graphId: _exec.graph.graphId,
+            instanceId,
             getGraph: () => _exec.graph,
             onEvent(event) {
+                if (!getFlowActive()) return;
+
                 const { type, text } = event;
                 notificationObservable.next({
                     type: type as "info" | "error",
@@ -178,25 +193,13 @@ const runGraph = async (
                     duration: 3,
                 });
             },
-            // onError(error) {
-            //     notificationObservable.next({
-            //         type: "error",
-            //         text: error.message,
-            //         ts: Date.now(),
-            //         duration: 3,
-            //     });
-            //     console.error("Error:", error);
-            //     stopCurrentGraph();
-            // },
-            // onAutoExecute(nodeId) {
-            //     if (!isGraphActive(_exec.graph.graphId)) return;
-            //     control.execute(nodeId);
-            // },
-            // onFlowNode(nodeId) {
-            //     if (!isGraphActive(_exec.graph.graphId)) return;
-            //     updateActiveNode(_exec.graph.graphId, nodeId);
-            // },
             async onControlChange(node, control, value) {
+                if (!getFlowActive()) {
+                    throw new Error(
+                        "Executor: control change signalled on inactive instance!"
+                    );
+                }
+
                 // Update current graph
                 const update = {
                     ..._exec.graph,
@@ -214,22 +217,23 @@ const runGraph = async (
                 _exec.graph = update;
                 // Save to disk if needed
                 if (saveOption !== "onDemand") {
-                    await new Promise((resolve, reject) => {
-                        fs.writeFile(
-                            graphPath,
-                            JSON.stringify(update),
-                            (err) => {
-                                if (err) reject(err);
-                                else resolve(null);
-                            }
-                        );
-                    });
+                    console.log(
+                        "SAVE: onControlChange",
+                        JSON.stringify(_exec.graph, null, 2)
+                    );
+                    await saveGraph(dirData, _exec.graph);
                 }
                 // Notify frontend
                 controlObservable.next({ graphId, node, control, value });
             },
             async onExternalAction(action) {
-                // console.log("External action", action);
+                if (!getFlowActive()) {
+                    throw new Error(
+                        "Executor: External action called on inactive instance!"
+                    );
+                }
+
+                // console.log("onExternalAction", action);
 
                 let result: any;
 
@@ -308,9 +312,7 @@ const runGraph = async (
             getApiKeyByName(name) {
                 return getApiKeyByName(dirData, name);
             },
-            getIsActive() {
-                return isGraphActive(_exec.graph.graphId);
-            },
+            getFlowActive,
             unselect() {
                 // No selection in headless
             },
@@ -318,10 +320,14 @@ const runGraph = async (
         nodeRegistry,
         {
             onFlowNode(nodeId) {
-                if (!isGraphActive(_exec.graph.graphId)) return;
+                if (!getFlowActive()) return;
+
                 updateActiveNode(_exec.graph.graphId, nodeId);
             },
             onError(error) {
+                stopCurrentGraph();
+                if (!getFlowActive()) return;
+
                 notificationObservable.next({
                     type: "error",
                     text: error.message,
@@ -329,7 +335,6 @@ const runGraph = async (
                     duration: 3,
                 });
                 console.error("Error:", error);
-                stopCurrentGraph();
             },
         }
     );

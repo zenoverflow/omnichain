@@ -38,7 +38,7 @@ export class SelectControl extends ClassicPreset.Control {
         this.value = value;
         // Allow user to change the value
         // But prevent dual updates during exec
-        if (!this.context.getIsActive()) {
+        if (!this.context.getFlowActive()) {
             void this.context.onControlChange(
                 this.nodeId,
                 this.nodeControl,
@@ -60,7 +60,7 @@ export class SelectControl extends ClassicPreset.Control {
                 findValueMatch(this.grabValue())
             );
             const [disabled, setDisabled] = useState(
-                this.context.getIsActive()
+                this.context.getFlowActive()
             );
 
             useEffect(() => {

@@ -52,17 +52,16 @@ export const TemplateSlotNode = makeNode(
                 in?: string[];
             };
 
-            const valControl = node.controls.val as any;
-
-            valControl.value = (inputs.in || [""])[0] || valControl.value;
+            const oldValue = controls.val as string;
+            const update = (inputs.in || [])[0] || oldValue;
 
             // Update graph
-            await context.onControlChange(node.id, "val", valControl.value);
+            await context.onControlChange(node.id, "val", update);
 
             return {
                 templateSlot: {
                     name: controls["slotName"],
-                    value: valControl.value,
+                    value: update,
                 },
             };
         },

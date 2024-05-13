@@ -40,9 +40,12 @@ export const AwaitNextMessageNode = makeNode(
                 }
                 return false;
             };
-            while (!(await check())) {
+            while (context.getFlowActive() && !(await check())) {
                 await new Promise((resolve) => setTimeout(resolve, 100));
             }
+
+            if (!context.getFlowActive()) return null;
+
             await context.onExternalAction({
                 type: "grabNextMessage",
             });

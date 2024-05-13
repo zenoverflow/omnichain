@@ -29,14 +29,13 @@ export const TextNode = makeNode(
                 in?: string[];
             };
 
-            const valControl = node.controls.val as any;
-
-            valControl.value = (inputs.in || [])[0] ?? valControl.value;
+            const oldValue = context.getAllControls(node.id).val as string;
+            const update = (inputs.in || [])[0] || oldValue;
 
             // Update graph
-            await context.onControlChange(node.id, "val", valControl.value);
+            await context.onControlChange(node.id, "val", update);
 
-            return { out: valControl.value };
+            return { out: update };
         },
     }
 );

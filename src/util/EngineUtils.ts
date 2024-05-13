@@ -116,7 +116,7 @@ export const EngineUtils = {
                     sourceInstance.instance,
                     context
                 );
-                if (!context.getIsActive()) {
+                if (!context.getFlowActive()) {
                     throw new Error("Execution aborted by user");
                 }
 
@@ -145,7 +145,7 @@ export const EngineUtils = {
         let trigger = "triggerIn";
 
         // Run control flow
-        while (currentControl) {
+        while (currentControl && context.getFlowActive()) {
             try {
                 const nodeInstance = nodeInstances[currentControl] as
                     | _RuntimeInstance
@@ -164,7 +164,7 @@ export const EngineUtils = {
                     context,
                     trigger
                 );
-                if (!sourceOutput || !context.getIsActive()) break;
+                if (!sourceOutput || !context.getFlowActive()) break;
                 eventHandlers.onFlowNode(currentControl);
 
                 // Find next node via connections

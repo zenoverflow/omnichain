@@ -4,6 +4,7 @@ import { AreaPlugin, AreaExtensions } from "rete-area-plugin";
 import { ConnectionPlugin } from "rete-connection-plugin";
 import { ReactPlugin } from "rete-react-plugin";
 import { ReadonlyPlugin } from "rete-readonly-plugin";
+import { v4 as uuid } from "uuid";
 // import {
 //     AutoArrangePlugin,
 //     Presets as ArrangePresets,
@@ -55,9 +56,12 @@ export async function createEditor(container: HTMLElement) {
         }
     );
 
+    const instanceId = uuid();
+
     const nodeContext: NodeContextObj = {
         headless: false,
         graphId,
+        instanceId,
         editor,
         area,
         getGraph() {
@@ -96,7 +100,7 @@ export async function createEditor(container: HTMLElement) {
             // No API keys in visual editor
             return null;
         },
-        getIsActive() {
+        getFlowActive() {
             return isGraphActive(graphId);
         },
         unselect: nodeSelectorPlugin.unselect,

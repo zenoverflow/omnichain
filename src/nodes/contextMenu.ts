@@ -11,7 +11,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
         throw new Error("Context menu: area missing!");
     }
 
-    const entrypointsCount = editor
+    const entrypointsCount = editor!
         .getNodes()
         .filter((n) => n.label === "StartNode").length;
 
@@ -30,7 +30,7 @@ const makeRootMenu = (nodeContext: NodeContextObj) => {
             label: key.replace(/Node$/, "").trim(),
             handler: async () => {
                 const n = customNode.editorNode(nodeContext);
-                await editor.addNode(n);
+                await editor!.addNode(n);
                 await area.translate(n.id, { x, y });
             },
         }))
@@ -90,7 +90,7 @@ export const makeContextMenu = (nodeContext: NodeContextObj) => {
             if (menuCtx) {
                 const isRoot = menuCtx === "root";
                 if (!isRoot) {
-                    menuCtx = editor.getNode(menuCtx);
+                    menuCtx = editor!.getNode(menuCtx);
                 }
                 const items = _makeMenu(menuCtx, nodeContext);
                 const { clientX, clientY } = ctx.data.event;

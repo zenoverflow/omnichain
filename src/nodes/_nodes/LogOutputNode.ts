@@ -30,12 +30,11 @@ export const LogOutputNode = makeNode(
                 data?: any[];
             };
 
-            const valControl = node.controls.val as any;
-
-            valControl.value = (inputs.data || [])[0] ?? valControl.value;
+            const oldValue = context.getAllControls(node.id).val as string;
+            const update = (inputs.data || [])[0] || oldValue;
 
             // Update graph
-            await context.onControlChange(node.id, "val", valControl.value);
+            await context.onControlChange(node.id, "val", update);
 
             return null;
         },
