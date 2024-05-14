@@ -1,12 +1,15 @@
 import type { NodeContextObj } from "../nodes/context";
-import type { CustomNode } from "../nodes/_nodes/_Base";
+import type { CustomNode } from "../data/typesCustomNodes";
 import type { CNodeEditor, CAreaPlugin } from "../data/typesRete";
 
+import { GraphUtils } from "../util/GraphUtils";
 import { StatefulObservable } from "../util/ObservableUtils";
+
 import { nodeSelectionStorage, updateNodeSelection } from "./nodeSelection";
 import { nodeRegistryStorage } from "./nodeRegistry";
 import { graphStorage } from "./graphs";
 import { complexErrorObservable } from "./watcher";
+import { SerializedGraph } from "../data/types";
 
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
@@ -66,26 +69,31 @@ export const duplicateNode = async (
     const editorState = editorStateStorage.get();
     if (!editorState) return;
 
+    const editorTarget = editorTargetStorage.get();
+    if (!editorTarget) return;
+
     const { editor, area } = editorState;
 
-    const original = editor.getNode(id);
-    if (!original) return;
+    const graph = graphStorage.get()[editorTarget] as
+        | SerializedGraph
+        | undefined;
+    if (!graph) return;
+
+    const originalData = graph.nodes.find((n) => n.nodeId === id);
+    if (!originalData) return;
 
     // Special nodes cannot be duplicated
-    if (!["StartNode"].includes(original.label)) {
+    if (!["StartNode"].includes(originalData.nodeType)) {
         const nodeView = area.nodeViews.get(id);
         if (!nodeView) return;
 
-        const customNode = nodeRegistryStorage.get()[original.label] as
-            | CustomNode
-            | undefined;
-        if (!customNode) return;
-
-        const duplicate = customNode.editorNode(nodeContext);
-        // Copy control values
-        for (const [key, control] of Object.entries<any>(original.controls)) {
-            duplicate.controls[key].value = control.value;
-        }
+        const duplicate = GraphUtils.mkEditorNode(
+            originalData.nodeType,
+            nodeContext,
+            nodeRegistryStorage.get(),
+            undefined,
+            originalData.controls
+        );
 
         await editor.addNode(duplicate);
 

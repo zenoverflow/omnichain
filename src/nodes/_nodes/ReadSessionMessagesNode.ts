@@ -1,5 +1,6 @@
 import { makeNode } from "./_Base";
-import { ChatMessage } from "../../data/types";
+
+import type { ChatMessage } from "../../data/types";
 
 const doc = [
     //

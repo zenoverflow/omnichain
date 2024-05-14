@@ -1,7 +1,7 @@
 export type SerializedNode = {
     nodeType: string;
     nodeId: string;
-    controls: Record<string, any>;
+    controls: Record<string, string | number | null>;
     positionX: number;
     positionY: number;
 };

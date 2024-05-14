@@ -1,6 +1,8 @@
 import db from "mime-db";
-import { makeNode } from "./_Base";
+
 import type { ChatMessage } from "../../data/types";
+
+import { makeNode } from "./_Base";
 
 const doc = [
     "Reads the current message's files from the session.",

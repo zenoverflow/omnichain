@@ -11,6 +11,18 @@ import { v4 as uuid } from "uuid";
 //     ArrangeAppliers,
 // } from "rete-auto-arrange-plugin";
 
+import type { NodeContextObj } from "../../nodes/context";
+
+// Components
+import { makeContextMenu } from "./ContextMenu";
+import { GraphWatcher } from "./GraphWatcher";
+import { AreaSelectionWatcher } from "./AreaSelectionWatcher";
+import { NodeCustomizer } from "./NodeCustomizer";
+import { FlowCustomizer } from "./FlowCustomizer";
+import { GraphTemplate } from "./GraphTemplate";
+import { integrateMagCon } from "./magconnection";
+
+// State
 import {
     clearEditorState,
     editorTargetStorage,
@@ -23,16 +35,7 @@ import {
 } from "../../state/watcher";
 import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
-
-import { NodeContextObj } from "../../nodes/context";
-
-import { makeContextMenu } from "./ContextMenu";
-import { GraphWatcher } from "./GraphWatcher";
-import { AreaSelectionWatcher } from "./AreaSelectionWatcher";
-import { NodeCustomizer } from "./NodeCustomizer";
-import { FlowCustomizer } from "./FlowCustomizer";
-import { GraphTemplate } from "./GraphTemplate";
-import { integrateMagCon } from "./magconnection";
+import { nodeRegistryStorage } from "../../state/nodeRegistry";
 
 // const { TransitionApplier } = ArrangeAppliers;
 
@@ -140,7 +143,11 @@ export async function createEditor(container: HTMLElement) {
 
         // Default content for new graphs
         if (editor.getNodes().length === 0) {
-            await GraphTemplate.empty(editor, nodeContext);
+            await GraphTemplate.empty(
+                editor,
+                nodeContext,
+                nodeRegistryStorage.get()
+            );
             await AreaExtensions.zoomAt(area, editor.getNodes());
             // Use of the ordering extension, unused
             // await arrange.layout({ applier });

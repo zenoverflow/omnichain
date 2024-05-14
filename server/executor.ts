@@ -10,16 +10,17 @@ import { setupOpenAiCompatibleAPI } from "./openai.ts";
 
 import type { ExternalAction } from "../src/nodes/context.ts";
 import type { ControlUpdate } from "../src/nodes/context.ts";
-import {
-    StatefulObservable,
-    SimpleObservable,
-} from "../src/util/ObservableUtils.ts";
 import type {
     ChatMessage,
     ExecutorInstance,
     SerializedGraph,
 } from "../src/data/types.ts";
-import type { CustomNode } from "../src/nodes/_nodes/_Base.ts";
+import type { CustomNode } from "../src/data/typesCustomNodes.ts";
+
+import {
+    StatefulObservable,
+    SimpleObservable,
+} from "../src/util/ObservableUtils.ts";
 import { EngineUtils } from "../src/util/EngineUtils.ts";
 
 // State

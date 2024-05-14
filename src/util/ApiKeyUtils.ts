@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { ApiKey } from "../data/types";
+
+import type { ApiKey } from "../data/types";
 
 export const ApiKeyUtils = {
     empty(name: string): ApiKey {

@@ -1,10 +1,4 @@
-import React, {
-    useEffect,
-    useState,
-    useRef,
-    useMemo,
-    useCallback,
-} from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { Menu, MenuProps, Input } from "antd";
 
 import {
@@ -21,21 +15,21 @@ export const ContextMenu: React.FC = () => {
     const [active, setActive] = useState(!!menu);
     const [filter, setFilter] = useState("");
 
-    const [hideTimeout, setHideTimeout] = useState<
-        NodeJS.Timeout | undefined
-    >();
+    // const [hideTimeout, setHideTimeout] = useState<
+    //     NodeJS.Timeout | undefined
+    // >();
 
-    const haltTimeout = useCallback(() => {
-        if (hideTimeout) clearTimeout(hideTimeout);
-    }, [hideTimeout]);
+    // const haltTimeout = useCallback(() => {
+    //     if (hideTimeout) clearTimeout(hideTimeout);
+    // }, [hideTimeout]);
 
-    const startTimeout = () => {
-        setHideTimeout(
-            setTimeout(() => {
-                hideContextMenu();
-            }, 1200)
-        );
-    };
+    // const startTimeout = () => {
+    //     setHideTimeout(
+    //         setTimeout(() => {
+    //             hideContextMenu();
+    //         }, 1200)
+    //     );
+    // };
 
     useEffect(() => {
         if (!!menu && !active) {
@@ -44,21 +38,21 @@ export const ContextMenu: React.FC = () => {
         }
         //
         else if (!menu && active) {
-            haltTimeout();
+            // haltTimeout();
             setActive(false);
             setFilter("");
         }
-    }, [menu, active, haltTimeout]);
+    }, [menu, active]);
 
-    useEffect(() => {
-        if (active) startTimeout();
-    }, [active]);
+    // useEffect(() => {
+    //     if (active) startTimeout();
+    // }, [active]);
 
     useEffect(() => {
         const listener = (e: any) => {
             if (menuRef.current) {
                 if (!(menuRef.current as Node).contains(e.target)) {
-                    haltTimeout();
+                    // haltTimeout();
                     hideContextMenu();
                 }
             }
@@ -69,7 +63,7 @@ export const ContextMenu: React.FC = () => {
         return () => {
             window.removeEventListener("click", listener);
         };
-    }, [haltTimeout, menuRef]);
+    }, [menuRef]);
 
     const items: MenuProps["items"] = useMemo(() => {
         if (!menu || !active) return [];
@@ -102,9 +96,10 @@ export const ContextMenu: React.FC = () => {
                 borderRadius: "10px",
                 backgroundColor: "#001529",
                 paddingBottom: "5px",
+                overflow: "hidden",
             }}
-            onMouseEnter={haltTimeout}
-            onMouseLeave={startTimeout}
+            // onMouseEnter={haltTimeout}
+            // onMouseLeave={startTimeout}
         >
             {menu.isRoot ? (
                 <Input
@@ -114,7 +109,7 @@ export const ContextMenu: React.FC = () => {
                         setFilter((e.target.value || "").toLowerCase());
                     }}
                     placeholder="Search..."
-                    onMouseEnter={haltTimeout}
+                    // onMouseEnter={haltTimeout}
                     style={{ marginBottom: "10px" }}
                     autoFocus
                 />
@@ -141,7 +136,7 @@ export const ContextMenu: React.FC = () => {
                         maxHeight: "200px",
                         overflowY: "auto",
                     }}
-                    onMouseEnter={haltTimeout}
+                    // onMouseEnter={haltTimeout}
                 />
             )}
         </div>

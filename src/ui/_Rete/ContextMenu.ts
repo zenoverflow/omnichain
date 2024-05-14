@@ -1,16 +1,18 @@
-import { CAreaPlugin, CNodeEditor } from "../../data/typesRete";
-import { NodeContextObj } from "../../nodes/context";
+import type { CAreaPlugin, CNodeEditor } from "../../data/typesRete";
+import type { NodeContextObj } from "../../nodes/context";
+
 import { deleteNode, duplicateNode } from "../../state/editor";
 import { showContextMenu } from "../../state/editorContextMenu";
 import { isGraphActive } from "../../state/executor";
 import { nodeRegistryStorage } from "../../state/nodeRegistry";
+import { GraphUtils } from "../../util/GraphUtils";
 
 const _makeRootMenu = (
     editor: CNodeEditor,
     area: CAreaPlugin,
     nodeContext: NodeContextObj
 ) => {
-    const entrypointsCount = editor!
+    const entrypointsCount = editor
         .getNodes()
         .filter((n) => n.label === "StartNode").length;
 
@@ -24,12 +26,16 @@ const _makeRootMenu = (
             }
             return true;
         })
-        .map(([key, customNode]) => ({
+        .map(([key, _customNode]) => ({
             key,
             label: key.replace(/Node$/, "").trim(),
             handler: async () => {
-                const n = customNode.editorNode(nodeContext);
-                await editor!.addNode(n);
+                const n = GraphUtils.mkEditorNode(
+                    key,
+                    nodeContext,
+                    nodeRegistryStorage.get()
+                );
+                await editor.addNode(n);
                 await area.translate(n.id, { x, y });
             },
         }))
@@ -95,7 +101,7 @@ export const makeContextMenu = (
             if (menuCtx) {
                 const isRoot = menuCtx === "root";
                 if (!isRoot) {
-                    menuCtx = editor!.getNode(menuCtx);
+                    menuCtx = editor.getNode(menuCtx);
                 }
                 const items = _makeMenu(menuCtx, editor, area, nodeContext);
                 const { clientX, clientY } = ctx.data.event;
@@ -110,7 +116,6 @@ export const makeContextMenu = (
                 });
             }
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return ctx;
     });
 };

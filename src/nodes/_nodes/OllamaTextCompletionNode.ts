@@ -1,7 +1,8 @@
 import { Ollama } from "ollama";
 
+import type { ChatMessageFile } from "../../data/types";
+
 import { makeNode } from "./_Base";
-import { ChatMessageFile } from "../../data/types";
 
 const doc = [
     "Generate text using Ollama's basic completion API (/api/generate).",

@@ -1,5 +1,5 @@
 import type { NodeContextObj } from "../nodes/context";
-import type { CustomNode } from "../nodes/_nodes/_Base";
+import type { CustomNode } from "../data/typesCustomNodes";
 import type { SerializedNode } from "../data/types";
 
 type _RuntimeInstance = { node: CustomNode; instance: SerializedNode };

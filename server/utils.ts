@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-import type { CustomNode } from "../src/nodes/_nodes/_Base.ts";
+import type { CustomNode } from "../src/data/typesCustomNodes.ts";
+
 import { CustomNodeUtils } from "../src/util/CustomNodeUtils.ts";
 import * as NODE_MAKERS from "../src/nodes/index.tsx";
 

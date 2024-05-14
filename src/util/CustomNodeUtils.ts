@@ -1,5 +1,7 @@
+import type { CustomNode } from "../data/typesCustomNodes";
+
 import { EnvUtils } from "./EnvUtils";
-import { CustomNode, makeNode } from "../nodes/_nodes/_Base";
+import { makeNode } from "../nodes/_nodes/_Base";
 import * as NODE_MAKERS from "../nodes";
 
 export const CustomNodeUtils = {

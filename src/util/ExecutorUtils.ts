@@ -1,5 +1,6 @@
 import { EnvUtils } from "./EnvUtils";
-import { ChatMessage } from "../data/types";
+
+import type { ChatMessage } from "../data/types";
 
 export const ExecutorUtils = {
     async runGraph(graphId: string) {

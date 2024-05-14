@@ -1,5 +1,6 @@
-import type { ResourceIndex } from "../data/types";
 import { EnvUtils } from "./EnvUtils";
+
+import type { ResourceIndex } from "../data/types";
 
 export const BackendResourceUtils = {
     // Single-file resources

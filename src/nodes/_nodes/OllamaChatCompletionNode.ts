@@ -2,8 +2,9 @@ import { Ollama } from "ollama";
 import { v4 as uuid } from "uuid";
 import isUint8Array from "@stdlib/assert-is-uint8array";
 
+import type { ChatMessage, ChatMessageFile } from "../../data/types";
+
 import { makeNode } from "./_Base";
-import { ChatMessage, ChatMessageFile } from "../../data/types";
 
 const doc = [
     "Generate text using Ollama's chat completion API (/api/chat).",

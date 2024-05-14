@@ -1,9 +1,10 @@
+import type { ChatMessage, ExecutorInstance } from "../data/types";
+
 import { StatefulObservable } from "../util/ObservableUtils";
 import { updateNodeControl } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { ExecutorUtils } from "../util/ExecutorUtils";
-import type { ChatMessage, ExecutorInstance } from "../data/types";
 import { QueueUtils } from "../util/QueueUtils";
 import { MsgUtils } from "../util/MsgUtils";
 import { finishGlobalLoading, startGlobalLoading } from "./loader";

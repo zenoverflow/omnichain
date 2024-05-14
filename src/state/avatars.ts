@@ -1,8 +1,9 @@
+import type { ChatAvatar } from "../data/types";
+
 import { StatefulObservable } from "../util/ObservableUtils";
 import { ImgUtils } from "../util/ImgUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { BackendResourceUtils } from "../util/BackendResourceUtils";
-import { ChatAvatar } from "../data/types";
 import { clearRedundantOptions } from "./options";
 
 export const avatarStorage = new StatefulObservable<Record<string, ChatAvatar>>(

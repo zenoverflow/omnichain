@@ -14,8 +14,6 @@ let debouncerAreaZoom: NodeJS.Timeout | null = null;
 
 export const GraphWatcher = {
     observe(graphId: string, editor: CNodeEditor, area: CAreaPlugin) {
-        if (!editor || !area || !graphId) return;
-
         editor.addPipe((context) => {
             if (
                 (
@@ -99,7 +97,6 @@ export const GraphWatcher = {
                     }, 50);
                     break;
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
     },

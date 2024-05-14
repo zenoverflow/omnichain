@@ -1,6 +1,3 @@
-import { NodeEditor } from "rete";
-import { AreaPlugin } from "rete-area-plugin";
-
 import type { CAreaPlugin, CNodeEditor } from "../data/typesRete";
 import type { SerializedGraph } from "../data/types";
 import type { NodeContextObj } from "../nodes/context";
@@ -76,8 +73,8 @@ export const initGraph = async (
  * @param callSource
  */
 export const updateGraph = (
-    editor: NodeEditor<any>,
-    area: AreaPlugin<any, any>,
+    editor: CNodeEditor,
+    area: CAreaPlugin,
     graphId: string,
     callSource?: string // for debug only
 ) => {

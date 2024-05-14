@@ -1,12 +1,32 @@
 import { v4 as uuidv4 } from "uuid";
 import { ClassicPreset } from "rete";
+
 import type { NodeEditor } from "rete";
 import type { AreaPlugin } from "rete-area-plugin";
 
 import type { NodeContextObj } from "../nodes/context";
 import type { SerializedGraph, SerializedNode } from "../data/types";
-import { CustomNode } from "../nodes/_nodes/_Base";
-import { CAreaPlugin, CNodeEditor } from "../data/typesRete";
+import type { CAreaPlugin, CNodeEditor } from "../data/typesRete";
+import type {
+    CustomIO,
+    CustomNodeControl,
+    CustomNode,
+} from "../data/typesCustomNodes";
+
+// Sockets
+import { TriggerSocket } from "../nodes/_sockets/TriggerSocket";
+import { StringSocket } from "../nodes/_sockets/StringSocket";
+import { StringArraySocket } from "../nodes/_sockets/StringArraySocket";
+import { ChatMessageArraySocket } from "../nodes/_sockets/ChatMessageArraySocket";
+import { ChatMessageSocket } from "../nodes/_sockets/ChatMessageSocket";
+import { FileArraySocket } from "../nodes/_sockets/FileArraySocket";
+import { FileSocket } from "../nodes/_sockets/FileSocket";
+import { TemplateSlotSocket } from "../nodes/_sockets/TemplateSlotSocket";
+
+// Controls
+import { TextControl } from "../nodes/_controls/TextControl";
+import { NumberControl } from "../nodes/_controls/NumberControl";
+import { SelectControl } from "../nodes/_controls/SelectControl";
 
 export const GraphUtils = {
     empty(name = "New Chain"): SerializedGraph {
@@ -36,7 +56,7 @@ export const GraphUtils = {
 
             nodes: editor.getNodes().map(
                 //
-                (n) => this.serializeNode(area, n)
+                (n) => GraphUtils.serializeNode(area, n)
             ),
 
             connections: editor
@@ -76,16 +96,16 @@ export const GraphUtils = {
             );
         }
         // Nodes
-        for (const n of graph.nodes) {
+        for (const node of graph.nodes) {
             // Node
             await editor.addNode(
-                this.deserializeNode(n, context, nodeRegistry)
+                GraphUtils.deserializeNode(node, context, nodeRegistry)
             );
             // Positions
             await area.nodeViews
-                .get(n.nodeId)
+                .get(node.nodeId)
                 //
-                ?.translate(n.positionX, n.positionY);
+                ?.translate(node.positionX, node.positionY);
         }
         // Connections
         for (const c of graph.connections) {
@@ -105,10 +125,6 @@ export const GraphUtils = {
         await a.zoom(graph.zoom);
         await a.translate(graph.areaX, graph.areaY);
     },
-
-    //
-    // UTIL
-    //
 
     serializeNode(
         area: AreaPlugin<any, any>,
@@ -136,14 +152,143 @@ export const GraphUtils = {
     },
 
     deserializeNode(
-        nodeObj: SerializedNode,
+        node: SerializedNode,
         context: NodeContextObj,
         nodeRegistry: Record<string, CustomNode>
     ) {
-        const { nodeType, nodeId } = nodeObj;
+        return GraphUtils.mkEditorNode(
+            node.nodeType,
+            context,
+            nodeRegistry,
+            node.nodeId
+        );
+    },
 
+    mkEditorNode(
+        nodeType: string,
+        context: NodeContextObj,
+        nodeRegistry: Record<string, CustomNode>,
+        nodeId: string | null = null,
+        controlValueOverrdes: Record<string, string | number | null> = {}
+    ) {
         const customNode = nodeRegistry[nodeType];
 
-        return customNode.editorNode(context, nodeId);
+        const { inputs, outputs, controls } = customNode.config.ioConfig;
+
+        class _NodeMaker extends ClassicPreset.Node<any, any, any> {
+            doc = customNode.config.baseConfig.doc;
+            width = customNode.config.baseConfig.dimensions[0];
+            height = customNode.config.baseConfig.dimensions[1];
+
+            constructor(
+                public context: NodeContextObj,
+                id: string | null = null // for deserialization
+            ) {
+                super(customNode.config.baseConfig.nodeName);
+                const self = this;
+                self.id = id ?? self.id;
+
+                // Inputs
+                for (const { name, label, type: socket, multi } of inputs) {
+                    self.addInput(
+                        //
+                        name,
+                        new ClassicPreset.Input(
+                            GraphUtils.mkSocket(socket),
+                            label ?? name,
+                            multi ?? false
+                        )
+                    );
+                }
+                // Outputs
+                for (const { name, label, type, multi } of outputs) {
+                    self.addOutput(
+                        //
+                        name,
+                        new ClassicPreset.Output(
+                            GraphUtils.mkSocket(type),
+                            label ?? name,
+                            multi ?? false
+                        )
+                    );
+                }
+                // Controls
+                for (const { name, control } of controls) {
+                    self.addControl(
+                        //
+                        name,
+                        GraphUtils.mkControl(
+                            self.id,
+                            name,
+                            context,
+                            control,
+                            controlValueOverrdes[name]
+                        )
+                    );
+                }
+            }
+        }
+        return new _NodeMaker(context, nodeId);
+    },
+
+    mkSocket(socket: CustomIO["type"]) {
+        switch (socket) {
+            case "trigger":
+                return new TriggerSocket();
+            case "string":
+                return new StringSocket();
+            case "stringArray":
+                return new StringArraySocket();
+            case "templateSlot":
+                return new TemplateSlotSocket();
+            case "file":
+                return new FileSocket();
+            case "fileArray":
+                return new FileArraySocket();
+            case "chatMessage":
+                return new ChatMessageSocket();
+            case "chatMessageArray":
+                return new ChatMessageArraySocket();
+            default:
+                throw new Error("Invalid socket type " + (socket as string));
+        }
+    },
+
+    mkControl(
+        nodeId: string,
+        nodeControl: string,
+        context: NodeContextObj,
+        controlData: CustomNodeControl["control"],
+        valueOverride?: string | number | null
+    ) {
+        const Maker = (() => {
+            switch (controlData.type) {
+                case "text":
+                    return TextControl;
+                case "number":
+                    return NumberControl;
+                case "select":
+                    return SelectControl;
+                default:
+                    return null;
+            }
+        })();
+
+        if (!Maker) {
+            throw new Error("Invalid control type " + controlData.type);
+        }
+
+        // Typing is broken here, on purpose, for code brevity.
+
+        return new Maker(
+            nodeId,
+            nodeControl,
+            // @ts-expect-error
+            valueOverride === undefined
+                ? controlData.defaultValue
+                : valueOverride,
+            controlData.config,
+            context
+        );
     },
 };

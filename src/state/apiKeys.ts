@@ -1,8 +1,9 @@
+import type { ApiKey } from "../data/types";
+
 import { StatefulObservable } from "../util/ObservableUtils";
 import { ApiKeyUtils } from "../util/ApiKeyUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { BackendResourceUtils } from "../util/BackendResourceUtils";
-import { ApiKey } from "../data/types";
 
 export const apiKeyStorage = new StatefulObservable<Record<string, ApiKey>>({});
 

@@ -7,6 +7,7 @@ import {
 import { getElementCenter } from "rete-render-utils";
 
 import type { CAreaPlugin, CNodeEditor } from "../../../data/typesRete";
+
 import { Position, findNearestPoint, isInsideRect } from "./math";
 import { getNodeRect } from "./utils";
 import { FlowCustomizer } from "../FlowCustomizer";
@@ -86,8 +87,8 @@ const _configureMagCon = (
 
                     return {
                         ...socket,
-                        x: x + (nodeView.position.x as number),
-                        y: y + (nodeView.position.y as number),
+                        x: x + nodeView.position.x,
+                        y: y + nodeView.position.y,
                     };
                 })
             );

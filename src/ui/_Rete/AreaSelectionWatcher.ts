@@ -10,8 +10,6 @@ export const AreaSelectionWatcher = {
      * @param nodeContext
      */
     observe(editor: CNodeEditor, area: CAreaPlugin): void {
-        if (!area) return;
-
         const syncSelection = () => {
             const sel = editor
                 .getNodes()
@@ -32,7 +30,6 @@ export const AreaSelectionWatcher = {
             ) {
                 syncSelection();
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
 
@@ -48,7 +45,6 @@ export const AreaSelectionWatcher = {
             ) {
                 syncSelection();
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return context;
         });
     },
