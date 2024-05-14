@@ -31,7 +31,7 @@ const notificationObservable = new SimpleObservable<{
     type: "info" | "error";
     text: string;
     ts: number;
-    duration: number;
+    duration: number | null;
 }>();
 
 const controlObservable = new SimpleObservable<ControlUpdate>();
@@ -141,7 +141,7 @@ const runGraph = async (
     ) {
         notificationObservable.next({
             type: "error",
-            duration: 3,
+            duration: null,
             ts: Date.now(),
             text: "Tried to execute a graph with missing custom nodes!",
         });
@@ -152,7 +152,7 @@ const runGraph = async (
     if (!_exec.graph.nodes.find((n) => n.nodeType === "StartNode")) {
         notificationObservable.next({
             type: "error",
-            duration: 3,
+            duration: null,
             ts: Date.now(),
             text: "The Chain needs an Entrypoint to start execution!",
         });
@@ -190,7 +190,7 @@ const runGraph = async (
                     type: type as "info" | "error",
                     text,
                     ts: Date.now(),
-                    duration: 3,
+                    duration: 10,
                 });
             },
             async onControlChange(node, control, value) {
@@ -315,7 +315,7 @@ const runGraph = async (
                     type: "error",
                     text: error.message,
                     ts: Date.now(),
-                    duration: 3,
+                    duration: null,
                 });
                 console.error("Error:", error);
             },

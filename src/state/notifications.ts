@@ -4,7 +4,7 @@ type Notification = {
     type: "error" | "info" | "warning" | "success";
     ts: number;
     text: string;
-    duration: number;
+    duration: number | null;
 };
 
 export const showNotification = (n: Notification) => {
