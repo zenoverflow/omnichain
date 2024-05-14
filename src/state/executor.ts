@@ -32,7 +32,7 @@ const updateChecker = async () => {
                         message.data.node,
                         message.data.control,
                         message.data.value,
-                        false // do not save, already saved
+                        false // do not save, change is from backend
                     );
                     controlObservable.next(message.data);
                     break;
@@ -54,49 +54,6 @@ export const isGraphActive = (id: string): boolean => {
     return executorStorage.get()?.graphId === id;
 };
 
-let indicatorLock = false;
-
-const unmarkAllNodes = () => {
-    document
-        .querySelectorAll("[data-exec-graph]")
-        .forEach((e) => ((e as HTMLElement).style.display = "none"));
-};
-
-const markActiveNode = (force = false) => {
-    if (indicatorLock && !force) return;
-    indicatorLock = true;
-
-    unmarkAllNodes();
-
-    const currentExec = executorStorage.get();
-
-    if (!currentExec) {
-        indicatorLock = false;
-        return;
-    }
-
-    try {
-        if (currentExec.step) {
-            const query = [
-                `[data-exec-graph="${currentExec.graphId}"]`,
-                `[data-exec-node="${currentExec.step}"]`,
-            ].join("");
-
-            const tNode: HTMLElement | null = document.querySelector(query);
-
-            if (tNode) {
-                tNode.style.display = "block";
-            }
-        }
-    } catch (error) {
-        console.error(error);
-    }
-
-    setTimeout(() => {
-        markActiveNode(true);
-    }, 250);
-};
-
 export const stopGraph = () => {
     void ExecutorUtils.stopGraph();
 };
@@ -110,7 +67,6 @@ export const runGraph = async (graphId: string) => {
 
     const executorUpdate = await ExecutorUtils.runGraph(graphId);
     executorStorage.set(executorUpdate as any);
-    markActiveNode();
 
     void updateChecker();
 };
@@ -138,7 +94,6 @@ export const loadExecutor = async () => {
     const state = await ExecutorUtils.getState();
     executorStorage.set(state as any);
     if (state) {
-        markActiveNode();
         void updateChecker();
     }
 };

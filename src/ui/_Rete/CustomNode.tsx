@@ -4,6 +4,8 @@ import { ClassicScheme, RenderEmit, Presets } from "rete-react-plugin";
 
 import { getMenuIcon } from "./NodeIcons";
 import { BtnDoc } from "./BtnDoc";
+import { useOuterState } from "../../util/ObservableUtilsReact";
+import { executorStorage } from "../../state/executor";
 
 const SOCKET_MARGIN = 6;
 const SOCKET_SIZE = 25;
@@ -132,17 +134,24 @@ type Props<S extends ClassicScheme> = {
 };
 
 const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
+    const [executor] = useOuterState(executorStorage);
+    const isActive = useMemo(() => {
+        if (!executor) return false;
+        return (
+            executor.graphId === props.node.graphId &&
+            executor.step === props.node.id
+        );
+    }, [executor, props.node.graphId, props.node.id]);
+
     return (
         <div
-            data-exec-graph={props.node.graphId}
-            data-exec-node={props.node.id}
             style={{
-                display: "none",
+                display: isActive ? "block" : "none",
                 position: "absolute",
-                top: -1,
-                left: -1,
-                right: -1,
-                bottom: -1,
+                top: -6,
+                left: -6,
+                right: -6,
+                bottom: -6,
                 zIndex: -1,
                 borderRadius: "10px",
                 pointerEvents: "none",
