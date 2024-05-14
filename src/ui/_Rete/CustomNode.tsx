@@ -42,7 +42,7 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
     cursor: pointer;
     box-sizing: border-box;
     padding-bottom: 6px;
-    border: 3px solid #91caff;
+    border: 6px solid #1677ff;
     border-radius: 10px;
     width: ${(props) =>
         Number.isFinite(props.width) && props.width
@@ -57,7 +57,7 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
     ${(props) =>
         props.selected &&
         css`
-            border-color: #ffc53d;
+            border-color: #fff1b8;
         `}
     .title {
         color: white;
