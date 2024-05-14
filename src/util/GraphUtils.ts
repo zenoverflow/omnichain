@@ -225,9 +225,9 @@ export const GraphUtils = {
                         //
                         name,
                         GraphUtils.mkControl(
+                            context.graphId,
                             self.id,
                             name,
-                            context,
                             control,
                             controlValueOverrdes[name]
                         )
@@ -262,12 +262,14 @@ export const GraphUtils = {
     },
 
     mkControl(
+        graphId: string,
         nodeId: string,
         nodeControl: string,
-        context: NodeContextObj,
         controlData: CustomNodeControl["control"],
         valueOverride?: string | number | null
     ) {
+        // Typing is broken here, on purpose, for code brevity.
+
         const Maker = (() => {
             switch (controlData.type) {
                 case "text":
@@ -285,17 +287,15 @@ export const GraphUtils = {
             throw new Error("Invalid control type " + controlData.type);
         }
 
-        // Typing is broken here, on purpose, for code brevity.
-
         return new Maker(
+            graphId,
             nodeId,
             nodeControl,
             // @ts-expect-error
             valueOverride === undefined
                 ? controlData.defaultValue
                 : valueOverride,
-            controlData.config,
-            context
+            controlData.config
         );
     },
 };

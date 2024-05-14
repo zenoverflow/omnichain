@@ -113,7 +113,7 @@ export const updateNodeControl = async (
     graphId: string,
     nodeId: string,
     controlKey: string,
-    controlValue: string | number,
+    controlValue: string | number | null,
     saveToBackend = true
 ) => {
     const graph = graphStorage.get()[graphId];
@@ -131,13 +131,14 @@ export const updateNodeControl = async (
         }),
     };
 
-    if (saveToBackend) {
-        await backendSetGraph(graphId, update);
-    }
     graphStorage.set({
         ...graphStorage.get(),
         [graphId]: update,
     });
+
+    if (saveToBackend) {
+        await backendSetGraph(graphId, update);
+    }
 };
 
 export const deleteGraph = async (graphId: string) => {

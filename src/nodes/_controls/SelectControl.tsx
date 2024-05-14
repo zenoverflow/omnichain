@@ -1,98 +1,44 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { Select } from "antd";
-import { ClassicPreset } from "rete";
 
-import type { NodeContextObj } from "../context";
-
-type SelectValue = {
-    value: string;
-    label: string;
-};
+import { BaseControl, useControlState } from "./_Control";
 
 export type SelectControlConfig = {
     label?: string;
     showSearch?: boolean;
-    values: SelectValue[];
+    values: {
+        value: string;
+        label: string;
+    }[];
 };
 
-export class SelectControl extends ClassicPreset.Control {
-    value: string | null = null;
-
-    constructor(
-        public nodeId: string,
-        public nodeControl: string,
-        public defaultValue: string,
-        public config: SelectControlConfig,
-        private context: NodeContextObj
-    ) {
-        super();
-        this.value = this.grabValue();
-    }
-
-    private grabValue() {
-        const val = this.context.getControlValue(this.nodeId, this.nodeControl);
-        return (val ?? this.defaultValue) as string | null;
-    }
-
-    private handleChange(value: string) {
-        this.value = value;
-        // Allow user to change the value
-        // But prevent dual updates during exec
-        if (!this.context.getFlowActive()) {
-            void this.context.onControlChange(
-                this.nodeId,
-                this.nodeControl,
-                value
-            );
-        }
-    }
-
+export class SelectControl extends BaseControl<
+    string | null,
+    SelectControlConfig
+> {
     component() {
         const self = this;
 
-        const findValueMatch = (v: string | null) =>
-            v
-                ? self.config.values.find(({ value }) => value === v) ?? null
+        const findValueMatch = (val: string | null) =>
+            val
+                ? self.config.values.find(({ value }) => value === val) ?? null
                 : null;
 
         const _Component: React.FC = () => {
-            const [value, setValue] = useState(
-                findValueMatch(this.grabValue())
-            );
-            const [disabled, setDisabled] = useState(
-                this.context.getFlowActive()
+            const controlState = useControlState(
+                self.graphId,
+                self.nodeId,
+                self.controlName,
+                self.grabValue()
             );
 
-            useEffect(() => {
-                const valUnsub = self.context
-                    .getControlObservable()
-                    ?.subscribe(({ graphId, node, control, value }) => {
-                        if (
-                            graphId === self.context.graphId &&
-                            node === self.nodeId &&
-                            control === self.nodeControl
-                        ) {
-                            setValue(findValueMatch(value as string));
-                        }
-                    });
-                const disabledUnsub = self.context
-                    .getControlDisabledObservable()
-                    ?.subscribe(([graphId, disabled]) => {
-                        if (graphId === self.context.graphId) {
-                            setDisabled(disabled);
-                        }
-                    });
-                return () => {
-                    if (valUnsub) valUnsub();
-                    if (disabledUnsub) disabledUnsub();
-                };
-            }, [setValue]);
-            // const parentRef = useRef<any>();
-            // const [lastUpdate, setLastUpdate] = useState(0);
+            const selectedOption = useMemo(
+                () => findValueMatch(controlState.value),
+                [controlState.value]
+            );
+
             return (
                 <div
-                    // key={lastUpdate}
-                    // ref={parentRef}
                     onPointerDown={(e) => {
                         e.stopPropagation();
                     }}
@@ -119,12 +65,11 @@ export class SelectControl extends ClassicPreset.Control {
                             {self.config.label ?? "Option"}
                         </span>
                         <Select
-                            disabled={disabled}
-                            value={value}
+                            disabled={controlState.disabled}
+                            value={selectedOption}
                             onSelect={(_, option) => {
-                                setValue(option);
-                                self.handleChange(option.value);
-                                // setLastUpdate(Date.now());
+                                self.value = option.value;
+                                controlState.setValue(option.value);
                             }}
                             options={self.config.values}
                             className="c__rmleftrad c__nodecontrol"
