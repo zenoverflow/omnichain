@@ -1,5 +1,4 @@
 import type { CAreaPlugin, CNodeEditor } from "../../data/typesRete";
-import type { NodeContextObj } from "../../nodes/context";
 
 import { deleteNode, duplicateNode } from "../../state/editor";
 import { showContextMenu } from "../../state/editorContextMenu";
@@ -10,7 +9,7 @@ import { GraphUtils } from "../../util/GraphUtils";
 const _makeRootMenu = (
     editor: CNodeEditor,
     area: CAreaPlugin,
-    nodeContext: NodeContextObj
+    graphId: string
 ) => {
     const entrypointsCount = editor
         .getNodes()
@@ -31,8 +30,8 @@ const _makeRootMenu = (
             label: key.replace(/Node$/, "").trim(),
             handler: async () => {
                 const n = GraphUtils.mkEditorNode(
+                    graphId,
                     key,
-                    nodeContext,
                     nodeRegistryStorage.get()
                 );
                 await editor.addNode(n);
@@ -44,12 +43,12 @@ const _makeRootMenu = (
     return filtered;
 };
 
-const _makeNodeMenu = (nodeContext: NodeContextObj, context: any) => {
+const _makeNodeMenu = (context: any) => {
     return [
         {
             key: "duplicate",
             label: "Duplicate",
-            handler: () => duplicateNode(context.id, nodeContext),
+            handler: () => duplicateNode(context.id),
         },
         {
             key: "delete",
@@ -63,19 +62,19 @@ const _makeMenu = (
     ctx: any,
     editor: CNodeEditor,
     area: CAreaPlugin,
-    nodeContext: NodeContextObj
+    graphId: string
 ) => {
     if (ctx === "root") {
-        return _makeRootMenu(editor, area, nodeContext);
+        return _makeRootMenu(editor, area, graphId);
     }
 
-    return _makeNodeMenu(nodeContext, ctx);
+    return _makeNodeMenu(ctx);
 };
 
 export const makeContextMenu = (
     editor: CNodeEditor,
     area: CAreaPlugin,
-    nodeContext: NodeContextObj
+    graphId: string
 ) => {
     const findContextMenu = (target: HTMLElement): string | null => {
         let dataAttr = target.dataset.contextMenu;
@@ -94,7 +93,7 @@ export const makeContextMenu = (
     area.addPipe((ctx) => {
         if (ctx.type === "contextmenu") {
             ctx.data.event.preventDefault();
-            if (isGraphActive(nodeContext.graphId)) return;
+            if (isGraphActive(graphId)) return;
 
             const target = ctx.data.event.target as HTMLElement;
             let menuCtx = findContextMenu(target);
@@ -103,7 +102,7 @@ export const makeContextMenu = (
                 if (!isRoot) {
                     menuCtx = editor.getNode(menuCtx);
                 }
-                const items = _makeMenu(menuCtx, editor, area, nodeContext);
+                const items = _makeMenu(menuCtx, editor, area, graphId);
                 const { clientX, clientY } = ctx.data.event;
                 const { layerX, layerY } = ctx.data.event;
                 showContextMenu({

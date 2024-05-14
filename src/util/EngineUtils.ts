@@ -1,4 +1,4 @@
-import type { NodeContextObj } from "../nodes/context";
+import type { FlowContext } from "../data/typesExec";
 import type { CustomNode } from "../data/typesCustomNodes";
 import type { SerializedNode } from "../data/types";
 
@@ -13,7 +13,7 @@ type _EventHandlers = {
 
 export const EngineUtils = {
     async runGraph(
-        context: NodeContextObj,
+        context: FlowContext,
         nodeRegistry: Record<string, CustomNode>,
         eventHandlers: _EventHandlers
     ): Promise<void> {

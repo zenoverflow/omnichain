@@ -4,14 +4,11 @@ import { AreaPlugin, AreaExtensions } from "rete-area-plugin";
 import { ConnectionPlugin } from "rete-connection-plugin";
 import { ReactPlugin } from "rete-react-plugin";
 import { ReadonlyPlugin } from "rete-readonly-plugin";
-import { v4 as uuid } from "uuid";
 // import {
 //     AutoArrangePlugin,
 //     Presets as ArrangePresets,
 //     ArrangeAppliers,
 // } from "rete-auto-arrange-plugin";
-
-import type { NodeContextObj } from "../../nodes/context";
 
 // Components
 import { makeContextMenu } from "./ContextMenu";
@@ -28,8 +25,7 @@ import {
     editorTargetStorage,
     setEditorState,
 } from "../../state/editor";
-import { initGraph, graphStorage } from "../../state/graphs";
-import { isGraphActive } from "../../state/executor";
+import { initGraph } from "../../state/graphs";
 import { updateNodeSelection } from "../../state/nodeSelection";
 import { nodeRegistryStorage } from "../../state/nodeRegistry";
 
@@ -59,43 +55,8 @@ export async function createEditor(container: HTMLElement) {
         }
     );
 
-    const instanceId = uuid();
-
-    const nodeContext: NodeContextObj = {
-        headless: false,
-        graphId,
-        instanceId,
-        getGraph() {
-            return graphStorage.get()[graphId];
-        },
-        onEvent(_event) {
-            // No events from visual editor
-        },
-        async onControlChange(_node, _control, _value) {
-            // No control changes from visual editor
-            // Control components signal this directly
-        },
-        async onExternalAction(_action) {
-            // No external actions from visual editor
-        },
-        getAllControls(nodeId) {
-            const graph = graphStorage.get()[graphId];
-            const controls = graph.nodes.find(
-                (n) => n.nodeId === nodeId
-            )?.controls;
-            return controls || {};
-        },
-        getApiKeyByName(_name) {
-            // No API keys in visual editor
-            return null;
-        },
-        getFlowActive() {
-            return isGraphActive(graphId);
-        },
-    };
-
     // const arrange = new AutoArrangePlugin<any>();
-    makeContextMenu(editor, area, nodeContext);
+    makeContextMenu(editor, area, graphId);
     // const applier = new TransitionApplier<any, never>({
     //     duration: 120,
     //     timingFunction: (t) => t,
@@ -120,7 +81,7 @@ export async function createEditor(container: HTMLElement) {
     // arrange.addPreset(ArrangePresets.classic.setup());
 
     try {
-        await initGraph(graphId, editor, area, nodeContext);
+        await initGraph(graphId, editor, area);
 
         AreaSelectionWatcher.observe(editor, area);
         GraphWatcher.observe(graphId, editor, area);
@@ -129,7 +90,7 @@ export async function createEditor(container: HTMLElement) {
         if (editor.getNodes().length === 0) {
             await GraphTemplate.empty(
                 editor,
-                nodeContext,
+                graphId,
                 nodeRegistryStorage.get()
             );
             await AreaExtensions.zoomAt(area, editor.getNodes());

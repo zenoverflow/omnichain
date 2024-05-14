@@ -1,4 +1,4 @@
-import type { ControlUpdate } from "../nodes/context";
+import type { ControlUpdate } from "../data/typesExec";
 
 import { SimpleObservable } from "../util/ObservableUtils";
 

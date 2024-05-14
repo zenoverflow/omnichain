@@ -1,6 +1,5 @@
 import type { CAreaPlugin, CNodeEditor } from "../data/typesRete";
 import type { SerializedGraph } from "../data/types";
-import type { NodeContextObj } from "../nodes/context";
 
 import { StatefulObservable } from "../util/ObservableUtils";
 import { GraphUtils } from "../util/GraphUtils";
@@ -45,8 +44,7 @@ export const createGraph = (name = "New Chain") => {
 export const initGraph = async (
     graphId: string,
     editor: CNodeEditor,
-    area: CAreaPlugin,
-    context: NodeContextObj
+    area: CAreaPlugin
 ) => {
     const graph = graphStorage.get()[graphId];
     try {
@@ -54,7 +52,6 @@ export const initGraph = async (
             graph,
             editor,
             area,
-            context,
             nodeRegistryStorage.get()
         );
     } catch (error: any) {

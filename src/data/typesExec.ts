@@ -1,4 +1,4 @@
-import type { ChatMessage, SerializedGraph } from "../data/types";
+import type { ChatMessage, SerializedGraph } from "./types";
 
 export type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
@@ -22,21 +22,18 @@ export type ControlUpdate = {
     value: string | number;
 };
 
-export type NodeContextObj = {
-    headless: boolean;
-
+export type FlowContext = {
     graphId: string;
 
     getGraph: () => SerializedGraph;
 
     /**
-     * Used for both the editor and the executor.
-     * During execution, this will be the executor's instance ID.
+     * The executor instance's ID.
      */
     instanceId: string;
 
     /**
-     * Used during execution. Will not be used in the visual editor.
+     * Fetches inputs for a node. Used during flow execution.
      */
     fetchInputs?: (
         nodeId: string
@@ -48,8 +45,7 @@ export type NodeContextObj = {
     onEvent: (event: ExecutionEvent) => any;
 
     /**
-     * For signalling control updates, either from controls in the
-     * visual editor, or from changes during graph flow execution.
+     * For signalling control updates during flow execution.
      */
     onControlChange: (
         node: string,
@@ -64,14 +60,14 @@ export type NodeContextObj = {
     onExternalAction: (action: ExternalAction) => Promise<any>;
 
     /**
-     * Allows a node to grab its control values from state/storage.
+     * Allows a node to grab its control values from storage.
      *
      * @returns The values of all the controls.
      */
     getAllControls: (nodeId: string) => { [x: string]: string | number | null };
 
     /**
-     * Allows nodes to read API keys from state/storage.
+     * Allows nodes to read API keys from storage.
      *
      * @param name name of the API key
      * @returns the API key string or null if not found
@@ -79,17 +75,8 @@ export type NodeContextObj = {
     getApiKeyByName: (name: string) => string | null;
 
     /**
-     * For tracking graph flow execution.
-     * Should have slightly different implementations for the
-     * editor and the executor.
-     *
-     * The editor implementation should return whether the graph
-     * itself is active, in order to lock controls, the context menu, etc.
-     *
-     * The executor implementation should return whether the graph
-     * is active, but also whether the context's instanceId matches
-     * the executor's execId, because nodes may need to know if they
-     * need to stop execution of their own logic in flow code.
+     * Lets nodes know when the flow has stopped executing.
+     * Useful for cutting off long-running processes.
      *
      * @returns Whether the graph is active
      */
@@ -98,11 +85,11 @@ export type NodeContextObj = {
 
 export type CustomControlFlow = (
     nodeId: string,
-    context: NodeContextObj,
+    context: FlowContext,
     trigger: string
 ) => Promise<string | null>;
 
 export type CustomDataFlow = (
     nodeId: string,
-    context: NodeContextObj
+    context: FlowContext
 ) => Promise<{ [x: string]: any }>;

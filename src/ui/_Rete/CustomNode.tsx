@@ -134,7 +134,7 @@ type Props<S extends ClassicScheme> = {
 const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
     return (
         <div
-            data-exec-graph={props.node.context.graphId}
+            data-exec-graph={props.node.graphId}
             data-exec-node={props.node.id}
             style={{
                 display: "none",

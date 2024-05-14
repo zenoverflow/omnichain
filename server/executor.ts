@@ -8,8 +8,8 @@ import { v4 as uuid } from "uuid";
 import { readJsonFile, buildNodeRegistry } from "./utils.ts";
 import { setupOpenAiCompatibleAPI } from "./openai.ts";
 
-import type { ExternalAction } from "../src/nodes/context.ts";
-import type { ControlUpdate } from "../src/nodes/context.ts";
+import type { ExternalAction } from "../src/data/typesExec.ts";
+import type { ControlUpdate } from "../src/data/typesExec.ts";
 import type {
     ChatMessage,
     ExecutorInstance,
@@ -179,7 +179,6 @@ const runGraph = async (
     // Execute
     void EngineUtils.runGraph(
         {
-            headless: true,
             graphId: _exec.graph.graphId,
             instanceId,
             getGraph: () => _exec.graph,

@@ -1,4 +1,3 @@
-import type { NodeContextObj } from "../nodes/context";
 import type { CustomNode } from "../data/typesCustomNodes";
 import type { CNodeEditor, CAreaPlugin } from "../data/typesRete";
 
@@ -62,10 +61,7 @@ export const closeEditor = () => {
 /**
  * Duplicate a specific node
  */
-export const duplicateNode = async (
-    id: string,
-    nodeContext: NodeContextObj
-) => {
+export const duplicateNode = async (id: string) => {
     const editorState = editorStateStorage.get();
     if (!editorState) return;
 
@@ -88,8 +84,8 @@ export const duplicateNode = async (
         if (!nodeView) return;
 
         const duplicate = GraphUtils.mkEditorNode(
+            editorTarget,
             originalData.nodeType,
-            nodeContext,
             nodeRegistryStorage.get(),
             undefined,
             originalData.controls

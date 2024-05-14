@@ -4,7 +4,6 @@ import { ClassicPreset } from "rete";
 import type { NodeEditor } from "rete";
 import type { AreaPlugin } from "rete-area-plugin";
 
-import type { NodeContextObj } from "../nodes/context";
 import type { SerializedGraph, SerializedNode } from "../data/types";
 import type { CAreaPlugin, CNodeEditor } from "../data/typesRete";
 import type {
@@ -88,7 +87,6 @@ export const GraphUtils = {
         graph: SerializedGraph,
         editor: CNodeEditor,
         area: CAreaPlugin,
-        context: NodeContextObj,
         nodeRegistry: Record<string, CustomNode>
     ): Promise<void> {
         // Missing nodes check
@@ -106,7 +104,7 @@ export const GraphUtils = {
         for (const node of graph.nodes) {
             // Node
             await editor.addNode(
-                GraphUtils.deserializeNode(node, context, nodeRegistry)
+                GraphUtils.deserializeNode(graph.graphId, node, nodeRegistry)
             );
             // Positions
             await area.nodeViews
@@ -159,21 +157,21 @@ export const GraphUtils = {
     },
 
     deserializeNode(
+        graphId: string,
         node: SerializedNode,
-        context: NodeContextObj,
         nodeRegistry: Record<string, CustomNode>
     ) {
         return GraphUtils.mkEditorNode(
+            graphId,
             node.nodeType,
-            context,
             nodeRegistry,
             node.nodeId
         );
     },
 
     mkEditorNode(
+        graphId: string,
         nodeType: string,
-        context: NodeContextObj,
         nodeRegistry: Record<string, CustomNode>,
         nodeId: string | null = null,
         controlValueOverrdes: Record<string, string | number | null> = {}
@@ -188,7 +186,7 @@ export const GraphUtils = {
             height = customNode.config.baseConfig.dimensions[1];
 
             constructor(
-                public context: NodeContextObj,
+                public graphId: string,
                 id: string | null = null // for deserialization
             ) {
                 super(customNode.config.baseConfig.nodeName);
@@ -225,7 +223,7 @@ export const GraphUtils = {
                         //
                         name,
                         GraphUtils.mkControl(
-                            context.graphId,
+                            graphId,
                             self.id,
                             name,
                             control,
@@ -235,7 +233,7 @@ export const GraphUtils = {
                 }
             }
         }
-        return new _NodeMaker(context, nodeId);
+        return new _NodeMaker(graphId, nodeId);
     },
 
     mkSocket(socket: CustomIO["type"]) {
