@@ -13,6 +13,16 @@ export const executorStorage = new StatefulObservable<ExecutorInstance | null>(
     null
 );
 
+export const lastNodeErrorStorage = new StatefulObservable<{
+    graphId: string;
+    nodeId: string;
+    error: string;
+} | null>(null);
+
+export const clearLastNodeError = () => {
+    lastNodeErrorStorage.set(null);
+};
+
 const updateChecker = async () => {
     // let messages: { type: string; data: any }[] = [];
     try {
@@ -25,6 +35,13 @@ const updateChecker = async () => {
                     break;
                 case "notification":
                     showNotification(message.data);
+                    if (message.data.type === "error") {
+                        lastNodeErrorStorage.set({
+                            graphId: message.data.graphId,
+                            nodeId: message.data.nodeId,
+                            error: message.data.text,
+                        });
+                    }
                     break;
                 case "controlUpdate":
                     await updateNodeControl(
@@ -59,6 +76,8 @@ export const stopGraph = () => {
 };
 
 export const runGraph = async (graphId: string) => {
+    clearLastNodeError();
+
     // Wait for all queued tasks to finish
     // This ensures updates are complete before running the graph
     while (QueueUtils.busy()) {

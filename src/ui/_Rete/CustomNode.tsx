@@ -5,7 +5,7 @@ import { ClassicScheme, RenderEmit, Presets } from "rete-react-plugin";
 import { getMenuIcon } from "./NodeIcons";
 import { BtnDoc } from "./BtnDoc";
 import { useOuterState } from "../../util/ObservableUtilsReact";
-import { executorStorage } from "../../state/executor";
+import { executorStorage, lastNodeErrorStorage } from "../../state/executor";
 import { graphStorage } from "../../state/graphs";
 
 const SOCKET_MARGIN = 6;
@@ -148,7 +148,42 @@ export const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
                 borderRadius: "10px",
                 pointerEvents: "none",
                 boxSizing: "border-box",
-                animation: "glow 1.2s ease-in infinite",
+                animation: "glowYellow 1.2s ease-in infinite",
+            }}
+        ></div>
+    );
+};
+
+export const ErrorIndicator: React.FC<{ node: any }> = (props) => {
+    const [lastNodeError] = useOuterState(lastNodeErrorStorage);
+
+    const message: string | null = useMemo(() => {
+        if (
+            lastNodeError &&
+            lastNodeError.graphId === props.node.graphId &&
+            lastNodeError.nodeId === props.node.id
+        ) {
+            return lastNodeError.error.trim();
+        }
+        return null;
+    }, [lastNodeError, props.node.graphId, props.node.id]);
+
+    // TODO: display message somewhere
+
+    return (
+        <div
+            style={{
+                display: message?.length ? "block" : "none",
+                position: "absolute",
+                top: -6,
+                left: -6,
+                right: -6,
+                bottom: -6,
+                zIndex: -1,
+                borderRadius: "10px",
+                pointerEvents: "none",
+                boxSizing: "border-box",
+                animation: "glowRed 1.2s ease-in infinite",
             }}
         ></div>
     );
@@ -225,6 +260,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
             styles={props.styles}
         >
             <ExecutionIndicator node={props.data} />
+            <ErrorIndicator node={props.data} />
             <div
                 style={{
                     width: "100%",

@@ -32,6 +32,8 @@ const notificationObservable = new SimpleObservable<{
     text: string;
     ts: number;
     duration: number | null;
+    graphId?: string;
+    nodeId?: string;
 }>();
 
 const controlObservable = new SimpleObservable<ControlUpdate>();
@@ -308,15 +310,29 @@ const runGraph = async (
                 updateActiveNode(_exec.graph.graphId, nodeId);
             },
             onError(error) {
-                stopCurrentGraph();
-                if (!getFlowActive()) return;
+                const executor = executorStorage.get();
+                const graphId = executor?.graphId ?? undefined;
+                const nodeId = executor?.step ?? undefined;
+
+                const nodeType = nodeId
+                    ? _exec.graph.nodes.find((n) => n.nodeId === nodeId)
+                          ?.nodeType ?? undefined
+                    : undefined;
+
+                const text = nodeType
+                    ? `${nodeType}: ${error.message}`
+                    : error.message;
 
                 notificationObservable.next({
                     type: "error",
-                    text: error.message,
+                    text,
                     ts: Date.now(),
                     duration: null,
+                    graphId,
+                    nodeId,
                 });
+
+                stopCurrentGraph();
                 console.error("Error:", error);
             },
         }
