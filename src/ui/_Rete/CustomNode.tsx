@@ -6,6 +6,7 @@ import { getMenuIcon } from "./NodeIcons";
 import { BtnDoc } from "./BtnDoc";
 import { useOuterState } from "../../util/ObservableUtilsReact";
 import { executorStorage } from "../../state/executor";
+import { graphStorage } from "../../state/graphs";
 
 const SOCKET_MARGIN = 6;
 const SOCKET_SIZE = 25;
@@ -61,15 +62,6 @@ const StyledWrapper = styled.div<NodeExtraData & WrapperProps>`
         css`
             border-color: #fff1b8;
         `}
-    .title {
-        color: white;
-        font-family: sans-serif;
-        font-size: 18px;
-        padding: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
 
     .output {
         text-align: right;
@@ -133,7 +125,7 @@ type Props<S extends ClassicScheme> = {
     emit: RenderEmit<S>;
 };
 
-const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
+export const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
     const [executor] = useOuterState(executorStorage);
     const isActive = useMemo(() => {
         if (!executor) return false;
@@ -162,6 +154,52 @@ const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
     );
 };
 
+export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
+    const [graphs] = useOuterState(graphStorage);
+
+    const hidden = useMemo(
+        () => graphs[node.graphId].zoom < 0.5,
+        [graphs, node.graphId]
+    );
+
+    const cleanLabel = useMemo(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return node.label.replace(/Node$/, "").trim();
+    }, [node.label]);
+
+    const icon = useMemo(() => {
+        return getMenuIcon(node.label);
+    }, [node.label]);
+
+    if (hidden) return null;
+
+    return (
+        <div
+            // className="title"
+            // data-testid="title"
+            style={{
+                width: "100%",
+                height: "100%",
+                color: "white",
+                fontFamily: "sans-serif",
+                fontSize: "18px",
+                paddingLeft: "10px",
+                paddingRight: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+            }}
+        >
+            <div>
+                {icon}
+                <span style={{ paddingLeft: "5px" }}>{cleanLabel}</span>
+            </div>
+
+            <BtnDoc nodeName={cleanLabel} doc={node.doc} />
+        </div>
+    );
+};
+
 export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     const inputs = useMemo(
         () => sortByIndex(Object.entries(props.data.inputs)),
@@ -178,14 +216,6 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
         [props.data.controls]
     );
 
-    const cleanLabel = useMemo(() => {
-        return props.data.label.replace(/Node$/, "").trim();
-    }, [props.data.label]);
-
-    const icon = useMemo(() => {
-        return getMenuIcon(props.data.label);
-    }, [props.data.label]);
-
     return (
         <StyledWrapper
             data-context-menu={props.data.id}
@@ -195,13 +225,16 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
             styles={props.styles}
         >
             <ExecutionIndicator node={props.data} />
-            <div className="title" data-testid="title">
-                <div>
-                    {icon}
-                    <span style={{ paddingLeft: "5px" }}>{cleanLabel}</span>
-                </div>
-
-                <BtnDoc nodeName={cleanLabel} doc={(props.data as any).doc} />
+            <div
+                style={{
+                    width: "100%",
+                    height: "30px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <CustomNodeTitle node={props.data} />
             </div>
             {/* Outputs */}
             {outputs.map(
