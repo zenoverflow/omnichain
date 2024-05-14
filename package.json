@@ -45,7 +45,6 @@
         "rete-auto-arrange-plugin": "^2.0.1",
         "rete-connection-plugin": "^2.0.1",
         "rete-context-menu-plugin": "^2.0.2",
-        "rete-engine": "^2.0.1",
         "rete-react-plugin": "^2.0.5",
         "rete-readonly-plugin": "^2.0.1",
         "rete-render-utils": "^2.0.2",
