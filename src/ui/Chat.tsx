@@ -445,6 +445,7 @@ export const ChatInterface: React.FC = () => {
                             autoSize={{ minRows: 2, maxRows: 8 }}
                             style={{ flex: "1" }}
                             disabled={blocked}
+                            autoFocus
                         />
                         <div style={{ width: "5px" }} />
                         <Button
