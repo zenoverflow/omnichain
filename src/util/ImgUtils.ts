@@ -2,6 +2,13 @@ import { v4 as uuidv4 } from "uuid";
 
 import type { ChatAvatar } from "../data/types";
 
+/**
+ * Image utilities.
+ *
+ * This is meant to be used ONLY on the frontend.
+ * Never import this file on the backend, because it uses
+ * frontend-only components like canvas.
+ */
 export const ImgUtils = {
     empty(name = "Anon"): ChatAvatar {
         return {

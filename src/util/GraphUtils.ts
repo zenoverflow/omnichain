@@ -28,6 +28,13 @@ import { TextControl } from "../nodes/_controls/TextControl";
 import { NumberControl } from "../nodes/_controls/NumberControl";
 import { SelectControl } from "../nodes/_controls/SelectControl";
 
+/**
+ * Graph utilities.
+ *
+ * This is meant to be used ONLY on the frontend.
+ * Never import this file on the backend, because it uses
+ * frontend-only components and imports.
+ */
 export const GraphUtils = {
     empty(name = "New Chain"): SerializedGraph {
         return {
