@@ -11,7 +11,7 @@ export const CustomNodeUtils = {
      * Meant to be used from the frontend only.
      */
     exposeNodeMaker() {
-        (window as any)._omnichat = {
+        (window as any)._omnichain = {
             makeNode,
         };
     },
