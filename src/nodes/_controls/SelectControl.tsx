@@ -37,6 +37,8 @@ export class SelectControl extends BaseControl<
                 [controlState.value]
             );
 
+            if (controlState.hidden) return null;
+
             return (
                 <div
                     onPointerDown={(e) => {

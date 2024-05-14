@@ -14,6 +14,9 @@ export const useControlState = <T extends string | number | null>(
 ) => {
     const [value, _setValue] = useState<T>(initValue);
     const [executor] = useOuterState(executorStorage);
+    const [graphs] = useOuterState(graphStorage);
+
+    const hidden = useMemo(() => graphs[graphId].zoom < 0.5, [graphs, graphId]);
 
     const disabled = useMemo(
         () => !!executor && executor.graphId === graphId,
@@ -53,7 +56,7 @@ export const useControlState = <T extends string | number | null>(
         };
     }, [controlName, graphId, nodeId]);
 
-    return { value, setValue, disabled };
+    return { value, setValue, disabled, hidden };
 };
 
 export abstract class BaseControl<VALUE, CONFIG> extends ClassicPreset.Control {

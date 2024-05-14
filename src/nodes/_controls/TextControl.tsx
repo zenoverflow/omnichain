@@ -19,6 +19,8 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                 self.grabValue()
             );
 
+            if (controlState.hidden) return null;
+
             return self.config.large ?? false ? (
                 <Input.TextArea
                     disabled={controlState.disabled}
