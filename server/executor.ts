@@ -290,16 +290,6 @@ const runGraph = async (
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return result;
             },
-            getControlObservable() {
-                return controlObservable;
-            },
-            getControlDisabledObservable() {
-                return null;
-            },
-            getControlValue(node, control) {
-                return _exec.graph.nodes.find((n) => n.nodeId === node)
-                    ?.controls[control] as string | number | null;
-            },
             getAllControls(nodeId) {
                 const controls = _exec.graph.nodes.find(
                     (n) => n.nodeId === nodeId

@@ -1,4 +1,3 @@
-import type { SimpleObservable } from "../util/ObservableUtils";
 import type { ChatMessage, SerializedGraph } from "../data/types";
 
 export type ExecutionEvent = {
@@ -65,34 +64,7 @@ export type NodeContextObj = {
     onExternalAction: (action: ExternalAction) => Promise<any>;
 
     /**
-     * Used to send updates down to a node's controls.
-     *
-     * @returns The observable for control updates.
-     */
-    getControlObservable: () => SimpleObservable<ControlUpdate> | null;
-
-    /**
-     * Used to send disabled state down to a node's controls.
-     *
-     * @returns The observable for control updates.
-     */
-    getControlDisabledObservable: () => SimpleObservable<
-        [string, boolean]
-    > | null;
-
-    /**
-     * Used to allow a node's controls to grab their values from state/storage.
-     * May also be used inside flow logic to grab single control values.
-     *
-     * @returns The value of the control.
-     */
-    getControlValue: (
-        nodeId: string,
-        control: string
-    ) => string | number | null;
-
-    /**
-     * Allows a node to grab all of its control values from state/storage.
+     * Allows a node to grab its control values from state/storage.
      *
      * @returns The values of all the controls.
      */

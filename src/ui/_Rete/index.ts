@@ -28,11 +28,7 @@ import {
     editorTargetStorage,
     setEditorState,
 } from "../../state/editor";
-import { initGraph, updateNodeControl, graphStorage } from "../../state/graphs";
-import {
-    controlObservable,
-    controlDisabledObservable,
-} from "../../state/watcher";
+import { initGraph, graphStorage } from "../../state/graphs";
 import { isGraphActive } from "../../state/executor";
 import { updateNodeSelection } from "../../state/nodeSelection";
 import { nodeRegistryStorage } from "../../state/nodeRegistry";
@@ -75,24 +71,12 @@ export async function createEditor(container: HTMLElement) {
         onEvent(_event) {
             // No events from visual editor
         },
-        async onControlChange(node, control, value) {
-            await updateNodeControl(graphId, node, control, value);
-            controlObservable.next({ graphId, node, control, value });
+        async onControlChange(_node, _control, _value) {
+            // No control changes from visual editor
+            // Control components signal this directly
         },
         async onExternalAction(_action) {
             // No external actions from visual editor
-        },
-        getControlObservable() {
-            return controlObservable;
-        },
-        getControlDisabledObservable() {
-            return controlDisabledObservable;
-        },
-        getControlValue(node, control) {
-            const graph = graphStorage.get()[graphId];
-            return graph.nodes.find((n) => n.nodeId === node)?.controls[
-                control
-            ] as string | number | null;
         },
         getAllControls(nodeId) {
             const graph = graphStorage.get()[graphId];
