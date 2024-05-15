@@ -17,7 +17,6 @@ import { AreaSelectionWatcher } from "./AreaSelectionWatcher";
 import { NodeCustomizer } from "./NodeCustomizer";
 import { FlowCustomizer } from "./FlowCustomizer";
 import { GraphTemplate } from "./GraphTemplate";
-import { integrateMagCon } from "./magconnection";
 
 // State
 import {
@@ -74,7 +73,8 @@ export async function createEditor(container: HTMLElement) {
     render.addPreset(NodeCustomizer.presetForNodes(editor));
 
     area.use(connection);
-    integrateMagCon(editor, area, connection);
+    // integrateMagCon(editor, area, connection);
+
     // area.use(arrange);
 
     connection.addPreset(FlowCustomizer.getFlowBuilder(connection));

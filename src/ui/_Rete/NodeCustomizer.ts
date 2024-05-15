@@ -4,8 +4,6 @@ import { Presets } from "rete-react-plugin";
 import { CustomNode, StyledSocket } from "./CustomNode";
 import { makeColoredConnection } from "./CustomConnection";
 
-import { MagneticConnection } from "./magconnection";
-
 import { NumberControl } from "../../nodes/_controls/NumberControl";
 import { TextControl } from "../../nodes/_controls/TextControl";
 import { SelectControl } from "../../nodes/_controls/SelectControl";
@@ -42,10 +40,6 @@ export const NodeCustomizer = {
                 },
                 connection(context) {
                     const connection = context.payload;
-
-                    if ((connection as any).isMagnetic) {
-                        return MagneticConnection;
-                    }
 
                     const sourceNode = editor.getNode(connection.source);
                     const targetNode = editor.getNode(connection.target);

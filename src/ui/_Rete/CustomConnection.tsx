@@ -34,10 +34,59 @@ type ConnectionProps = {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const makeColoredConnection = (stroke = "#f0f5ff") => {
-    const CustomConnection = (props: ConnectionProps) => {
-        const { path } = useConnection();
+    const createSvgPath = (
+        start: { x: number; y: number },
+        end: { x: number; y: number }
+    ) => {
+        // If end is to the right, draw a line
+        if (end.x > start.x) {
+            return `M${start.x},${start.y}L${end.x},${end.y}`;
+        }
 
-        if (!path) return null;
+        // Otherwise, follow a turn algo
+
+        // standard deviation
+        const sd = 70;
+
+        // First, make a point at x+100,y
+        const p1 = {
+            x: start.x + sd,
+            y: start.y,
+        };
+
+        // Next, make a point at p1.x,p1.y-120
+        const p2 = {
+            x: p1.x,
+            y: p1.y - 120,
+        };
+
+        // Next, make a point at end.x-sd,p2.y
+        const p3 = {
+            x: end.x - sd,
+            y: p2.y,
+        };
+
+        // Next, make a point at p3.x,end.y
+        const p4 = {
+            x: p3.x,
+            y: end.y,
+        };
+
+        // Finally, draw the path
+        return [
+            `M${start.x},${start.y}`,
+            `L${p1.x},${p1.y}`,
+            `L${p2.x},${p2.y}`,
+            `L${p3.x},${p3.y}`,
+            `L${p4.x},${p4.y}`,
+            `L${end.x},${end.y}`,
+        ].join("");
+    };
+
+    const CustomConnection = (props: ConnectionProps) => {
+        const { path, start, end } = useConnection();
+
+        if (!path || !start || !end) return null;
 
         return (
             <Svg data-testid="connection">
@@ -45,7 +94,7 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
                     //
                     styles={props.styles}
                     stroke={stroke}
-                    d={path}
+                    d={createSvgPath(start, end)}
                 />
             </Svg>
         );
