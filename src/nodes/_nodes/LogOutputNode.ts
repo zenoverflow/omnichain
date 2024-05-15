@@ -9,7 +9,7 @@ export const LogOutputNode = makeNode(
     },
     {
         inputs: [
-            { name: "trigger", type: "trigger" },
+            { name: "trigger", type: "trigger", multi: true },
             { name: "data", type: "string" },
         ],
         outputs: [],

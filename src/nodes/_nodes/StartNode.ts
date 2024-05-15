@@ -10,7 +10,12 @@ export const StartNode = makeNode(
     {
         inputs: [
             //
-            { name: "triggerIn", type: "trigger", label: "trigger in" },
+            {
+                name: "triggerIn",
+                type: "trigger",
+                label: "trigger in",
+                multi: true,
+            },
         ],
         outputs: [
             //
@@ -19,7 +24,7 @@ export const StartNode = makeNode(
         controls: [],
     },
     {
-        async controlFlow(_node, _context) {
+        async controlFlow(_nodeId, _context) {
             return "triggerOut";
         },
     }

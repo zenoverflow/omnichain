@@ -3,20 +3,21 @@ import { makeNode } from "./_Base";
 import type { ChatMessage } from "../../data/types";
 
 const doc = [
-    "Waits for a new user message to appear on the message queue.",
+    "Checks if a new user message has appeared on the message queue.",
     "If a new message is detected, this node saves it to the session,",
-    "so it can be read by other nodes, and triggers the 'trigger out' output.",
+    "so it can be read by other nodes, and triggers the 'yes' output.",
+    "If no message is detected, it triggers the 'no' output.",
     "Every time a new message is detected, it replaces the previous one",
     "in the session.",
 ]
     .join(" ")
     .trim();
 
-export const AwaitNextMessageNode = makeNode(
+export const CheckForNextMessageNode = makeNode(
     {
-        nodeName: "AwaitNextMessageNode",
+        nodeName: "CheckForNextMessageNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [300, 175],
+        dimensions: [300, 220],
         doc,
     },
     {
@@ -29,7 +30,8 @@ export const AwaitNextMessageNode = makeNode(
             },
         ],
         outputs: [
-            { name: "triggerOut", type: "trigger", label: "trigger out" },
+            { name: "haveMsg", type: "trigger", label: "yes" },
+            { name: "noMsg", type: "trigger", label: "no" },
         ],
         controls: [
             {
@@ -63,17 +65,18 @@ export const AwaitNextMessageNode = makeNode(
                 return false;
             };
 
-            while (context.getFlowActive() && !(await check())) {
-                await new Promise((resolve) => setTimeout(resolve, waitTime));
+            if (await check()) {
+                await context.onExternalAction({
+                    type: "grabNextMessage",
+                });
+                return "haveMsg";
             }
+
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
 
             if (!context.getFlowActive()) return null;
 
-            await context.onExternalAction({
-                type: "grabNextMessage",
-            });
-
-            return "triggerOut";
+            return "noMsg";
         },
     }
 );

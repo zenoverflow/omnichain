@@ -24,7 +24,7 @@ export const ReadCurrentMessageTextNode = makeNode(
         controls: [],
     },
     {
-        async dataFlow(_node, context) {
+        async dataFlow(_nodeId, context) {
             const msg: ChatMessage | null = await context.onExternalAction({
                 type: "readCurrentMessage",
             });

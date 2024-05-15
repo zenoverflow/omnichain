@@ -156,6 +156,16 @@ export const makeNode = (
         throw new Error("Node name cannot be empty");
     }
 
+    // Ensure outputs don't have multi set to true
+    // if the type is trigger - that can break the engine.
+    for (const output of ioConfig.outputs) {
+        if (output.type === "trigger" && output.multi) {
+            throw new Error(
+                `Output ${output.name} has type trigger and multi set to true - this is not allowed`
+            );
+        }
+    }
+
     return {
         config: {
             baseConfig: { ...baseConfig, nodeName: nodeNameClean },

@@ -82,7 +82,7 @@ export const AutoTextSlicerNode = makeNode(
     {
         nodeName: "AutoTextSlicerNode",
         nodeIcon: "GroupOutlined",
-        dimensions: [300, 165],
+        dimensions: [300, 200],
         doc: "Automatically slice text into chunks based on sentence separators.",
     },
     {
