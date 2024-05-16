@@ -1,18 +1,32 @@
-import type Router from "koa-router";
+import Koa from "koa";
+import Router from "koa-router";
+import { koaBody } from "koa-body";
 import { v4 as uuid } from "uuid";
 import mime from "mime-types";
 
 import { ChatMessage } from "../src/data/types.ts";
 import { MsgUtils } from "../src/util/MsgUtils.ts";
 
+const appOpenAi = new Koa();
+const routerOpenAi = new Router();
+
+/**
+ * Set up the OpenAI-compatible API.
+ *
+ * Runs on a separate port, to allow easy forwarding
+ * separately from the main app for special use-cases.
+ *
+ * @param port
+ * @param onMessage
+ */
 export const setupOpenAiCompatibleAPI = (
-    router: Router,
+    port: number,
     onMessage: (
         message: ChatMessage,
         checkRequestActive: () => boolean
     ) => Promise<ChatMessage | null>
 ) => {
-    router.post("/v1/completions", async (ctx) => {
+    routerOpenAi.post("/v1/completions", async (ctx) => {
         try {
             const { model, prompt } = ctx.request.body;
 
@@ -50,7 +64,7 @@ export const setupOpenAiCompatibleAPI = (
         }
     });
 
-    router.post("/v1/chat/completions", async (ctx) => {
+    routerOpenAi.post("/v1/chat/completions", async (ctx) => {
         try {
             const { model, messages } = ctx.request.body;
 
@@ -126,5 +140,19 @@ export const setupOpenAiCompatibleAPI = (
             console.error(error);
             ctx.status = 400;
         }
+    });
+
+    // Set up the server itself
+    appOpenAi
+        // body parsing
+        .use(koaBody({ jsonLimit: "10240gb" }))
+        // routing
+        .use(routerOpenAi.routes())
+        .use(routerOpenAi.allowedMethods());
+
+    appOpenAi.listen(port, () => {
+        console.log(
+            `OpenAI-compatible API started on http://localhost:${port}`
+        );
     });
 };

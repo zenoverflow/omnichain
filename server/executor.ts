@@ -344,7 +344,8 @@ const runGraph = async (
 export const setupExecutorApi = (
     router: Router,
     dirData: string,
-    dirCustomNodes: string
+    dirCustomNodes: string,
+    portOpenAi: number
 ) => {
     // Executor connection for ping api
     executorStorage.subscribe((instance) => {
@@ -401,36 +402,40 @@ export const setupExecutorApi = (
     });
 
     // Endpoints to receive messages from an OpenAI-compatible client
-    setupOpenAiCompatibleAPI(router, async (message, checkRequestActive) => {
-        messageQueue.push(message);
-        addMessageToSession(message);
-        console.log("Received message from OAI API:", message.content);
+    // Runs as a separate app on a separate port
+    setupOpenAiCompatibleAPI(
+        portOpenAi,
+        async (message, checkRequestActive) => {
+            messageQueue.push(message);
+            addMessageToSession(message);
+            console.log("Received message from OAI API:", message.content);
 
-        // Ensure the correct chain is running
-        await runGraph(message.chainId, dirData, dirCustomNodes);
+            // Ensure the correct chain is running
+            await runGraph(message.chainId, dirData, dirCustomNodes);
 
-        // If the graph did not run, something went wrong. Return null.
-        if (!executorStorage.get()) return null;
+            // If the graph did not run, something went wrong. Return null.
+            if (!executorStorage.get()) return null;
 
-        // Wait for message with the assistant role to appear in the executor session
-        let result: ChatMessage | null = null;
-        while (checkRequestActive()) {
-            const session = executorStorage.get();
-            if (!session) break;
+            // Wait for message with the assistant role to appear in the executor session
+            let result: ChatMessage | null = null;
+            while (checkRequestActive()) {
+                const session = executorStorage.get();
+                if (!session) break;
 
-            const messages = session.sessionMessages;
-            if (messages.length) {
-                const lastMessage = messages[messages.length - 1];
-                if (lastMessage.role === "assistant") {
-                    result = lastMessage;
-                    break;
+                const messages = session.sessionMessages;
+                if (messages.length) {
+                    const lastMessage = messages[messages.length - 1];
+                    if (lastMessage.role === "assistant") {
+                        result = lastMessage;
+                        break;
+                    }
                 }
-            }
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+            return result;
         }
-        return result;
-    });
+    );
 
     // Endpoint to run graph
     router.post("/api/executor/run/:id", async (ctx) => {

@@ -27,39 +27,30 @@ const DIR_FRONTEND = path.join(__dirname, "dist");
 const DIR_DATA = path.join(__dirname, "data");
 const DIR_CUSTOM_NODES = path.join(__dirname, "custom_nodes");
 
-// API setup
-
-const app = new Koa();
-const router = new Router();
-
-setupResourcesApi(router, DIR_DATA, DIR_CUSTOM_NODES);
-setupExecutorApi(router, DIR_DATA, DIR_CUSTOM_NODES);
-// setupExecutorWs(router);
-
-// Setup folders
-
 ensureDirExists(DIR_DATA);
 ensureDirExists(DIR_CUSTOM_NODES);
 
-// Config: middleware
+// Server setup
 
-app
+const appMain = new Koa();
+const routerMain = new Router();
+
+const portOpenAi: number = argv.port_openai || 5002;
+
+setupResourcesApi(routerMain, DIR_DATA, DIR_CUSTOM_NODES);
+setupExecutorApi(routerMain, DIR_DATA, DIR_CUSTOM_NODES, portOpenAi);
+
+appMain
     // body parsing
-    .use(
-        koaBody({
-            jsonLimit: "1gb",
-        })
-    )
+    .use(koaBody({ jsonLimit: "10240gb" }))
     // routing
-    .use(router.routes())
-    .use(router.allowedMethods())
+    .use(routerMain.routes())
+    .use(routerMain.allowedMethods())
     // frontend
     .use(serve(DIR_FRONTEND));
 
-// Config: server
-
 const port: number = argv.port || 12538;
 
-app.listen(port, () => {
-    console.log(`Server started on http://localhost:${port.toString()}`);
+appMain.listen(port, () => {
+    console.log(`App started on http://localhost:${port}`);
 });
