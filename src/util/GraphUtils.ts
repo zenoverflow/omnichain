@@ -294,7 +294,8 @@ export const GraphUtils = {
             valueOverride === undefined
                 ? controlData.defaultValue
                 : valueOverride,
-            controlData.config
+            controlData.config,
+            controlData.readOnly ?? false
         );
     },
 };

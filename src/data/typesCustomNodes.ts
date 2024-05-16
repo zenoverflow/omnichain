@@ -26,15 +26,22 @@ export type CustomIO = {
 };
 
 export type CustomControlConfig =
-    | { type: "text"; defaultValue: string | null; config: TextControlConfig }
+    | {
+          type: "text";
+          defaultValue: string | null;
+          readOnly?: boolean;
+          config: TextControlConfig;
+      }
     | {
           type: "number";
           defaultValue: number | null;
+          readOnly?: boolean;
           config: NumberControlConfig;
       }
     | {
           type: "select";
           defaultValue: string | null;
+          readOnly?: boolean;
           config: SelectControlConfig;
       };
 

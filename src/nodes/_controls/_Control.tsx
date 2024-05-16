@@ -67,7 +67,8 @@ export abstract class BaseControl<VALUE, CONFIG> extends ClassicPreset.Control {
         public nodeId: string,
         public controlName: string,
         public defaultValue: VALUE,
-        public config: CONFIG
+        public config: CONFIG,
+        public readOnly = false
     ) {
         super();
         this.value = this.grabValue();

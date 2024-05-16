@@ -109,6 +109,7 @@ const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
                                 type: ["string", "number", "null"],
                             },
                             config: { type: "object" },
+                            readOnly: { type: "boolean" },
                         },
                         required: ["type", "defaultValue", "config"],
                         additionalProperties: false,

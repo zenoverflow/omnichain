@@ -23,7 +23,7 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
 
             return self.config.large ?? false ? (
                 <Input.TextArea
-                    disabled={controlState.disabled}
+                    disabled={self.readOnly || controlState.disabled}
                     value={controlState.value}
                     onChange={(e) => {
                         const v = e.target.value;
@@ -42,7 +42,7 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                 />
             ) : (
                 <Input
-                    disabled={controlState.disabled}
+                    disabled={self.readOnly || controlState.disabled}
                     value={controlState.value}
                     onChange={(e) => {
                         const v = e.target.value;

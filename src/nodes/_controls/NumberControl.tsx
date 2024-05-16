@@ -36,7 +36,7 @@ export class NumberControl extends BaseControl<
                     }}
                 >
                     <InputNumber
-                        disabled={controlState.disabled}
+                        disabled={self.readOnly || controlState.disabled}
                         value={controlState.value}
                         onChange={(val) => {
                             const v = val ?? self.config.min ?? 0;

@@ -8,7 +8,7 @@ const doc = [
     "so it can be read by other nodes, and triggers the 'yes' output.",
     "If no message is detected, it triggers the 'no' output.",
     "Every time a new message is detected, it replaces the previous one",
-    "in the session.",
+    "in the session. The node stores the ID of the last new message it confirmed.",
 ]
     .join(" ")
     .trim();
@@ -49,30 +49,45 @@ export const CheckForNextMessageNode = makeNode(
     },
     {
         async controlFlow(nodeId, context) {
-            const waitTime = context.getAllControls(nodeId)
-                .waitTimeMs as number;
+            const controls = context.getAllControls(nodeId);
 
-            const check = async () => {
-                const messages = (await context.onExternalAction({
+            const checkForFreshMsg = async (): Promise<ChatMessage | null> => {
+                const messages: ChatMessage[] = await context.onExternalAction({
                     type: "checkQueue",
-                })) as ChatMessage[];
+                });
+
                 if (messages.length) {
-                    const last = messages[messages.length - 1];
-                    if (last.role === "user") {
-                        return true;
+                    const prevMessage: ChatMessage | null =
+                        await context.onExternalAction({
+                            type: "readCurrentMessage",
+                        });
+
+                    const latest = messages[messages.length - 1];
+
+                    if (
+                        latest.role === "user" &&
+                        latest.messageId !== prevMessage?.messageId
+                    ) {
+                        return latest;
                     }
                 }
-                return false;
+
+                return null;
             };
 
-            if (await check()) {
+            const freshMsg = await checkForFreshMsg();
+
+            if (freshMsg) {
+                // Saves the last message to the session
                 await context.onExternalAction({
                     type: "grabNextMessage",
                 });
                 return "haveMsg";
             }
 
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
+            await new Promise((resolve) =>
+                setTimeout(resolve, controls.waitTimeMs as number)
+            );
 
             if (!context.getFlowActive()) return null;
 

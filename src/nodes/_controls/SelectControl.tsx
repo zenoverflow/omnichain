@@ -67,7 +67,7 @@ export class SelectControl extends BaseControl<
                             {self.config.label ?? "Option"}
                         </span>
                         <Select
-                            disabled={controlState.disabled}
+                            disabled={self.readOnly || controlState.disabled}
                             value={selectedOption}
                             onSelect={(_, option) => {
                                 self.value = option.value;
