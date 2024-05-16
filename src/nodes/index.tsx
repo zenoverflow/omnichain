@@ -9,7 +9,6 @@ export { OpenAIChatCompletionNode } from "./_nodes/OpenAIChatCompletionNode";
 export { TemplateSlotNode } from "./_nodes/TemplateSlotNode";
 export { PromptBuilderNode } from "./_nodes/PromptBuilderNode";
 export { PickStringArrayItemNode } from "./_nodes/PickStringArrayItemNode";
-export { AwaitNextMessageNode } from "./_nodes/AwaitNextMessageNode";
 export { ReadCurrentMessageTextNode } from "./_nodes/ReadCurrentMessageTextNode";
 export { ReadCurrentMessageFilesNode } from "./_nodes/ReadCurrentMessageFilesNode";
 export { PickFileArrayItemNode } from "./_nodes/PickFileArrayItemNode";
