@@ -133,6 +133,7 @@ export const ContextMenu: React.FC = () => {
                     theme="dark"
                     items={items}
                     style={{
+                        minWidth: "200px",
                         maxHeight: "200px",
                         overflowY: "auto",
                     }}

@@ -167,6 +167,32 @@ export const makeNode = (
         }
     }
 
+    // Set default multi values for inputs and outputs
+    // Trigger inputs are always {multi: true} (unless specified)
+    // Trigger outputs are always {multi: false} (throw error if specified)
+    // Regular inputs are always {multi: false} (unless specified)
+    // Regular outputs are always {multi: true} (unless specified)
+    for (const input of ioConfig.inputs) {
+        // Triggers
+        if (input.type === "trigger" && input.multi === undefined) {
+            input.multi = true;
+        }
+        // Regular inputs
+        else if (input.multi === undefined) {
+            input.multi = false;
+        }
+    }
+    for (const output of ioConfig.outputs) {
+        // Triggers
+        if (output.type === "trigger" && output.multi === undefined) {
+            output.multi = false;
+        }
+        // Regular outputs
+        else if (output.multi === undefined) {
+            output.multi = true;
+        }
+    }
+
     return {
         config: {
             baseConfig: { ...baseConfig, nodeName: nodeNameClean },
