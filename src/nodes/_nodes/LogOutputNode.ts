@@ -33,8 +33,10 @@ export const LogOutputNode = makeNode(
             const oldValue = context.getAllControls(nodeId).val as string;
             const update = (inputs.data || [])[0] || oldValue;
 
-            // Update graph
-            await context.onControlChange(nodeId, "val", update);
+            // Update graph if necessary
+            if (update !== oldValue) {
+                await context.onControlChange(nodeId, "val", update);
+            }
 
             return null;
         },

@@ -14,6 +14,7 @@ const doc = [
     "the single image will be appended to the array.",
     "The API key name property is used to reference an API key set via",
     "the API key management dialog from the top bar.",
+    "Note that you can unload a model by setting keep_alive to 0.",
 ]
     .join(" ")
     .trim();
@@ -224,10 +225,10 @@ export const OllamaChatCompletionNode = makeNode(
                 name: "keepAlive",
                 control: {
                     type: "number",
-                    defaultValue: 1,
+                    defaultValue: -1,
                     config: {
                         label: "keep_alive",
-                        min: 1,
+                        min: -1,
                     },
                 },
             },

@@ -33,9 +33,9 @@ export type FlowContext = {
     instanceId: string;
 
     /**
-     * Fetches inputs for a node. Used during flow execution.
+     * Fetches inputs for a node.
      */
-    fetchInputs?: (
+    fetchInputs: (
         nodeId: string
     ) => Promise<{ [x: string]: any[] | undefined }>;
 

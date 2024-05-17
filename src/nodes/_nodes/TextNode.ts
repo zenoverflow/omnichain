@@ -1,11 +1,19 @@
 import { makeNode } from "./_Base";
 
+const doc = [
+    "Simple text node that can be used as intermediate data flow storage.",
+    "It only grabs new data if the input is connected to another node.",
+    "If the input is not connected, it can be used as a static text node.",
+]
+    .join(" ")
+    .trim();
+
 export const TextNode = makeNode(
     {
         nodeName: "TextNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [580, 450],
-        doc: "Simple text node that stores and outputs the input string.",
+        doc,
     },
     {
         inputs: [{ name: "in", type: "string" }],
@@ -32,8 +40,10 @@ export const TextNode = makeNode(
             const oldValue = context.getAllControls(nodeId).val as string;
             const update = (inputs.in || [])[0] || oldValue;
 
-            // Update graph
-            await context.onControlChange(nodeId, "val", update);
+            // Update graph if necessary
+            if (update !== oldValue) {
+                await context.onControlChange(nodeId, "val", update);
+            }
 
             return { out: update };
         },

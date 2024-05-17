@@ -20,3 +20,6 @@ export { PickChatMessageArrayItemNode } from "./_nodes/PickChatMessageArrayItemN
 export { OllamaTextCompletionNode } from "./_nodes/OllamaTextCompletionNode";
 export { OllamaChatCompletionNode } from "./_nodes/OllamaChatCompletionNode";
 export { CheckForNextMessageNode } from "./_nodes/CheckForNextMessageNode";
+export { GrabTextNode } from "./_nodes/GrabTextNode";
+export { RegexCheckNode } from "./_nodes/RegexCheckNode";
+export { TextJoinNode } from "./_nodes/TextJoinNode";

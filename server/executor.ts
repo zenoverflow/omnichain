@@ -195,6 +195,11 @@ const runGraph = async (
                     duration: 10,
                 });
             },
+            // Will be replaced by the real implementation
+            // when used by EngineUtils
+            async fetchInputs(_nodeId) {
+                return {};
+            },
             async onControlChange(node, control, value) {
                 if (!getFlowActive()) {
                     throw new Error(
@@ -244,23 +249,15 @@ const runGraph = async (
                             const { command } = action.args;
                             exec(command, (error, stdout, stderr) => {
                                 if (error) {
-                                    resolve({
-                                        type: "error",
-                                        message: error.message,
-                                    });
+                                    resolve(`Error: ${error.message}`);
                                     return;
                                 }
+                                const result: string[] = [];
                                 if (stderr) {
-                                    resolve({
-                                        type: "error",
-                                        message: stderr,
-                                    });
-                                    return;
+                                    result.push(`Error: ${stderr}`);
                                 }
-                                resolve({
-                                    type: "stdout",
-                                    message: stdout,
-                                });
+                                result.push(`Result: ${stdout}`);
+                                resolve(result.join("\n"));
                             });
                         });
                         break;

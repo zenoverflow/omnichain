@@ -6,12 +6,16 @@ import { makeNode } from "./_Base";
 
 const doc = [
     "Generate text using Ollama's basic completion API (/api/generate).",
+    "Set raw to true if you want to bypass ollama's templating and",
+    "pass in a full templated prompt,",
+    "(made with the TemplateBuilder node, for example).",
     "This node supports images as file inputs.",
     "Non-image files will be filtered out by mime type.",
     "If both a single image and an array of images are passed in,",
     "the single image will be appended to the array.",
     "The API key name property is used to reference an API key set via",
     "the API key management dialog from the top bar.",
+    "Note that you can unload a model by setting keep_alive to 0.",
 ]
     .join(" ")
     .trim();
@@ -20,7 +24,7 @@ export const OllamaTextCompletionNode = makeNode(
     {
         nodeName: "OllamaTextCompletionNode",
         nodeIcon: "LaptopOutlined",
-        dimensions: [620, 1090],
+        dimensions: [620, 1130],
         doc,
     },
     {
@@ -223,10 +227,10 @@ export const OllamaTextCompletionNode = makeNode(
                 name: "keepAlive",
                 control: {
                     type: "number",
-                    defaultValue: 1,
+                    defaultValue: -1,
                     config: {
                         label: "keep_alive",
-                        min: 1,
+                        min: -1,
                     },
                 },
             },
@@ -237,6 +241,20 @@ export const OllamaTextCompletionNode = makeNode(
                     defaultValue: "false",
                     config: {
                         label: "json",
+                        values: [
+                            { value: "true", label: "true" },
+                            { value: "false", label: "false" },
+                        ],
+                    },
+                },
+            },
+            {
+                name: "raw",
+                control: {
+                    type: "select",
+                    defaultValue: "false",
+                    config: {
+                        label: "raw",
                         values: [
                             { value: "true", label: "true" },
                             { value: "false", label: "false" },
@@ -305,6 +323,7 @@ export const OllamaTextCompletionNode = makeNode(
                     top_k: controls.topK as number,
                     top_p: controls.topP as number,
                 },
+                raw: (controls.raw as string) === "true",
             });
 
             return {
