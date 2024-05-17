@@ -1,8 +1,8 @@
 import { makeNode } from "./_Base";
 
-export const PromptBuilderNode = makeNode(
+export const TemplateBuilderNode = makeNode(
     {
-        nodeName: "PromptBuilderNode",
+        nodeName: "TemplateBuilderNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [580, 450],
         doc: "Build a prompt by combining a template with values.",
