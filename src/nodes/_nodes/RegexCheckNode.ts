@@ -12,7 +12,7 @@ export const RegexCheckNode = makeNode(
     {
         nodeName: "RegexCheckNode",
         nodeIcon: "CodeOutlined",
-        dimensions: [300, 250],
+        dimensions: [300, 290],
         doc,
     },
     {
@@ -40,25 +40,30 @@ export const RegexCheckNode = makeNode(
     },
     {
         async controlFlow(nodeId, context) {
-            const controls = context.getAllControls(nodeId);
+            try {
+                const controls = context.getAllControls(nodeId);
 
-            const regexRaw = controls.regex as string;
+                const regexRaw = controls.regex as string;
 
-            if (!regexRaw.length) {
-                throw new Error("Missing regex pattern!");
+                if (!regexRaw.length) {
+                    throw new Error("Missing regex pattern!");
+                }
+
+                const regex = new RegExp(regexRaw, "g");
+
+                const inputs = await context.fetchInputs(nodeId);
+
+                const data = (inputs.dataIn || [])[0] || "";
+
+                if (regex.test(data)) {
+                    return "pass";
+                }
+
+                return "fail";
+            } catch (error) {
+                console.error("--ERROR--\n", error);
+                return "error";
             }
-
-            const regex = new RegExp(regexRaw, "g");
-
-            const inputs = await context.fetchInputs(nodeId);
-
-            const data = (inputs.dataIn || [])[0] || "";
-
-            if (regex.test(data)) {
-                return "pass";
-            }
-
-            return "fail";
         },
     }
 );

@@ -193,10 +193,25 @@ export const makeNode = (
         }
     }
 
+    const outputs = [...ioConfig.outputs];
+
+    // If control flow is used, add an error output
+    if (flowConfig?.controlFlow) {
+        outputs.push({
+            name: "error",
+            type: "trigger",
+            label: "on error",
+            multi: false,
+        });
+    }
+
     return {
         config: {
             baseConfig: { ...baseConfig, nodeName: nodeNameClean },
-            ioConfig,
+            ioConfig: {
+                ...ioConfig,
+                outputs,
+            },
             flowConfig,
         },
         icon: (ICONS as any)[nodeIcon] ?? ICONS.BorderOutlined,

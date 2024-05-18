@@ -4,7 +4,7 @@ export const BlockChatNode = makeNode(
     {
         nodeName: "BlockChatNode",
         nodeIcon: "PauseCircleOutlined",
-        dimensions: [300, 175],
+        dimensions: [300, 210],
         doc: "Block or unblock user's ability to send new chat messages.",
     },
     {
@@ -30,16 +30,21 @@ export const BlockChatNode = makeNode(
     },
     {
         async controlFlow(nodeId, context) {
-            const action = context.getAllControls(nodeId)["action"] as
-                | "block"
-                | "unblock";
+            try {
+                const action = context.getAllControls(nodeId)["action"] as
+                    | "block"
+                    | "unblock";
 
-            await context.onExternalAction({
-                type: "chatBlock",
-                args: { blocked: action === "block" },
-            });
+                await context.onExternalAction({
+                    type: "chatBlock",
+                    args: { blocked: action === "block" },
+                });
 
-            return "triggerOut";
+                return "triggerOut";
+            } catch (error) {
+                console.error("--ERROR--\n", error);
+                return "error";
+            }
         },
     }
 );

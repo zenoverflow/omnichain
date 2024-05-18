@@ -306,6 +306,7 @@ const runGraph = async (
 
                 updateActiveNode(_exec.graph.graphId, nodeId);
             },
+            // For uncaught errors during execution
             onError(error) {
                 const executor = executorStorage.get();
                 const graphId = executor?.graphId ?? undefined;
@@ -330,7 +331,7 @@ const runGraph = async (
                 });
 
                 stopCurrentGraph();
-                console.error("Error:", error);
+                console.error("--UNCAUGHT ERROR--\n", error);
             },
         }
     );

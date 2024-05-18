@@ -73,10 +73,10 @@ export const updateGraph = (
     editor: CNodeEditor,
     area: CAreaPlugin,
     graphId: string,
-    callSource?: string // for debug only
+    _callSource?: string // for debug only
 ) => {
     QueueUtils.addTask(async () => {
-        console.log("UPDATE GRAPH", callSource ?? "somewhere");
+        // console.log("UPDATE GRAPH", callSource ?? "somewhere");
         const graph = graphStorage.get()[graphId];
         const update = GraphUtils.serializeFromEditor(
             editor,

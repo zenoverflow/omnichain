@@ -11,7 +11,7 @@ export const ResponseNode = makeNode(
     {
         nodeName: "ResponseNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [350, 180],
+        dimensions: [350, 200],
         doc,
     },
     {
@@ -26,18 +26,23 @@ export const ResponseNode = makeNode(
     },
     {
         async controlFlow(nodeId, context) {
-            const inputs = await context.fetchInputs!(nodeId);
+            try {
+                const inputs = await context.fetchInputs(nodeId);
 
-            const message = (inputs["message"] || [])[0];
-            if (!message) {
-                throw new Error("ResponseNode: Missing message input");
+                const message = (inputs["message"] || [])[0];
+                if (!message) {
+                    throw new Error("ResponseNode: Missing message input");
+                }
+                await context.onExternalAction({
+                    type: "addMessageToSession",
+                    args: { message },
+                });
+
+                return "triggerOut";
+            } catch (error) {
+                console.error("--ERROR--\n", error);
+                return "error";
             }
-            await context.onExternalAction({
-                type: "addMessageToSession",
-                args: { message },
-            });
-
-            return "triggerOut";
         },
     }
 );

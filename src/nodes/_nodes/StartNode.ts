@@ -4,7 +4,7 @@ export const StartNode = makeNode(
     {
         nodeName: "StartNode",
         nodeIcon: "PlayCircleOutlined",
-        dimensions: [200, 130],
+        dimensions: [200, 160],
         doc: "Entrypoint that starts the flow of the chain.",
     },
     {

@@ -17,7 +17,7 @@ export const CheckForNextMessageNode = makeNode(
     {
         nodeName: "CheckForNextMessageNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [300, 220],
+        dimensions: [300, 250],
         doc,
     },
     {
@@ -49,49 +49,56 @@ export const CheckForNextMessageNode = makeNode(
     },
     {
         async controlFlow(nodeId, context) {
-            const controls = context.getAllControls(nodeId);
+            try {
+                const controls = context.getAllControls(nodeId);
 
-            const checkForFreshMsg = async (): Promise<ChatMessage | null> => {
-                const messages: ChatMessage[] = await context.onExternalAction({
-                    type: "checkQueue",
-                });
+                const checkForFreshMsg =
+                    async (): Promise<ChatMessage | null> => {
+                        const messages: ChatMessage[] =
+                            await context.onExternalAction({
+                                type: "checkQueue",
+                            });
 
-                if (messages.length) {
-                    const prevMessage: ChatMessage | null =
-                        await context.onExternalAction({
-                            type: "readCurrentMessage",
-                        });
+                        if (messages.length) {
+                            const prevMessage: ChatMessage | null =
+                                await context.onExternalAction({
+                                    type: "readCurrentMessage",
+                                });
 
-                    const latest = messages[messages.length - 1];
+                            const latest = messages[messages.length - 1];
 
-                    if (
-                        latest.role === "user" &&
-                        latest.messageId !== prevMessage?.messageId
-                    ) {
-                        return latest;
-                    }
+                            if (
+                                latest.role === "user" &&
+                                latest.messageId !== prevMessage?.messageId
+                            ) {
+                                return latest;
+                            }
+                        }
+
+                        return null;
+                    };
+
+                const freshMsg = await checkForFreshMsg();
+
+                if (freshMsg) {
+                    // Saves the last message to the session
+                    await context.onExternalAction({
+                        type: "grabNextMessage",
+                    });
+                    return "haveMsg";
                 }
 
-                return null;
-            };
+                await new Promise((resolve) =>
+                    setTimeout(resolve, controls.waitTimeMs as number)
+                );
 
-            const freshMsg = await checkForFreshMsg();
+                if (!context.getFlowActive()) return null;
 
-            if (freshMsg) {
-                // Saves the last message to the session
-                await context.onExternalAction({
-                    type: "grabNextMessage",
-                });
-                return "haveMsg";
+                return "noMsg";
+            } catch (error) {
+                console.error("--ERROR--\n", error);
+                return "error";
             }
-
-            await new Promise((resolve) =>
-                setTimeout(resolve, controls.waitTimeMs as number)
-            );
-
-            if (!context.getFlowActive()) return null;
-
-            return "noMsg";
         },
     }
 );

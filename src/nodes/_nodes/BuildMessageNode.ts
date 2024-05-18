@@ -18,7 +18,7 @@ export const BuildMessageNode = makeNode(
     {
         nodeName: "BuildMessageNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [350, 265],
+        dimensions: [350, 255],
         doc,
     },
     {
@@ -43,7 +43,7 @@ export const BuildMessageNode = makeNode(
     },
     {
         async dataFlow(nodeId, context) {
-            const inputs = await context.fetchInputs!(nodeId);
+            const inputs = await context.fetchInputs(nodeId);
             const files = [...((inputs.filesArray || [])[0] || [])];
             const fileSingle = (inputs.fileSingle || [])[0];
             if (fileSingle) {

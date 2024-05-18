@@ -33,7 +33,7 @@ export const TextNode = makeNode(
     },
     {
         async dataFlow(nodeId, context) {
-            const inputs = (await context.fetchInputs!(nodeId)) as {
+            const inputs = (await context.fetchInputs(nodeId)) as {
                 in?: string[];
             };
 

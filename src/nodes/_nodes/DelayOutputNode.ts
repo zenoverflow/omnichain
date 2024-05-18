@@ -26,7 +26,7 @@ export const DelayOutputNode = makeNode(
     },
     {
         async dataFlow(nodeId, context) {
-            const inputs = (await context.fetchInputs!(nodeId)) as {
+            const inputs = (await context.fetchInputs(nodeId)) as {
                 dataIn?: string[];
             };
             await new Promise((r) =>

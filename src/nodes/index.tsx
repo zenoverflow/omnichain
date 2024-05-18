@@ -1,5 +1,4 @@
 export { StartNode } from "./_nodes/StartNode";
-export { LogOutputNode } from "./_nodes/LogOutputNode";
 export { DelayOutputNode } from "./_nodes/DelayOutputNode";
 export { TextNode } from "./_nodes/TextNode";
 export { AutoTextSlicerNode } from "./_nodes/AutoTextSlicerNode";

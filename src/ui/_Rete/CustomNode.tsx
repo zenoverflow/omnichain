@@ -125,8 +125,42 @@ type Props<S extends ClassicScheme> = {
     emit: RenderEmit<S>;
 };
 
-export const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
+// export const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
+//     const [executor] = useOuterState(executorStorage);
+//     const isActive = useMemo(() => {
+//         if (!executor) return false;
+//         return (
+//             executor.graphId === props.node.graphId &&
+//             executor.step === props.node.id
+//         );
+//     }, [executor, props.node.graphId, props.node.id]);
+
+//     return (
+//         <div
+//             style={{
+//                 display: isActive ? "block" : "none",
+//                 position: "absolute",
+//                 top: -6,
+//                 left: -6,
+//                 right: -6,
+//                 bottom: -6,
+//                 zIndex: -1,
+//                 borderRadius: "10px",
+//                 pointerEvents: "none",
+//                 boxSizing: "border-box",
+//                 animation: "glowYellow 1.2s ease-in infinite",
+//             }}
+//         ></div>
+//     );
+// };
+
+/**
+ * Used to indicate either node activity, or an error in the node.
+ */
+export const GlowIndicator: React.FC<{ node: any }> = (props) => {
+    const [lastNodeError] = useOuterState(lastNodeErrorStorage);
     const [executor] = useOuterState(executorStorage);
+
     const isActive = useMemo(() => {
         if (!executor) return false;
         return (
@@ -135,29 +169,7 @@ export const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
         );
     }, [executor, props.node.graphId, props.node.id]);
 
-    return (
-        <div
-            style={{
-                display: isActive ? "block" : "none",
-                position: "absolute",
-                top: -6,
-                left: -6,
-                right: -6,
-                bottom: -6,
-                zIndex: -1,
-                borderRadius: "10px",
-                pointerEvents: "none",
-                boxSizing: "border-box",
-                animation: "glowYellow 1.2s ease-in infinite",
-            }}
-        ></div>
-    );
-};
-
-export const ErrorIndicator: React.FC<{ node: any }> = (props) => {
-    const [lastNodeError] = useOuterState(lastNodeErrorStorage);
-
-    const message: string | null = useMemo(() => {
+    const errMessage: string | null = useMemo(() => {
         if (
             lastNodeError &&
             lastNodeError.graphId === props.node.graphId &&
@@ -168,12 +180,10 @@ export const ErrorIndicator: React.FC<{ node: any }> = (props) => {
         return null;
     }, [lastNodeError, props.node.graphId, props.node.id]);
 
-    // TODO: display message somewhere
-
     return (
         <div
             style={{
-                display: message?.length ? "block" : "none",
+                display: errMessage?.length || isActive ? "block" : "none",
                 position: "absolute",
                 top: -6,
                 left: -6,
@@ -183,7 +193,9 @@ export const ErrorIndicator: React.FC<{ node: any }> = (props) => {
                 borderRadius: "10px",
                 pointerEvents: "none",
                 boxSizing: "border-box",
-                animation: "glowRed 1.2s ease-in infinite",
+                animation: errMessage?.length
+                    ? "glowRed 1.2s ease-in infinite"
+                    : "glowYellow 1.2s ease-in infinite",
             }}
         ></div>
     );
@@ -259,8 +271,8 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
             height={props.data.height}
             styles={props.styles}
         >
-            <ExecutionIndicator node={props.data} />
-            <ErrorIndicator node={props.data} />
+            {/* <ExecutionIndicator node={props.data} /> */}
+            <GlowIndicator node={props.data} />
             <div
                 style={{
                     width: "100%",

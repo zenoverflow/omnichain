@@ -15,7 +15,7 @@ export const GrabTextNode = makeNode(
     {
         nodeName: "GrabTextNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [580, 520],
+        dimensions: [580, 550],
         doc,
     },
     {
@@ -40,17 +40,22 @@ export const GrabTextNode = makeNode(
     },
     {
         async controlFlow(nodeId, context) {
-            const inputs = await context.fetchInputs(nodeId);
+            try {
+                const inputs = await context.fetchInputs(nodeId);
 
-            const oldValue = context.getAllControls(nodeId).val as string;
-            const update = (inputs.dataIn || [])[0] || oldValue;
+                const oldValue = context.getAllControls(nodeId).val as string;
+                const update = (inputs.dataIn || [])[0] || oldValue;
 
-            // Update graph if necessary
-            if (update !== oldValue) {
-                await context.onControlChange(nodeId, "val", update);
+                // Update graph if necessary
+                if (update !== oldValue) {
+                    await context.onControlChange(nodeId, "val", update);
+                }
+
+                return "triggerOut";
+            } catch (error) {
+                console.error("--ERROR--\n", error);
+                return "error";
             }
-
-            return "triggerOut";
         },
         async dataFlow(nodeId, context) {
             return {
