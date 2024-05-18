@@ -55,84 +55,84 @@ export const EngineUtils = {
             // Signal node activity
             eventHandlers.onFlowNode(nodeId);
 
-            const targetNode = nodeInstances[nodeId];
-
-            // Use connections to fetch inputs
-            const dataInputs = targetNode.node.config.ioConfig.inputs
+            const dataInputs = nodeInstances[nodeId].node.config.ioConfig.inputs
                 .filter((i) => i.type !== "trigger")
                 .map((i) => i.name);
-            // These are the connections that are data inputs to the target node
-            const connections = context
-                .getGraph()
-                .connections.filter(
-                    (c) =>
-                        c.target === nodeId &&
-                        dataInputs.includes(c.targetInput)
-                );
 
-            // Grab sources using map because there can be multiple connections
-            // from the same source, and we don't want to re-run the dataflow
-            const sources: _InstanceMap = connections.reduce(
-                (acc, conn) =>
-                    ({
-                        ...acc,
-                        [conn.source]: nodeInstances[conn.source],
-                    } as _InstanceMap),
-                {}
-            );
+            const sourceOutputs: Record<string, any> = {};
 
             const inputs: { [x: string]: any[] | undefined } = {};
 
-            for (const sourceInstance of Object.values(sources)) {
-                const sourceName =
-                    sourceInstance.node.config.baseConfig.nodeName;
-
-                const sourceDataFlow =
-                    sourceInstance.node.config.flowConfig?.dataFlow;
-
-                if (!sourceDataFlow) {
-                    throw new Error(
-                        `Error in fetchInputs()! ${sourceName} does not have a data flow`
-                    );
+            const addInputResult = (inputName: string, result: any) => {
+                if (!inputs[inputName]) {
+                    inputs[inputName] = [];
                 }
+                inputs[inputName]!.push(result);
+            };
 
-                const controls = context
+            for (const dataInput of dataInputs) {
+                const dataInputConnections = context
                     .getGraph()
-                    .nodes.find(
-                        (n) => n.nodeId === sourceInstance.instance.nodeId
-                    )?.controls;
-
-                if (!controls) {
-                    throw new Error(
-                        `Error in fetchInputs()! Controls not found for ${sourceName}`
+                    .connections.filter(
+                        (c) =>
+                            c.target === nodeId && c.targetInput === dataInput
                     );
-                }
 
-                // Pass node activity signal to the target dataflow
-                eventHandlers.onFlowNode(sourceInstance.instance.nodeId);
-
-                const output = await sourceDataFlow(
-                    sourceInstance.instance.nodeId,
-                    context
-                );
-                if (!context.getFlowActive()) {
-                    throw new Error("Execution aborted by user");
-                }
-
-                // Pass node activity signal back to the current node
-                eventHandlers.onFlowNode(nodeId);
-
-                for (const key of Object.keys(output)) {
-                    const relatedConnection = connections.find(
-                        (c) => c.sourceOutput === key
-                    );
-                    if (!relatedConnection) continue;
-
-                    const targetInput = relatedConnection.targetInput;
-                    if (!inputs[targetInput]) {
-                        inputs[targetInput] = [];
+                for (const connection of dataInputConnections) {
+                    // Prevent pointless re-running of data flows in case
+                    // node has multiple inputs from the same source
+                    if (sourceOutputs[connection.source]) {
+                        addInputResult(
+                            dataInput,
+                            sourceOutputs[connection.source][
+                                connection.sourceOutput
+                            ]
+                        );
+                        continue;
                     }
-                    inputs[targetInput]!.push(output[key]);
+
+                    const sourceInstance = nodeInstances[connection.source];
+
+                    const sourceName =
+                        sourceInstance.node.config.baseConfig.nodeName;
+
+                    const sourceDataFlow =
+                        sourceInstance.node.config.flowConfig?.dataFlow;
+
+                    if (!sourceDataFlow) {
+                        throw new Error(
+                            `Error in fetchInputs()! ${sourceName} does not have a data flow`
+                        );
+                    }
+
+                    const controls = context
+                        .getGraph()
+                        .nodes.find(
+                            (n) => n.nodeId === sourceInstance.instance.nodeId
+                        )?.controls;
+
+                    if (!controls) {
+                        throw new Error(
+                            `Error in fetchInputs()! Controls not found for ${sourceName}`
+                        );
+                    }
+
+                    // Pass node activity signal to the target dataflow
+                    eventHandlers.onFlowNode(sourceInstance.instance.nodeId);
+
+                    const output = await sourceDataFlow(
+                        sourceInstance.instance.nodeId,
+                        context
+                    );
+                    sourceOutputs[connection.source] = output;
+                    if (!context.getFlowActive()) {
+                        throw new Error("Execution aborted by user");
+                    }
+
+                    // Pass node activity signal back to the current node
+                    eventHandlers.onFlowNode(nodeId);
+
+                    addInputResult(dataInput, output[connection.sourceOutput]);
                 }
             }
 
