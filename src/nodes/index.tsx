@@ -22,3 +22,4 @@ export { CheckForNextMessageNode } from "./_nodes/CheckForNextMessageNode";
 export { GrabTextNode } from "./_nodes/GrabTextNode";
 export { RegexCheckNode } from "./_nodes/RegexCheckNode";
 export { TextJoinNode } from "./_nodes/TextJoinNode";
+export { SaveStateNode } from "./_nodes/SaveStateNode";
