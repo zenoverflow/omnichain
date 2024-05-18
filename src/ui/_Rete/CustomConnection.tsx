@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { ClassicScheme, Presets } from "rete-react-plugin";
+import { editorStateStorage } from "../../state/editor";
 const { useConnection } = Presets.classic;
 
 const Svg = styled.svg`
@@ -86,10 +87,20 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
     const CustomConnection = (props: ConnectionProps) => {
         const { path, start, end } = useConnection();
 
+        // Remove connection on middle-click
+        const handleClick = (e: any) => {
+            e.preventDefault();
+            if (e.button === 1) {
+                const editorState = editorStateStorage.get();
+                if (!editorState) return;
+                void editorState.editor.removeConnection(props.data.id);
+            }
+        };
+
         if (!path || !start || !end) return null;
 
         return (
-            <Svg data-testid="connection">
+            <Svg data-testid="connection" onMouseUp={handleClick}>
                 <Path
                     //
                     styles={props.styles}
