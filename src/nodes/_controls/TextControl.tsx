@@ -1,10 +1,50 @@
-import { Input } from "antd";
+import { useState } from "react";
+import { Input, Button, Modal } from "antd";
+import { FullscreenOutlined } from "@ant-design/icons";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
 
 import { BaseControl, useControlState } from "./_Control";
 
 export type TextControlConfig = {
     large?: boolean;
     label?: string;
+    modalSyntaxHighlight?: boolean;
+};
+
+const _Modal: React.FC<{
+    closeModal: () => any;
+    value: string;
+    onChange: (v: string) => any;
+    modalSyntaxHighlight?: boolean;
+}> = ({ closeModal, value, onChange, modalSyntaxHighlight }) => {
+    return (
+        <Modal
+            title={<div style={{ height: "30px" }} />}
+            open={true}
+            afterClose={closeModal}
+            // onOk={handleApply}
+            onCancel={closeModal}
+            footer={() => <></>}
+            // footer={(_, { OkBtn, CancelBtn }) => (
+            //     <>
+            //         {/* <CancelBtn />
+            //         <OkBtn /> */}
+            //     </>
+            // )}
+            width={"80vw"}
+        >
+            <CodeMirror
+                value={value}
+                onChange={(val, _viewUpdate) => {
+                    onChange(val);
+                }}
+                height="80vh"
+                maxHeight="80vh"
+                extensions={[...(modalSyntaxHighlight ? [javascript({})] : [])]}
+            />
+        </Modal>
+    );
 };
 
 export class TextControl extends BaseControl<string, TextControlConfig> {
@@ -19,27 +59,74 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                 self.grabValue()
             );
 
+            const [modalOpen, setModalOpen] = useState(false);
+
             if (controlState.hidden) return null;
 
             return self.config.large ?? false ? (
-                <Input.TextArea
-                    disabled={self.readOnly || controlState.disabled}
-                    value={controlState.value}
-                    onChange={(e) => {
-                        const v = e.target.value;
-                        controlState.setValue(v);
-                        self.value = v;
-                    }}
-                    className="c__nodecontrol"
-                    onPointerDown={(e) => {
-                        e.stopPropagation();
-                    }}
-                    style={{
-                        width: "100%",
-                        height: "300px",
-                        resize: "none",
-                    }}
-                />
+                <>
+                    <Input.TextArea
+                        disabled={self.readOnly || controlState.disabled}
+                        value={controlState.value}
+                        onChange={(e) => {
+                            const v = e.target.value;
+                            controlState.setValue(v);
+                            self.value = v;
+                        }}
+                        className="c__nodecontrol"
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                        }}
+                        style={{
+                            width: "100%",
+                            height: "300px",
+                            resize: "none",
+                        }}
+                    />
+                    <div
+                        style={{
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                        }}
+                    >
+                        <Button
+                            type="primary"
+                            size="middle"
+                            style={{
+                                marginTop: "10px",
+                                padding: "0px 5px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: "#fafafa",
+                            }}
+                            onMouseUp={(e) => {
+                                e.stopPropagation();
+                                setModalOpen(true);
+                            }}
+                            disabled={modalOpen}
+                        >
+                            <FullscreenOutlined style={{ color: "#000" }} />
+                        </Button>
+                    </div>
+                    {modalOpen ? (
+                        <_Modal
+                            modalSyntaxHighlight={
+                                self.config.modalSyntaxHighlight
+                            }
+                            closeModal={() => {
+                                setModalOpen(false);
+                            }}
+                            value={controlState.value}
+                            onChange={(v) => {
+                                controlState.setValue(v);
+                                self.value = v;
+                            }}
+                        />
+                    ) : null}
+                </>
             ) : (
                 <Input
                     disabled={self.readOnly || controlState.disabled}

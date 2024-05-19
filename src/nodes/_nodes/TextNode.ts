@@ -12,7 +12,7 @@ export const TextNode = makeNode(
     {
         nodeName: "TextNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [580, 450],
+        dimensions: [580, 475],
         doc,
     },
     {

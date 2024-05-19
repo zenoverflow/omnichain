@@ -4,7 +4,7 @@ export const TemplateBuilderNode = makeNode(
     {
         nodeName: "TemplateBuilderNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [580, 450],
+        dimensions: [580, 475],
         doc: "Build a prompt by combining a template with values.",
     },
     {

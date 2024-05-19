@@ -15,7 +15,7 @@ export const GrabTextNode = makeNode(
     {
         nodeName: "GrabTextNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [580, 550],
+        dimensions: [580, 585],
         doc,
     },
     {
