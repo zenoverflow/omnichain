@@ -206,6 +206,7 @@ export const EditorGraph: React.FC = () => {
                 onClose={() => {
                     setPropertiesOpen(false);
                 }}
+                destroyOnClose
                 open={propertiesOpen}
                 extra={
                     <Space>
@@ -235,7 +236,7 @@ export const EditorGraph: React.FC = () => {
                 <Input
                     size="large"
                     addonBefore="name"
-                    value={currentGraph?.name ?? ""}
+                    defaultValue={currentGraph?.name ?? ""}
                     maxLength={120}
                     onChange={(e) => {
                         updateGraphName(editorTarget, e.target.value);
