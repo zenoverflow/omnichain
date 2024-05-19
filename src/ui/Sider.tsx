@@ -1,4 +1,4 @@
-import { Layout, Menu, MenuProps } from "antd";
+import { Layout, Menu, MenuProps, Tooltip } from "antd";
 
 import { graphStorage } from "../state/graphs";
 import { editorTargetStorage, openEditor } from "../state/editor";
@@ -20,11 +20,14 @@ export const Sider: React.FC<{
         () =>
             Object.entries(graphs)
                 .sort((a, b) => b[1].created - a[1].created)
-                .map(([graphId, { name }]) => ({
-                    key: graphId,
-                    icon: <ItemIcon graphId={graphId} />,
-                    label: name.trim().length ? name.trim() : "Chain",
-                })),
+                .map(([graphId, { name }]) => {
+                    const label = name.trim().length ? name.trim() : "Chain";
+                    return {
+                        key: graphId,
+                        icon: <ItemIcon graphId={graphId} />,
+                        label: <Tooltip title={label}>{label}</Tooltip>,
+                    };
+                }),
         [graphs]
     );
 
