@@ -8,6 +8,7 @@ const doc = [
     "If something goes wrong with the request configuration",
     "itself (before making the request), the error will be in",
     "the 'error' field, and the code will be 0.",
+    "The timeout can be set to 0 to disable it (default).",
 ]
     .join(" ")
     .trim();
@@ -55,9 +56,10 @@ export const MakeJSONRequestNode = makeNode(
                 name: "timeout",
                 control: {
                     type: "number",
-                    defaultValue: 10000,
+                    defaultValue: 0,
                     config: {
                         label: "timeout (ms)",
+                        min: 0,
                     },
                 },
             },
@@ -88,11 +90,16 @@ export const MakeJSONRequestNode = makeNode(
                     ...JSON.parse(headers),
                 };
 
+                const abortSignal =
+                    controls.timeout === 0
+                        ? undefined
+                        : AbortSignal.timeout(controls.timeout as number);
+
                 const result = await fetch(url, {
                     method,
                     headers: reqHeaders,
                     body,
-                    signal: AbortSignal.timeout(controls.timeout as number),
+                    signal: abortSignal,
                 });
 
                 let resultData: any = null;

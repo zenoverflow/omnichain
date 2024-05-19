@@ -15,6 +15,7 @@ export { PickStringArrayItemNode } from "./_nodes/PickStringArrayItemNode";
 export { ReadCurrentMessageFilesNode } from "./_nodes/ReadCurrentMessageFilesNode";
 export { ReadCurrentMessageNode } from "./_nodes/ReadCurrentMessageNode";
 export { ReadCurrentMessageTextNode } from "./_nodes/ReadCurrentMessageTextNode";
+export { ReadFromJSONNode } from "./_nodes/ReadFromJSONNode";
 export { ReadSessionMessagesNode } from "./_nodes/ReadSessionMessagesNode";
 export { RegexCheckNode } from "./_nodes/RegexCheckNode";
 export { ResponseNode } from "./_nodes/ResponseNode";
