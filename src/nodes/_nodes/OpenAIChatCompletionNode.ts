@@ -216,7 +216,7 @@ export const OpenAIChatCompletionNode = makeNode(
     },
     {
         async dataFlow(nodeId, context) {
-            const inputs = await context.fetchInputs!(nodeId);
+            const inputs = await context.fetchInputs(nodeId);
             const controls = context.getAllControls(nodeId);
 
             const messages: ChatMessage[] = [

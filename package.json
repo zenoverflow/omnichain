@@ -15,6 +15,8 @@
     },
     "dependencies": {
         "@codemirror/lang-javascript": "^6.2.2",
+        "@codemirror/lang-json": "^6.0.1",
+        "@codemirror/lang-markdown": "^6.2.5",
         "@stdlib/assert-is-uint8array": "^0.2.1",
         "@types/koa-router": "^7.4.8",
         "@types/koa-static": "^4.0.4",
