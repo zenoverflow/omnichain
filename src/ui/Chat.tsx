@@ -365,7 +365,7 @@ export const ChatInterface: React.FC = () => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [listRef, messages]);
+    }, [messages.length]);
 
     return (
         <div

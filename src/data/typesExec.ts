@@ -13,6 +13,8 @@ export type ExternalAction =
     | { type: "grabNextMessage"; args?: never }
     | { type: "readCurrentMessage"; args?: never }
     | { type: "addMessageToSession"; args: { message: ChatMessage } }
+    | { type: "writeFile"; args: { path: string; content: string } }
+    | { type: "readFile"; args: { path: string } }
     | { type: "saveGraph"; args?: never };
 
 export type ControlUpdate = {

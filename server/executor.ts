@@ -280,6 +280,26 @@ const runGraph = async (
                     case "saveGraph":
                         await saveGraph(dirData, _exec.graph);
                         break;
+                    case "writeFile":
+                        await new Promise((resolve, reject) => {
+                            fs.writeFile(
+                                action.args.path,
+                                Buffer.from(action.args.content, "base64"),
+                                (err) => {
+                                    if (err) reject(err);
+                                    else resolve(null);
+                                }
+                            );
+                        });
+                        break;
+                    case "readFile":
+                        result = await new Promise((resolve, reject) => {
+                            fs.readFile(action.args.path, (err, data) => {
+                                if (err) reject(err);
+                                else resolve(data.toString("base64"));
+                            });
+                        });
+                        break;
                     default:
                         externalActionObservable.next(action);
                         break;
