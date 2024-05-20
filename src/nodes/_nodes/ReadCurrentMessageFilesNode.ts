@@ -17,7 +17,7 @@ export const ReadCurrentMessageFilesNode = makeNode(
     {
         nodeName: "ReadCurrentMessageFilesNode",
         nodeIcon: "FileOutlined",
-        dimensions: [300, 140],
+        dimensions: [330, 140],
         doc,
     },
     {

@@ -11,7 +11,7 @@ export const RouteStringArrayNode = makeNode(
     {
         nodeName: "RouteStringArrayNode",
         nodeIcon: "BranchesOutlined",
-        dimensions: [300, 180],
+        dimensions: [330, 130],
         doc,
     },
     {

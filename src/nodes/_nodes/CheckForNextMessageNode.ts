@@ -17,7 +17,7 @@ export const CheckForNextMessageNode = makeNode(
     {
         nodeName: "CheckForNextMessageNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [300, 250],
+        dimensions: [330, 250],
         doc,
     },
     {

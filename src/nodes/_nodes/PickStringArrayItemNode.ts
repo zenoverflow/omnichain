@@ -4,7 +4,7 @@ export const PickStringArrayItemNode = makeNode(
     {
         nodeName: "PickStringArrayItemNode",
         nodeIcon: "OrderedListOutlined",
-        dimensions: [300, 175],
+        dimensions: [330, 175],
         doc: "Pick an item from a string array by index.",
     },
     {
@@ -26,7 +26,7 @@ export const PickStringArrayItemNode = makeNode(
     },
     {
         async dataFlow(nodeId, context) {
-            const inputs = await context.fetchInputs!(nodeId);
+            const inputs = await context.fetchInputs(nodeId);
             const controls = context.getAllControls(nodeId);
 
             const array = (inputs["array"] ?? [])[0] ?? [];

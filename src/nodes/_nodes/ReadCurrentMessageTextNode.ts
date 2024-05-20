@@ -15,7 +15,7 @@ export const ReadCurrentMessageTextNode = makeNode(
     {
         nodeName: "ReadCurrentMessageTextNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [300, 100],
+        dimensions: [330, 100],
         doc,
     },
     {

@@ -11,7 +11,7 @@ export const RouteChatMessageArrayNode = makeNode(
     {
         nodeName: "RouteChatMessageArrayNode",
         nodeIcon: "BranchesOutlined",
-        dimensions: [300, 180],
+        dimensions: [330, 130],
         doc,
     },
     {

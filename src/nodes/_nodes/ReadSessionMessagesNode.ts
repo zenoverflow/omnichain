@@ -15,7 +15,7 @@ export const ReadSessionMessagesNode = makeNode(
     {
         nodeName: "ReadSessionMessagesNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [300, 150],
+        dimensions: [330, 150],
         doc,
     },
     {

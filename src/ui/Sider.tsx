@@ -25,7 +25,11 @@ export const Sider: React.FC<{
                     return {
                         key: graphId,
                         icon: <ItemIcon graphId={graphId} />,
-                        label: <Tooltip title={label}>{label}</Tooltip>,
+                        label: (
+                            <Tooltip title={label} placement="right">
+                                {label}
+                            </Tooltip>
+                        ),
                     };
                 }),
         [graphs]
