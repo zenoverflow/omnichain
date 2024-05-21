@@ -52,7 +52,12 @@ export const ReadFromJSONNode = makeNode(
                 }
             }
 
-            return { data: JSON.stringify(data) };
+            const dataIsSimple =
+                typeof data === "string" || typeof data === "number";
+
+            return {
+                data: dataIsSimple ? `${data}` : JSON.stringify(data),
+            };
         },
     }
 );
