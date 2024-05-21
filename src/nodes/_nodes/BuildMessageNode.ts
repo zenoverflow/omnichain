@@ -26,25 +26,20 @@ export const BuildMessageNode = makeNode(
             { name: "content", type: "string", label: "content" },
             { name: "filesArray", type: "fileArray", label: "files (array)" },
             { name: "fileSingle", type: "file", label: "file (single)" },
+            { name: "avatarName", type: "string", label: "avatar name" },
         ],
         outputs: [{ name: "message", type: "chatMessage", label: "message" }],
-        controls: [
-            {
-                name: "avatarName",
-                control: {
-                    type: "text",
-                    defaultValue: "",
-                    config: {
-                        label: "avatar",
-                    },
-                },
-            },
-        ],
+        controls: [],
     },
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
+
+            const avatarName: string | undefined =
+                (inputs.avatarName || [])[0] || undefined;
+
             const files = [...((inputs.filesArray || [])[0] || [])];
+
             const fileSingle = (inputs.fileSingle || [])[0];
             if (fileSingle) {
                 files.push(fileSingle);
@@ -52,9 +47,7 @@ export const BuildMessageNode = makeNode(
             const message = MsgUtils.freshFromAssistant(
                 context.graphId,
                 (inputs.content || [])[0] || "",
-                (context.getAllControls(nodeId).avatarName || undefined) as
-                    | string
-                    | undefined,
+                avatarName,
                 files
             );
             return { message };
