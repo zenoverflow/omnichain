@@ -23,7 +23,7 @@ export const ReadCurrentMessageNode = makeNode(
     },
     {
         async dataFlow(_nodeId, context) {
-            const message = await context.onExternalAction({
+            const message = await context.extraAction({
                 type: "readCurrentMessage",
             });
             if (!message) {

@@ -10,7 +10,6 @@ import { loadNodeRegistry } from "./state/nodeRegistry";
 import { loadExecutor } from "./state/executor";
 
 import { QueueUtils } from "./util/QueueUtils";
-import { CustomNodeUtils } from "./util/CustomNodeUtils";
 
 import { Editor } from "./ui/Editor";
 
@@ -22,7 +21,6 @@ import { Editor } from "./ui/Editor";
 // ]);
 
 export const run = async () => {
-    CustomNodeUtils.exposeNodeMaker();
     await loadNodeRegistry();
     await loadGraphs();
     await loadAvatars();

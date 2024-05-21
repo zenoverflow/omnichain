@@ -5,7 +5,7 @@ export type ExecutionEvent = {
     text: string;
 };
 
-export type ExternalAction =
+export type ExtraAction =
     | { type: "chatBlock"; args: { blocked: boolean } }
     | { type: "terminal"; args: { command: string } }
     | { type: "checkQueue"; args?: never }
@@ -13,8 +13,6 @@ export type ExternalAction =
     | { type: "grabNextMessage"; args?: never }
     | { type: "readCurrentMessage"; args?: never }
     | { type: "addMessageToSession"; args: { message: ChatMessage } }
-    | { type: "writeFile"; args: { path: string; content: string } }
-    | { type: "readFile"; args: { path: string } }
     | { type: "saveGraph"; args?: never };
 
 export type ControlUpdate = {
@@ -47,19 +45,22 @@ export type FlowContext = {
     onEvent: (event: ExecutionEvent) => any;
 
     /**
-     * For signalling control updates during flow execution.
+     * For updating control values during flow execution.
      */
-    onControlChange: (
+    updateControl: (
         node: string,
         control: string,
         value: string | number
     ) => Promise<void>;
 
     /**
-     * Allows nodes to trigger external actions such as
-     * state changes, terminal commands, reading the message queue, etc.
+     * Allows nodes to trigger special actions that tie into the executor.
+     * This is useful for things like blocking the chat, reading messages, etc.
+     *
+     * @param action The action to perform.
+     * @returns the result of the action, may be a value or null, depending on the action.
      */
-    onExternalAction: (action: ExternalAction) => Promise<any>;
+    extraAction: (action: ExtraAction) => Promise<any>;
 
     /**
      * Allows a node to grab its control values from storage.

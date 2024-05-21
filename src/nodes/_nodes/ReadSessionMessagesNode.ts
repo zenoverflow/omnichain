@@ -41,7 +41,7 @@ export const ReadSessionMessagesNode = makeNode(
         async dataFlow(nodeId, context) {
             const controls = context.getAllControls(nodeId);
 
-            const messages: ChatMessage[] = await context.onExternalAction({
+            const messages: ChatMessage[] = await context.extraAction({
                 type: "readSessionMessages",
             });
             const limit = controls.limit as number;

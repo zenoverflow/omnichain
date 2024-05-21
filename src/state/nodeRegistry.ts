@@ -1,12 +1,13 @@
-import type { CustomNode } from "../data/typesCustomNodes";
-
+import { EnvUtils } from "../util/EnvUtils";
 import { StatefulObservable } from "../util/ObservableUtils";
-import { CustomNodeUtils } from "../util/CustomNodeUtils";
+
+import type { CustomNode } from "../data/typesCustomNodes";
 
 export const nodeRegistryStorage = new StatefulObservable<
     Record<string, CustomNode>
 >({});
 
 export const loadNodeRegistry = async () => {
-    nodeRegistryStorage.set(await CustomNodeUtils.consumeBackendRegistry());
+    const res = await fetch(`${EnvUtils.baseUrl()}/api/node_registry`);
+    nodeRegistryStorage.set(await res.json());
 };

@@ -31,7 +31,7 @@ export const SaveStateNode = makeNode(
     {
         async controlFlow(_nodeId, context) {
             try {
-                await context.onExternalAction({
+                await context.extraAction({
                     type: "saveGraph",
                 });
 

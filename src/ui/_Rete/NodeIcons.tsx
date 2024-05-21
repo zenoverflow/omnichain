@@ -1,3 +1,4 @@
+import * as ANT_ICONS from "@ant-design/icons";
 import {
     BorderOutlined,
     DeleteOutlined,
@@ -15,9 +16,9 @@ export const getMenuIcon = (itemName: string) => {
     const ICONS: Record<string, any> = {
         // Node makers (root menu) icons
         ...Object.fromEntries(
-            Object.values(nodeRegistryStorage.get()).map((M) => [
-                M.config.baseConfig.nodeName,
-                M.icon || BorderOutlined,
+            Object.values(nodeRegistryStorage.get()).map((node) => [
+                node.config.baseConfig.nodeName,
+                (ANT_ICONS as any)[node.icon] || BorderOutlined,
             ])
         ),
         // Node menu icons

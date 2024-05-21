@@ -1,3 +1,5 @@
+import { writeFile } from "fs";
+
 import { makeNode } from "./_Base";
 
 import type { ChatMessageFile } from "../../data/types";
@@ -59,12 +61,15 @@ export const WriteFileNode = makeNode(
                     throw new Error("Missing file or path!");
                 }
 
-                await context.onExternalAction({
-                    type: "writeFile",
-                    args: {
+                await new Promise((resolve, reject) => {
+                    writeFile(
                         path,
-                        content: fileToWrite.content,
-                    },
+                        Buffer.from(fileToWrite.content, "base64"),
+                        (err) => {
+                            if (err) reject(err);
+                            else resolve(null);
+                        }
+                    );
                 });
 
                 return "triggerOut";

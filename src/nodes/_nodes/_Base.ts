@@ -1,4 +1,3 @@
-import * as ICONS from "@ant-design/icons";
 import Ajv from "ajv";
 
 import type {
@@ -214,6 +213,6 @@ export const makeNode = (
             },
             flowConfig,
         },
-        icon: (ICONS as any)[nodeIcon] ?? ICONS.BorderOutlined,
+        icon: nodeIcon,
     };
 };

@@ -3,7 +3,6 @@ import path from "path";
 
 import type { CustomNode } from "../src/data/typesCustomNodes.ts";
 
-import { CustomNodeUtils } from "../src/util/CustomNodeUtils.ts";
 import * as NODE_MAKERS from "../src/nodes/index.tsx";
 
 export const readJsonFile = (path: string) =>
@@ -11,6 +10,61 @@ export const readJsonFile = (path: string) =>
 
 export const ensureDirExists = (dir: string) => {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+};
+
+/**
+ * Build a custom node registry from a list of [filename, rawJS].
+ * Can be used from the frontend or backend.
+ *
+ * @param registry list of [filename, rawJS]
+ * @returns custom node registry
+ */
+const _buildCustomNodeRegistry = (
+    registry: [string, string][]
+): Record<string, CustomNode> => {
+    try {
+        const internalNodes = Object.keys(NODE_MAKERS);
+        const customNodeRegistry: Record<string, any> = {};
+
+        for (const [name, rawJS] of registry) {
+            try {
+                const customNodeObj = eval(rawJS)() as
+                    | CustomNode
+                    | null
+                    | undefined;
+
+                if (!customNodeObj) {
+                    console.error(
+                        `Custom node eval failed for ${name}. Skipping.`
+                    );
+                    continue;
+                }
+
+                if (
+                    internalNodes.includes(
+                        customNodeObj.config.baseConfig.nodeName
+                    )
+                ) {
+                    const n = customNodeObj.config.baseConfig.nodeName;
+                    console.error(
+                        `${n} already exists. Cannot add to custom nodes.`
+                    );
+                    continue;
+                }
+
+                customNodeRegistry[customNodeObj.config.baseConfig.nodeName] =
+                    customNodeObj;
+            } catch (error) {
+                console.error(error);
+                console.error(`Custom node eval failed for ${name}. Skipping.`);
+            }
+        }
+
+        return customNodeRegistry;
+    } catch (error) {
+        console.error(error);
+        return {};
+    }
 };
 
 /**
@@ -47,7 +101,7 @@ export const buildNodeRegistry = (
 
     const result = {
         ...NODE_MAKERS,
-        ...CustomNodeUtils.buildCustomNodeRegistry(
+        ..._buildCustomNodeRegistry(
             customNodes.map((file) => [file, fs.readFileSync(file, "utf-8")])
         ),
     } as Record<string, CustomNode>;

@@ -42,7 +42,7 @@ export const TextNode = makeNode(
 
             // Update graph if necessary
             if (update !== oldValue) {
-                await context.onControlChange(nodeId, "val", update);
+                await context.updateControl(nodeId, "val", update);
             }
 
             return { out: update };

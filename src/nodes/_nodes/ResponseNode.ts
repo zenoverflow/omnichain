@@ -33,7 +33,7 @@ export const ResponseNode = makeNode(
                 if (!message) {
                     throw new Error("ResponseNode: Missing message input");
                 }
-                await context.onExternalAction({
+                await context.extraAction({
                     type: "addMessageToSession",
                     args: { message },
                 });

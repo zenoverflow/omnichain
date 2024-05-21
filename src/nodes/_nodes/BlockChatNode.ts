@@ -35,7 +35,7 @@ export const BlockChatNode = makeNode(
                     | "block"
                     | "unblock";
 
-                await context.onExternalAction({
+                await context.extraAction({
                     type: "chatBlock",
                     args: { blocked: action === "block" },
                 });

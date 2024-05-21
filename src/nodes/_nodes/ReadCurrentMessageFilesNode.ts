@@ -51,7 +51,7 @@ export const ReadCurrentMessageFilesNode = makeNode(
         async dataFlow(nodeId, context) {
             const controls = context.getAllControls(nodeId);
 
-            const msg: ChatMessage | null = await context.onExternalAction({
+            const msg: ChatMessage | null = await context.extraAction({
                 type: "readCurrentMessage",
             });
             return {

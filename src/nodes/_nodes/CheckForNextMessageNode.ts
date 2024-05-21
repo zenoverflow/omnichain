@@ -55,13 +55,13 @@ export const CheckForNextMessageNode = makeNode(
                 const checkForFreshMsg =
                     async (): Promise<ChatMessage | null> => {
                         const messages: ChatMessage[] =
-                            await context.onExternalAction({
+                            await context.extraAction({
                                 type: "checkQueue",
                             });
 
                         if (messages.length) {
                             const prevMessage: ChatMessage | null =
-                                await context.onExternalAction({
+                                await context.extraAction({
                                     type: "readCurrentMessage",
                                 });
 
@@ -82,7 +82,7 @@ export const CheckForNextMessageNode = makeNode(
 
                 if (freshMsg) {
                     // Saves the last message to the session
-                    await context.onExternalAction({
+                    await context.extraAction({
                         type: "grabNextMessage",
                     });
                     return "haveMsg";

@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 import { readJsonFile, buildNodeRegistry } from "./utils.ts";
 import { setupOpenAiCompatibleAPI } from "./openai.ts";
 
-import type { ExternalAction } from "../src/data/typesExec.ts";
+import type { ExtraAction } from "../src/data/typesExec.ts";
 import type { ControlUpdate } from "../src/data/typesExec.ts";
 import type {
     ChatMessage,
@@ -38,7 +38,7 @@ const notificationObservable = new SimpleObservable<{
 
 const controlObservable = new SimpleObservable<ControlUpdate>();
 
-const externalActionObservable = new SimpleObservable<ExternalAction>();
+const externalActionObservable = new SimpleObservable<ExtraAction>();
 
 // Utils
 
@@ -200,7 +200,7 @@ const runGraph = async (
             async fetchInputs(_nodeId) {
                 return {};
             },
-            async onControlChange(node, control, value) {
+            async updateControl(node, control, value) {
                 if (!getFlowActive()) {
                     throw new Error(
                         "Executor: control change signalled on inactive instance!"
@@ -229,7 +229,7 @@ const runGraph = async (
                 // Notify frontend
                 controlObservable.next({ graphId, node, control, value });
             },
-            async onExternalAction(action) {
+            async extraAction(action) {
                 if (!getFlowActive()) {
                     throw new Error(
                         "Executor: External action called on inactive instance!"
@@ -238,7 +238,7 @@ const runGraph = async (
 
                 // console.log("onExternalAction", action);
 
-                let result: any;
+                let result: any = null;
 
                 switch (action.type) {
                     case "chatBlock":
@@ -279,26 +279,6 @@ const runGraph = async (
                         break;
                     case "saveGraph":
                         await saveGraph(dirData, _exec.graph);
-                        break;
-                    case "writeFile":
-                        await new Promise((resolve, reject) => {
-                            fs.writeFile(
-                                action.args.path,
-                                Buffer.from(action.args.content, "base64"),
-                                (err) => {
-                                    if (err) reject(err);
-                                    else resolve(null);
-                                }
-                            );
-                        });
-                        break;
-                    case "readFile":
-                        result = await new Promise((resolve, reject) => {
-                            fs.readFile(action.args.path, (err, data) => {
-                                if (err) reject(err);
-                                else resolve(data.toString("base64"));
-                            });
-                        });
                         break;
                     default:
                         externalActionObservable.next(action);
