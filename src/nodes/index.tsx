@@ -53,4 +53,5 @@ export { TemplateSlotNode } from "./_nodes/TemplateSlotNode";
 export { TextFieldNode } from "./_nodes/TextFieldNode";
 export { TextJoinNode } from "./_nodes/TextJoinNode";
 export { TextNode } from "./_nodes/TextNode";
+export { TextSplitNode } from "./_nodes/TextSplitNode";
 export { WriteFileNode } from "./_nodes/WriteFileNode";

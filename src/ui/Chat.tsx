@@ -31,6 +31,7 @@ const { TextArea } = Input;
 const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
     return (
         <Markdown
+            className="c__keep-whitespace"
             components={{
                 code(props) {
                     const { children, className, node, ...rest } = props;

@@ -29,7 +29,7 @@ export const TextJoinNode = makeNode(
                 name: "separator",
                 control: {
                     type: "text",
-                    defaultValue: "\n",
+                    defaultValue: "\\n",
                     config: {
                         label: "separator",
                     },
