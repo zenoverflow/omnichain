@@ -52,7 +52,7 @@ export const ReadFromJSONNode = makeNode(
                 }
             }
 
-            return { data };
+            return { data: JSON.stringify(data) };
         },
     }
 );

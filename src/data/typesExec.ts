@@ -7,7 +7,6 @@ export type ExecutionEvent = {
 
 export type ExtraAction =
     | { type: "chatBlock"; args: { blocked: boolean } }
-    | { type: "terminal"; args: { command: string } }
     | { type: "checkQueue"; args?: never }
     | { type: "readSessionMessages"; args?: never }
     | { type: "grabNextMessage"; args?: never }

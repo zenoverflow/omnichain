@@ -40,6 +40,7 @@ export { RouteStringArrayNode } from "./_nodes/RouteStringArrayNode";
 export { RouteStringNode } from "./_nodes/RouteStringNode";
 export { RouteTemplateSlotNode } from "./_nodes/RouteTemplateSlotNode";
 export { RouteTriggerNode } from "./_nodes/RouteTriggerNode";
+export { RunCommandNode } from "./_nodes/RunCommandNode";
 export { SaveStateNode } from "./_nodes/SaveStateNode";
 export { StartNode } from "./_nodes/StartNode";
 export { StringifyChatMessageArrayNode } from "./_nodes/StringifyChatMessageArrayNode";

@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { exec } from "child_process";
 
 import type Router from "koa-router";
 import { v4 as uuid } from "uuid";
@@ -243,23 +242,6 @@ const runGraph = async (
                 switch (action.type) {
                     case "chatBlock":
                         handleChatBlock(action.args.blocked);
-                        break;
-                    case "terminal":
-                        result = await new Promise((resolve) => {
-                            const { command } = action.args;
-                            exec(command, (error, stdout, stderr) => {
-                                if (error) {
-                                    resolve(`Error: ${error.message}`);
-                                    return;
-                                }
-                                const result: string[] = [];
-                                if (stderr) {
-                                    result.push(`Error: ${stderr}`);
-                                }
-                                result.push(`Result: ${stdout}`);
-                                resolve(result.join("\n"));
-                            });
-                        });
                         break;
                     case "checkQueue":
                         result = messageQueue;

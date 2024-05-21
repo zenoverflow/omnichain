@@ -44,7 +44,7 @@ export const StringifyFileNode = makeNode(
             }
 
             return {
-                out: JSON.stringify(result),
+                out: JSON.stringify(result, null, 2),
             };
         },
     }

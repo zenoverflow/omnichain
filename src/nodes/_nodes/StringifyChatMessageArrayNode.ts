@@ -40,7 +40,7 @@ export const StringifyChatMessageArrayNode = makeNode(
             const result = (inputs.in || [])[0] || [];
 
             return {
-                out: JSON.stringify(result),
+                out: JSON.stringify(result, null, 2),
             };
         },
     }
