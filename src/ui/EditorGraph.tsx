@@ -73,6 +73,11 @@ const GraphRunButton: React.FC = () => {
     const [editorTarget] = useOuterState(editorTargetStorage);
     const [executor] = useOuterState(executorStorage);
 
+    const otherGraphIsActive = useMemo(
+        () => (executor ? executor.graphId !== editorTarget : false),
+        [editorTarget, executor]
+    );
+
     const graphIsActive = useMemo(
         () => (editorTarget ? executor?.graphId === editorTarget : false),
         [editorTarget, executor]
@@ -102,6 +107,7 @@ const GraphRunButton: React.FC = () => {
                 void runGraph(editorTarget);
             }}
             style={{ pointerEvents: "all" }}
+            disabled={otherGraphIsActive}
         />
     );
 };
