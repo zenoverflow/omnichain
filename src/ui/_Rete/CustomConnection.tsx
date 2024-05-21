@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import { ClassicScheme, Presets } from "rete-react-plugin";
-import { editorStateStorage } from "../../state/editor";
 const { useConnection } = Presets.classic;
+
+import { editorStateStorage } from "../../state/editor";
+import { executorStorage } from "../../state/executor";
 
 const Svg = styled.svg`
     overflow: visible !important;
@@ -91,8 +93,13 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
         const handleClick = (e: any) => {
             e.preventDefault();
             if (e.button === 1) {
+                // Editing disabled during execution
+                const executorState = executorStorage.get();
+                if (executorState) return;
+
                 const editorState = editorStateStorage.get();
                 if (!editorState) return;
+
                 void editorState.editor.removeConnection(props.data.id);
             }
         };
