@@ -19,9 +19,13 @@ export const ensureDirExists = (dir: string) => {
  * They are not serializable and should not be sent to the frontend.
  *
  * @param dirCustomNodes
+ * @param configOnly - removes the flow functions (used for the frontend)
  * @returns
  */
-export const buildNodeRegistry = (dirCustomNodes: string) => {
+export const buildNodeRegistry = (
+    dirCustomNodes: string,
+    configOnly = false
+) => {
     const customNodes: string[] = [];
 
     for (const obj of fs.readdirSync(dirCustomNodes)) {
@@ -40,10 +44,28 @@ export const buildNodeRegistry = (dirCustomNodes: string) => {
             customNodes.push(path.join(dirCustomNodes, obj));
         }
     }
-    return {
+
+    const result = {
         ...NODE_MAKERS,
         ...CustomNodeUtils.buildCustomNodeRegistry(
             customNodes.map((file) => [file, fs.readFileSync(file, "utf-8")])
         ),
     } as Record<string, CustomNode>;
+
+    if (configOnly) {
+        return Object.fromEntries(
+            Object.entries(result).map(([key, value]) => [
+                key,
+                {
+                    ...value,
+                    config: {
+                        ...value.config,
+                        flowConfig: null,
+                    },
+                },
+            ])
+        );
+    }
+
+    return result;
 };

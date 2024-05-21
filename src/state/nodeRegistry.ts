@@ -2,16 +2,11 @@ import type { CustomNode } from "../data/typesCustomNodes";
 
 import { StatefulObservable } from "../util/ObservableUtils";
 import { CustomNodeUtils } from "../util/CustomNodeUtils";
-import * as NODE_MAKERS from "../nodes";
 
 export const nodeRegistryStorage = new StatefulObservable<
     Record<string, CustomNode>
 >({});
 
 export const loadNodeRegistry = async () => {
-    const registry = await CustomNodeUtils.consumeBackendRegistry();
-    nodeRegistryStorage.set({
-        ...NODE_MAKERS,
-        ...registry,
-    });
+    nodeRegistryStorage.set(await CustomNodeUtils.consumeBackendRegistry());
 };

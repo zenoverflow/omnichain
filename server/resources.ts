@@ -3,39 +3,17 @@ import fs from "fs";
 
 import type Router from "koa-router";
 
-import { readJsonFile, ensureDirExists } from "./utils.ts";
+import { readJsonFile, ensureDirExists, buildNodeRegistry } from "./utils.ts";
 
 export const setupResourcesApi = (
     router: Router,
     dirData: string,
     dirCustomNodes: string
 ) => {
-    // API: custom nodes (fetch only)
+    // API: node_registry (fetch only)
 
-    router.get("/api/custom_nodes", (ctx) => {
-        const customNodes: string[] = [];
-
-        for (const obj of fs.readdirSync(dirCustomNodes)) {
-            // Check for makers in roots of subdirectories
-            if (fs.statSync(path.join(dirCustomNodes, obj)).isDirectory()) {
-                const subdir = path.join(dirCustomNodes, obj);
-                // Read makers from subdirectory root
-                for (const subObj of fs.readdirSync(subdir)) {
-                    if (subObj.endsWith(".maker.js")) {
-                        customNodes.push(
-                            path.join(dirCustomNodes, obj, subObj)
-                        );
-                    }
-                }
-            }
-            // Directly add makers from root custom_nodes directory
-            else if (obj.endsWith(".maker.js")) {
-                customNodes.push(path.join(dirCustomNodes, obj));
-            }
-        }
-        ctx.body = JSON.stringify(
-            customNodes.map((file) => [file, fs.readFileSync(file, "utf-8")])
-        );
+    router.get("/api/node_registry", (ctx) => {
+        ctx.body = JSON.stringify(buildNodeRegistry(dirCustomNodes, true));
     });
 
     // API: single-file resources

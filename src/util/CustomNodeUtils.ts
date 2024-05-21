@@ -80,10 +80,8 @@ export const CustomNodeUtils = {
      */
     async consumeBackendRegistry(): Promise<Record<string, CustomNode>> {
         try {
-            const res = await fetch(`${EnvUtils.baseUrl()}/api/custom_nodes`);
-            const data = (await res.json()) as [string, string][];
-
-            return CustomNodeUtils.buildCustomNodeRegistry(data);
+            const res = await fetch(`${EnvUtils.baseUrl()}/api/node_registry`);
+            return (await res.json()) as Record<string, CustomNode>;
         } catch (error) {
             console.error(error);
             return {};

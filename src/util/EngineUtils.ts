@@ -155,7 +155,13 @@ export const EngineUtils = {
                 const controlFlow =
                     nodeInstance.node.config.flowConfig?.controlFlow;
 
-                if (!controlFlow) break;
+                if (!controlFlow) {
+                    console.log(
+                        "Stopping: No control flow for",
+                        nodeInstance.node.config.baseConfig.nodeName
+                    );
+                    break;
+                }
 
                 eventHandlers.onFlowNode(currentControl);
                 const sourceOutput = await controlFlow(
