@@ -8,7 +8,7 @@ export const TemplateBuilderNode = makeNode(
         doc: "Build a prompt by combining a template with values.",
     },
     {
-        inputs: [{ name: "parts", type: "templateSlot", multi: true }],
+        inputs: [{ name: "parts", type: "slot", multi: true }],
         outputs: [{ name: "result", type: "string" }],
         controls: [
             {

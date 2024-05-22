@@ -16,7 +16,7 @@ export type CustomIO = {
         | "trigger"
         | "string"
         | "stringArray"
-        | "templateSlot"
+        | "slot"
         | "file"
         | "fileArray"
         | "chatMessage"

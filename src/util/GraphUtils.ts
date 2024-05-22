@@ -20,7 +20,7 @@ import { ChatMessageArraySocket } from "../nodes/_sockets/ChatMessageArraySocket
 import { ChatMessageSocket } from "../nodes/_sockets/ChatMessageSocket";
 import { FileArraySocket } from "../nodes/_sockets/FileArraySocket";
 import { FileSocket } from "../nodes/_sockets/FileSocket";
-import { TemplateSlotSocket } from "../nodes/_sockets/TemplateSlotSocket";
+import { SlotSocket } from "../nodes/_sockets/SlotSocket";
 
 // Controls
 import { TextControl } from "../nodes/_controls/TextControl";
@@ -245,8 +245,8 @@ export const GraphUtils = {
                 return new StringSocket();
             case "stringArray":
                 return new StringArraySocket();
-            case "templateSlot":
-                return new TemplateSlotSocket();
+            case "slot":
+                return new SlotSocket();
             case "file":
                 return new FileSocket();
             case "fileArray":

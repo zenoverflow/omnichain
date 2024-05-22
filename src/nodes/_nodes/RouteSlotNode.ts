@@ -2,14 +2,14 @@ import { makeNode } from "./_Base";
 
 const doc = [
     //
-    "Use to route template slot connections.",
+    "Use to route slot connections.",
 ]
     .join(" ")
     .trim();
 
-export const RouteTemplateSlotNode = makeNode(
+export const RouteSlotNode = makeNode(
     {
-        nodeName: "RouteTemplateSlotNode",
+        nodeName: "RouteSlotNode",
         nodeIcon: "BranchesOutlined",
         dimensions: [330, 130],
         doc,
@@ -17,11 +17,11 @@ export const RouteTemplateSlotNode = makeNode(
     {
         inputs: [
             //
-            { name: "in", type: "templateSlot", label: "in" },
+            { name: "in", type: "slot", label: "in" },
         ],
         outputs: [
             //
-            { name: "out", type: "templateSlot", label: "out" },
+            { name: "out", type: "slot", label: "out" },
         ],
         controls: [],
     },
@@ -31,7 +31,7 @@ export const RouteTemplateSlotNode = makeNode(
             const slotObj = (inputs.in || [])[0];
 
             if (!slotObj) {
-                throw new Error("No template slot input.");
+                throw new Error("No slot input.");
             }
 
             return {

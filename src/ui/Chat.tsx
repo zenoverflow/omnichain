@@ -31,7 +31,7 @@ const { TextArea } = Input;
 const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
     return (
         <Markdown
-            className="c__keep-whitespace"
+            // className="c__keep-whitespace"
             components={{
                 code(props) {
                     const { children, className, node, ...rest } = props;
@@ -441,7 +441,7 @@ export const ChatInterface: React.FC = () => {
                             onChange={(e) => {
                                 setMessage(e.target.value);
                             }}
-                            onKeyUp={handleTextboxEnter}
+                            onKeyDown={handleTextboxEnter}
                             placeholder="Type a message..."
                             autoSize={{ minRows: 2, maxRows: 8 }}
                             style={{ flex: "1" }}

@@ -352,13 +352,23 @@ export const setupExecutorApi = (
     });
 
     router.get("/api/executor/ping", async (ctx) => {
-        const toSend: typeof events = [];
-        while (events.length) {
-            const ev = events.shift();
-            if (ev) toSend.push(ev);
+        try {
+            if (!events.length) {
+                ctx.body = "[]";
+                return;
+            }
+
+            const toSend: typeof events = [];
+
+            while (events.length) {
+                const ev = events.shift();
+                if (ev) toSend.push(ev);
+            }
+
+            ctx.body = JSON.stringify(toSend);
+        } catch (error) {
+            ctx.body = "[]";
         }
-        // console.log("Ping", toSend);
-        ctx.body = JSON.stringify(toSend);
     });
 
     // Endpoint to stop graph
