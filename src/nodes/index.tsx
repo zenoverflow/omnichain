@@ -7,6 +7,7 @@ export { BuildFileNode } from "./_nodes/BuildFileNode";
 export { BuildMessageNode } from "./_nodes/BuildMessageNode";
 export { CheckForNextMessageNode } from "./_nodes/CheckForNextMessageNode";
 export { DelayOutputNode } from "./_nodes/DelayOutputNode";
+export { EvalJsExpressionNode } from "./_nodes/EvalJsExpressionNode";
 export { GetApiKeyNode } from "./_nodes/GetApiKeyNode";
 export { GetFileContentNode } from "./_nodes/GetFileContentNode";
 export { GetFileMimeTypeNode } from "./_nodes/GetFileMimeTypeNode";

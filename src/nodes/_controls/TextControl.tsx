@@ -1,23 +1,37 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Input, Button, Modal } from "antd";
 import { FullscreenOutlined } from "@ant-design/icons";
 import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
+import { javascript as syntaxJs } from "@codemirror/lang-javascript";
+import { markdown as syntaxMd } from "@codemirror/lang-markdown";
+import { json as syntaxJson } from "@codemirror/lang-json";
 
 import { BaseControl, useControlState } from "./_Control";
 
 export type TextControlConfig = {
     large?: boolean;
     label?: string;
-    modalSyntaxHighlight?: boolean;
+    modalSyntaxHighlight?: "json" | "markdown" | "javascript";
 };
 
 const _Modal: React.FC<{
     closeModal: () => any;
     value: string;
     onChange: (v: string) => any;
-    modalSyntaxHighlight?: boolean;
+    modalSyntaxHighlight?: string;
 }> = ({ closeModal, value, onChange, modalSyntaxHighlight }) => {
+    const syntaxExtensions = useMemo(() => {
+        switch (modalSyntaxHighlight) {
+            case "json":
+                return [syntaxJson()];
+            case "markdown":
+                return [syntaxMd({})];
+            case "javascript":
+                return [syntaxJs({})];
+            default:
+                return [];
+        }
+    }, [modalSyntaxHighlight]);
     return (
         <Modal
             title={<div style={{ height: "30px" }} />}
@@ -41,7 +55,7 @@ const _Modal: React.FC<{
                 }}
                 height="80vh"
                 maxHeight="80vh"
-                extensions={[...(modalSyntaxHighlight ? [javascript({})] : [])]}
+                extensions={syntaxExtensions}
             />
         </Modal>
     );
