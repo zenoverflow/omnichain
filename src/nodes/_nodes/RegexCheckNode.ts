@@ -12,7 +12,7 @@ export const RegexCheckNode = makeNode(
     {
         nodeName: "RegexCheckNode",
         nodeIcon: "CodeOutlined",
-        dimensions: [300, 290],
+        dimensions: [580, 590],
         doc,
     },
     {
@@ -32,7 +32,7 @@ export const RegexCheckNode = makeNode(
                     type: "text",
                     defaultValue: "",
                     config: {
-                        label: "regex",
+                        large: true,
                     },
                 },
             },
@@ -49,7 +49,7 @@ export const RegexCheckNode = makeNode(
                     throw new Error("Missing regex pattern!");
                 }
 
-                const regex = new RegExp(regexRaw, "g");
+                const regex = new RegExp(regexRaw);
 
                 const inputs = await context.fetchInputs(nodeId);
 

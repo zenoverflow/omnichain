@@ -34,6 +34,7 @@ export { ReadFileNode } from "./_nodes/ReadFileNode";
 export { ReadFromJSONNode } from "./_nodes/ReadFromJSONNode";
 export { ReadSessionMessagesNode } from "./_nodes/ReadSessionMessagesNode";
 export { RegexCheckNode } from "./_nodes/RegexCheckNode";
+export { RegexExtractorNode } from "./_nodes/RegexExtractorNode";
 export { ResponseNode } from "./_nodes/ResponseNode";
 export { RouteChatMessageArrayNode } from "./_nodes/RouteChatMessageArrayNode";
 export { RouteChatMessageNode } from "./_nodes/RouteChatMessageNode";
