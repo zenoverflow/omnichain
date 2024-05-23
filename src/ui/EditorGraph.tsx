@@ -6,6 +6,7 @@ import {
     PlayCircleOutlined,
     StopOutlined,
     ExportOutlined,
+    CopyOutlined,
 } from "@ant-design/icons";
 import { Button, Drawer, Space, Input, Popconfirm, Select } from "antd";
 
@@ -156,6 +157,15 @@ export const EditorGraph: React.FC = () => {
         link.click();
     }, [currentGraph]);
 
+    const handleCopyId = useCallback(async () => {
+        if (!currentGraph) return;
+        try {
+            await navigator.clipboard.writeText(currentGraph.graphId);
+        } catch (error) {
+            console.error(error);
+        }
+    }, [currentGraph]);
+
     // Disable/enable controls manually
     useEffect(() => {
         if (editorTarget && editorData) {
@@ -272,6 +282,16 @@ export const EditorGraph: React.FC = () => {
                     >
                         {"Export"}
                     </Button>
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<CopyOutlined />}
+                        onClick={() => {
+                            void handleCopyId();
+                        }}
+                    >
+                        {"Copy ID"}
+                    </Button>
                     <Space
                         direction="vertical"
                         size="small"
@@ -280,7 +300,6 @@ export const EditorGraph: React.FC = () => {
                         <span style={{ opacity: 0.7 }}>Name</span>
                         <Input
                             size="large"
-                            addonBefore="name"
                             defaultValue={currentGraph.name}
                             maxLength={120}
                             onChange={(e) => {
