@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Layout, Menu, MenuProps, Tooltip } from "antd";
 
 import { graphStorage } from "../state/graphs";
@@ -5,7 +6,7 @@ import { editorTargetStorage, openEditor } from "../state/editor";
 import { useOuterState } from "../util/ObservableUtilsReact";
 import { ItemIcon } from "./_Sider/ItemIcon";
 import { BtnCreateGraph } from "./_Sider/BtnCreateGraph";
-import { useMemo } from "react";
+import { BtnImportGraph } from "./_Sider/BtnImportGraph";
 
 const { Sider: AntSider } = Layout;
 
@@ -57,12 +58,13 @@ export const Sider: React.FC<{
                 style={{
                     width: "100%",
                     display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "stretch",
+                    flexDirection: "row",
+                    // justifyContent: "stretch",
                     alignItems: "center",
                     padding: "5px 5px",
                 }}
             >
+                <BtnImportGraph />
                 <BtnCreateGraph />
             </div>
             {!collapsed ? (

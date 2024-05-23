@@ -24,7 +24,7 @@ export const BtnCreateGraph: React.FC = () => {
 
     const handleCreate = () => {
         setModalOpen(false);
-        createGraph(valOfName);
+        void createGraph(valOfName);
     };
 
     return (
@@ -32,7 +32,7 @@ export const BtnCreateGraph: React.FC = () => {
             <Button
                 type="primary"
                 size="large"
-                style={{ width: "100%" }}
+                style={{ flex: "1" }}
                 disabled={modalOpen}
                 onClick={handleOpenModal}
                 icon={<PlusCircleOutlined />}
@@ -44,6 +44,7 @@ export const BtnCreateGraph: React.FC = () => {
                 open={modalOpen}
                 onOk={handleCreate}
                 onCancel={handleCloseModal}
+                destroyOnClose
             >
                 <Input
                     // onPointerDown={(e) => e.stopPropagation()}

@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Button, Modal, Select, Space } from "antd";
-import {
-    SettingOutlined,
-    UploadOutlined,
-    DownloadOutlined,
-} from "@ant-design/icons";
+import { SettingOutlined } from "@ant-design/icons";
 
 import { optionsStorage, setOptions } from "../../state/options";
 import { graphStorage } from "../../state/graphs";
@@ -77,15 +73,6 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                 size="large"
                 style={{ width: "100%", marginTop: "10px" }}
             >
-                <Space
-                    direction="horizontal"
-                    size="middle"
-                    style={{ width: "100%" }}
-                >
-                    <Button icon={<DownloadOutlined />}>Export chains</Button>
-                    <Button icon={<UploadOutlined />}>Import chains</Button>
-                </Space>
-
                 {/* User chat avatar setting */}
 
                 <Space

@@ -1,10 +1,11 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useRete } from "rete-react-plugin";
 import {
     DeleteOutlined,
     EditOutlined,
     PlayCircleOutlined,
     StopOutlined,
+    ExportOutlined,
 } from "@ant-design/icons";
 import { Button, Drawer, Space, Input, Popconfirm } from "antd";
 
@@ -134,6 +135,20 @@ export const EditorGraph: React.FC = () => {
         [executor, editorTarget]
     );
 
+    const handleExport = useCallback(() => {
+        if (!currentGraph) return;
+
+        const link = document.createElement("a");
+
+        link.href =
+            "data:application/json;charset=utf-8," +
+            encodeURIComponent(JSON.stringify(currentGraph, null, 2));
+
+        link.download = `${currentGraph.name}.json`;
+
+        link.click();
+    }, [currentGraph]);
+
     // Disable/enable controls manually
     useEffect(() => {
         if (editorTarget && editorData) {
@@ -239,15 +254,27 @@ export const EditorGraph: React.FC = () => {
                     </Space>
                 }
             >
-                <Input
-                    size="large"
-                    addonBefore="name"
-                    defaultValue={currentGraph?.name ?? ""}
-                    maxLength={120}
-                    onChange={(e) => {
-                        updateGraphName(editorTarget, e.target.value);
-                    }}
-                />
+                <Space direction="vertical">
+                    <Input
+                        size="large"
+                        addonBefore="name"
+                        defaultValue={currentGraph?.name ?? ""}
+                        maxLength={120}
+                        onChange={(e) => {
+                            updateGraphName(editorTarget, e.target.value);
+                        }}
+                    />
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<ExportOutlined />}
+                        onClick={() => {
+                            handleExport();
+                        }}
+                    >
+                        {"Export"}
+                    </Button>
+                </Space>
             </Drawer>
         </>
     );

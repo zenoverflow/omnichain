@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+
 import type { CAreaPlugin, CNodeEditor } from "../data/typesRete";
 import type { SerializedGraph } from "../data/types";
 
@@ -10,6 +12,7 @@ import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
 import { nodeRegistryStorage } from "./nodeRegistry";
 import { complexErrorObservable } from "./watcher";
+import { GraphValidationUtils } from "../util/GraphValidationUtils";
 
 export const graphStorage = new StatefulObservable<
     Record<string, SerializedGraph>
@@ -29,16 +32,40 @@ const backendDeleteGraph = async (id: string) => {
 
 // ACTIONS //
 
-export const createGraph = (name = "New Chain") => {
-    QueueUtils.addTask(async () => {
-        const created = GraphUtils.empty(name);
-        await backendSetGraph(created.graphId, created);
+export const createGraph = async (name = "New Chain") => {
+    const created = GraphUtils.empty(name);
+    await backendSetGraph(created.graphId, created);
+    graphStorage.set({
+        ...graphStorage.get(),
+        [created.graphId]: created,
+    });
+    openEditor(created.graphId);
+};
+
+export const importGraph = async (graph: SerializedGraph) => {
+    try {
+        const valid = GraphValidationUtils.validateGraphObj(graph);
+
+        if (!valid) {
+            throw new Error("Invalid graph data.");
+        }
+
+        const validatedGraph: SerializedGraph = {
+            ...graph,
+            graphId: uuid(),
+        };
+
+        await backendSetGraph(validatedGraph.graphId, validatedGraph);
+
         graphStorage.set({
             ...graphStorage.get(),
-            [created.graphId]: created,
+            [validatedGraph.graphId]: validatedGraph,
         });
-        openEditor(created.graphId);
-    });
+
+        openEditor(validatedGraph.graphId);
+    } catch (error: any) {
+        complexErrorObservable.next(["Import error!", error.message]);
+    }
 };
 
 export const initGraph = async (
