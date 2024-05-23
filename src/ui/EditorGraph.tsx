@@ -7,13 +7,18 @@ import {
     StopOutlined,
     ExportOutlined,
 } from "@ant-design/icons";
-import { Button, Drawer, Space, Input, Popconfirm } from "antd";
+import { Button, Drawer, Space, Input, Popconfirm, Select } from "antd";
 
 import { createEditor } from "./_Rete";
 import { ContextMenu } from "./_EditorGraph/ContextMenu";
 import { useOuterState } from "../util/ObservableUtilsReact";
 
-import { graphStorage, updateGraphName, deleteGraph } from "../state/graphs";
+import {
+    graphStorage,
+    updateGraphName,
+    updateGraphExecPersistence,
+    deleteGraph,
+} from "../state/graphs";
 import { deleteSelectedNodes, editorTargetStorage } from "../state/editor";
 import { nodeSelectionStorage } from "../state/nodeSelection";
 import { executorStorage, stopGraph, runGraph } from "../state/executor";
@@ -169,7 +174,7 @@ export const EditorGraph: React.FC = () => {
         };
     }, [editorData]);
 
-    if (!editorTarget) return null;
+    if (!editorTarget || !currentGraph) return null;
 
     return (
         <>
@@ -255,15 +260,6 @@ export const EditorGraph: React.FC = () => {
                 }
             >
                 <Space direction="vertical">
-                    <Input
-                        size="large"
-                        addonBefore="name"
-                        defaultValue={currentGraph?.name ?? ""}
-                        maxLength={120}
-                        onChange={(e) => {
-                            updateGraphName(editorTarget, e.target.value);
-                        }}
-                    />
                     <Button
                         type="primary"
                         size="large"
@@ -274,6 +270,54 @@ export const EditorGraph: React.FC = () => {
                     >
                         {"Export"}
                     </Button>
+                    <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: "100%", marginTop: "10px" }}
+                    >
+                        <span style={{ opacity: 0.7 }}>Name</span>
+                        <Input
+                            size="large"
+                            addonBefore="name"
+                            defaultValue={currentGraph.name}
+                            maxLength={120}
+                            onChange={(e) => {
+                                updateGraphName(editorTarget, e.target.value);
+                            }}
+                        />
+                    </Space>
+                    <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: "100%", marginTop: "10px" }}
+                    >
+                        <span style={{ opacity: 0.7 }}>Save mode</span>
+                        <Select
+                            style={{ width: "100%" }}
+                            placeholder="Select an option..."
+                            options={[
+                                { label: "On change", value: "onChange" },
+                                { label: "On demand", value: "onDemand" },
+                            ]}
+                            onChange={(v) => {
+                                updateGraphExecPersistence(editorTarget, v);
+                            }}
+                            defaultValue={currentGraph.execPersistence}
+                        />
+                        <span
+                            className="c__mstyle"
+                            style={{ fontSize: "16px", opacity: 0.7 }}
+                        >
+                            Restart the running chain for this to take effect!
+                            The chain can update its own state and save it to
+                            disk during execution. This can bottleneck
+                            performance, and is the reason why the SaveState
+                            node exists. When you select the On Demand option,
+                            the chain will only save its state when a SaveState
+                            node is triggered. This can vastly improve
+                            performance, especially for complex chains.
+                        </span>
+                    </Space>
                 </Space>
             </Drawer>
         </>

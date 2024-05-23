@@ -6,11 +6,11 @@ import { BackendResourceUtils } from "../util/BackendResourceUtils";
 type OptionsState = {
     userAvatarId?: string | null;
     defaultChainId?: string | null;
-    execPersistence: "onChange" | "onDemand";
 };
 
 export const optionsStorage = new StatefulObservable<OptionsState>({
-    execPersistence: "onChange",
+    userAvatarId: null,
+    defaultChainId: null,
 });
 
 export const loadOptions = async () => {
@@ -47,16 +47,6 @@ export const setDefaultChain = async (graphId: string | null) => {
     await saveOptions();
 };
 
-export const setExecPersistence = async (
-    execPersistence: "onChange" | "onDemand"
-) => {
-    optionsStorage.set({
-        ...optionsStorage.get(),
-        execPersistence,
-    });
-    await saveOptions();
-};
-
 export const clearRedundantOptions = async () => {
     const graphs = graphStorage.get();
     const avatars = avatarStorage.get();
@@ -78,11 +68,6 @@ export const clearRedundantOptions = async () => {
         !Object.keys(graphs).includes(options.defaultChainId)
     ) {
         update.defaultChainId = null;
-        haveUpdate = true;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!["onChange", "onDemand"].includes(options.execPersistence || "")) {
-        update.execPersistence = "onChange";
         haveUpdate = true;
     }
 

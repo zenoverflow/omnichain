@@ -133,6 +133,22 @@ export const updateGraphName = (graphId: string, name: string) => {
     });
 };
 
+export const updateGraphExecPersistence = (
+    graphId: string,
+    execPersistence: SerializedGraph["execPersistence"]
+) => {
+    QueueUtils.addTask(async () => {
+        const graph = graphStorage.get()[graphId];
+        const update: SerializedGraph = { ...graph, execPersistence };
+
+        await backendSetGraph(graphId, update);
+        graphStorage.set({
+            ...graphStorage.get(),
+            [graphId]: update,
+        });
+    });
+};
+
 export const updateNodeControl = async (
     graphId: string,
     nodeId: string,

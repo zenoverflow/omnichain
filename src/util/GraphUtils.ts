@@ -45,6 +45,7 @@ export const GraphUtils = {
             areaX: 0,
             areaY: 0,
             created: Date.now(),
+            execPersistence: "onChange",
         };
     },
 

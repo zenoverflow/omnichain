@@ -116,13 +116,6 @@ const runGraph = async (
     stopCurrentGraph();
 
     const nodeRegistry = buildNodeRegistry(dirCustomNodes);
-    const saveOption = fs.existsSync(path.join(dirData, "options.json"))
-        ? JSON.parse(
-              fs.readFileSync(path.join(dirData, "options.json"), "utf-8")
-          ).execPersistence || "onChange"
-        : "onChange";
-
-    console.log("Graph save mode", saveOption);
 
     const graphPath = path.join(dirData, "chains", `${graphId}.json`);
 
@@ -133,6 +126,10 @@ const runGraph = async (
         graph: readJsonFile(graphPath) as SerializedGraph,
         currentMessage: null,
     };
+
+    const saveOption = _exec.graph.execPersistence || "onChange";
+
+    console.log("Graph save mode", saveOption);
 
     // Ensure nodes availability in registry
     if (

@@ -20,6 +20,7 @@ export type SerializedGraph = {
     areaX: number;
     areaY: number;
     created: number;
+    execPersistence: "onChange" | "onDemand";
 };
 
 export type ChatMessageFile = {

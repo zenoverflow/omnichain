@@ -1,7 +1,6 @@
 export { ArrayFromChatMessageNode } from "./_nodes/ArrayFromChatMessageNode";
 export { ArrayFromFileNode } from "./_nodes/ArrayFromFileNode";
 export { ArrayFromStringNode } from "./_nodes/ArrayFromStringNode";
-export { AutoTextSlicerNode } from "./_nodes/AutoTextSlicerNode";
 export { BlockChatNode } from "./_nodes/BlockChatNode";
 export { BuildFileNode } from "./_nodes/BuildFileNode";
 export { BuildMessageNode } from "./_nodes/BuildMessageNode";
