@@ -21,7 +21,7 @@ type PathProps = {
 
 export const Path = styled.path<PathProps>`
     fill: none;
-    stroke-width: 5px;
+    stroke-width: 8px;
     stroke: ${(props) => props.stroke};
     pointer-events: auto;
     ${
@@ -41,9 +41,18 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
         start: { x: number; y: number },
         end: { x: number; y: number }
     ) => {
-        // If end is to the right, draw a line
+        // If end is to the right, draw a slight cubic bezier curve
         if (end.x > start.x) {
-            return `M${start.x},${start.y}L${end.x},${end.y}`;
+            // return `M${start.x},${start.y}L${end.x},${end.y}`;
+            const c1 = {
+                x: start.x + 12,
+                y: start.y,
+            };
+            const c2 = {
+                x: end.x - 12,
+                y: end.y,
+            };
+            return `M${start.x},${start.y}C${c1.x},${c1.y},${c2.x},${c2.y},${end.x},${end.y}`;
         }
 
         // Otherwise, follow a turn algo
