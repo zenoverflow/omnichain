@@ -14,6 +14,7 @@ import { ChatInterface } from "./Chat";
 import { BtnOptions } from "./_Header/BtnOptions";
 import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
+import { BtnNodeIndex } from "./_Header/BtnNodeIndex";
 
 import { editorTargetStorage, closeEditor } from "../state/editor";
 import { loaderStorage } from "../state/loader";
@@ -113,6 +114,7 @@ export const Editor: React.FC = () => {
                             />
                             <BtnAvatars />
                             <BtnApiKeys />
+                            <BtnNodeIndex />
                             <BtnOptions />
                         </Space>
                     </Space>
