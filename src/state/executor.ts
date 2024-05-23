@@ -1,7 +1,7 @@
 import type { ChatMessage, ExecutorInstance } from "../data/types";
 
 import { StatefulObservable } from "../util/ObservableUtils";
-import { updateNodeControl } from "./graphs";
+import { updateNodeControl, pullSingleGraph } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
 import { ExecutorUtils } from "../util/ExecutorUtils";
@@ -23,6 +23,22 @@ export const clearLastNodeError = () => {
     lastNodeErrorStorage.set(null);
 };
 
+const pullOnStop = async () => {
+    const executor = executorStorage.get();
+    if (!executor) return;
+
+    startGlobalLoading();
+
+    const graphId = executor.graphId;
+
+    // Refresh the graph due to possible discrepancies
+    // if execPersistence was not set to onChange
+    // and no SaveState node was used.
+    await pullSingleGraph(graphId);
+
+    finishGlobalLoading();
+};
+
 const updateChecker = async () => {
     // let messages: { type: string; data: any }[] = [];
     try {
@@ -30,7 +46,14 @@ const updateChecker = async () => {
         for (const message of messages) {
             switch (message.type) {
                 case "executorUpdate":
-                    executorStorage.set(message.data);
+                    if (!message.data) {
+                        // console.log("Executor stopped");
+                        await pullOnStop();
+                        executorStorage.set(null);
+                        return;
+                    } else {
+                        executorStorage.set(message.data);
+                    }
                     // console.log("Executor update", message.data);
                     break;
                 case "notification":
@@ -71,8 +94,8 @@ export const isGraphActive = (id: string): boolean => {
     return executorStorage.get()?.graphId === id;
 };
 
-export const stopGraph = () => {
-    void ExecutorUtils.stopGraph();
+export const stopGraph = async () => {
+    await ExecutorUtils.stopGraph();
 };
 
 export const runGraph = async (graphId: string) => {

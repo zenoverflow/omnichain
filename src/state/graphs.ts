@@ -7,7 +7,7 @@ import { StatefulObservable } from "../util/ObservableUtils";
 import { GraphUtils } from "../util/GraphUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { BackendResourceUtils } from "../util/BackendResourceUtils";
-import { closeEditor, openEditor } from "./editor";
+import { closeEditor, openEditor, editorTargetStorage } from "./editor";
 import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
 import { nodeRegistryStorage } from "./nodeRegistry";
@@ -31,6 +31,38 @@ const backendDeleteGraph = async (id: string) => {
 };
 
 // ACTIONS //
+
+/**
+ * Pull up-to-date data about a specific graph from the backend.
+ *
+ * @param graphId
+ */
+export const pullSingleGraph = async (graphId: string) => {
+    try {
+        const graph =
+            await BackendResourceUtils.getMultiSingle<SerializedGraph>(
+                "chains",
+                graphId
+            );
+        graphStorage.set({
+            ...graphStorage.get(),
+            [graphId]: graph,
+        });
+
+        // Reopen editor if it was open for this graph
+        // in order to update the data
+        const editorTarget = editorTargetStorage.get();
+        if (editorTarget === graphId) {
+            closeEditor();
+            setTimeout(() => {
+                openEditor(graphId);
+            }, 1);
+        }
+    } catch (error: any) {
+        console.error(error);
+        // complexErrorObservable.next(["Pull error!", error.message]);
+    }
+};
 
 export const createGraph = async (name = "New Chain") => {
     const created = GraphUtils.empty(name);

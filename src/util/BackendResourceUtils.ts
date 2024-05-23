@@ -61,28 +61,23 @@ export const BackendResourceUtils = {
         }
     },
 
-    async getMultiAll(resource: string) {
+    async getMultiAll<T>(resource: string) {
         try {
             const res = await fetch(
                 `${EnvUtils.baseUrl()}/api/resource/multi/all/${resource}`
             );
-            return (await res.json()) as Record<string, any>;
+            return (await res.json()) as Record<string, T>;
         } catch (error) {
             console.error(error);
-            return {} as Record<string, any>;
+            return {} as Record<string, T>;
         }
     },
 
     async getMultiSingle<T>(resource: string, id: string) {
-        try {
-            const res = await fetch(
-                `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`
-            );
-            return (await res.json()) as T;
-        } catch (error) {
-            console.error(error);
-            return {} as T;
-        }
+        const res = await fetch(
+            `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`
+        );
+        return (await res.json()) as T;
     },
 
     async setMultiSingle(

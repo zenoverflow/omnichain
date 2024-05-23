@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -23,10 +23,21 @@ const { Header, Content } = Layout;
 
 const EditorContent: React.FC = () => {
     const [graphId] = useOuterState(editorTargetStorage);
+
+    const [key, setKey] = useState<string>("no-graph-open");
+
+    useEffect(() => {
+        if (graphId) {
+            setKey(`${graphId}-${Date.now()}`);
+        } else {
+            setKey("no-graph-open");
+        }
+    }, [graphId]);
+
     return (
         <Content
             id="TheEditor"
-            key={graphId}
+            key={key}
             style={{
                 margin: 0,
                 padding: 0,

@@ -97,7 +97,9 @@ const GraphRunButton: React.FC = () => {
                 type="primary"
                 size="large"
                 icon={<StopOutlined />}
-                onClick={stopGraph}
+                onClick={() => {
+                    void stopGraph();
+                }}
                 style={{ pointerEvents: "all" }}
                 danger
             />
