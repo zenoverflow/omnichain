@@ -3,7 +3,6 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     CommentOutlined,
-    BellOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Space, Spin } from "antd";
 
@@ -101,17 +100,6 @@ export const Editor: React.FC = () => {
                             </Button>
                         ) : null}
                         <Space align="center">
-                            <Button
-                                type="primary"
-                                shape="circle"
-                                size="large"
-                                icon={<BellOutlined />}
-                                style={{
-                                    display: "inline-flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            />
                             <BtnAvatars />
                             <BtnApiKeys />
                             <BtnNodeIndex />
