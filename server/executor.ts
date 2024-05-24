@@ -127,9 +127,7 @@ const runGraph = async (
         currentMessage: null,
     };
 
-    const saveOption = _exec.graph.execPersistence || "onChange";
-
-    console.log("Graph save mode", saveOption);
+    const saveOption = _exec.graph.execPersistence;
 
     // Ensure nodes availability in registry
     if (
@@ -137,23 +135,27 @@ const runGraph = async (
             (n) => !(nodeRegistry[n.nodeType] as CustomNode | undefined)
         )
     ) {
+        const errText = "Tried to execute a graph with missing custom nodes!";
         notificationObservable.next({
             type: "error",
             duration: null,
             ts: Date.now(),
-            text: "Tried to execute a graph with missing custom nodes!",
+            text: errText,
         });
+        console.error("Error: " + errText);
         return;
     }
 
     // Ensure entrypoint presence
     if (!_exec.graph.nodes.find((n) => n.nodeType === "StartNode")) {
+        const errText = "The Chain needs an Entrypoint to start execution!";
         notificationObservable.next({
             type: "error",
             duration: null,
             ts: Date.now(),
-            text: "The Chain needs an Entrypoint to start execution!",
+            text: errText,
         });
+        console.error("Error: " + errText);
         return;
     }
 
@@ -173,6 +175,9 @@ const runGraph = async (
             instanceId === executorStorage.get()?.execId
         );
     };
+
+    console.log("Running graph", _exec.graph.graphId);
+    console.log("Graph save mode", saveOption);
 
     // Execute
     void EngineUtils.runGraph(

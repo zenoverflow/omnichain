@@ -23,13 +23,12 @@ export const clearLastNodeError = () => {
     lastNodeErrorStorage.set(null);
 };
 
-const pullOnStop = async () => {
-    const executor = executorStorage.get();
-    if (!executor) return;
+const pullOnStop = async (graphId: string) => {
+    // const executor = executorStorage.get();
+    // if (!executor) return;
+    // const graphId = executor.graphId;
 
     startGlobalLoading();
-
-    const graphId = executor.graphId;
 
     // Refresh the graph due to possible discrepancies
     // if execPersistence was not set to onChange
@@ -46,15 +45,12 @@ const updateChecker = async () => {
         for (const message of messages) {
             switch (message.type) {
                 case "executorUpdate":
-                    if (!message.data) {
-                        // console.log("Executor stopped");
-                        await pullOnStop();
-                        executorStorage.set(null);
-                        return;
-                    } else {
-                        executorStorage.set(message.data);
-                    }
                     // console.log("Executor update", message.data);
+                    // if (!message.data && !!executorStorage.get()) {
+                    //     // console.log("Executor stopped");
+                    //     await pullOnStop();
+                    // }
+                    executorStorage.set(message.data);
                     break;
                 case "notification":
                     showNotification(message.data);
@@ -95,7 +91,11 @@ export const isGraphActive = (id: string): boolean => {
 };
 
 export const stopGraph = async () => {
+    const graphId = executorStorage.get()?.graphId;
+    if (!graphId) return;
+
     await ExecutorUtils.stopGraph();
+    await pullOnStop(graphId);
 };
 
 export const runGraph = async (graphId: string) => {

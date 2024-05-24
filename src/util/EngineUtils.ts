@@ -191,6 +191,7 @@ export const EngineUtils = {
                 currentControl = connection.target;
                 trigger = connection.targetInput;
             } catch (error: any) {
+                console.error(error);
                 eventHandlers.onError(error);
                 break;
             }

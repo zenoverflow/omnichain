@@ -1,0 +1,659 @@
+{
+  "name": "Example - Censor",
+  "graphId": "88f86fb4-ff8d-4806-a606-e711de7fcdfd",
+  "nodes": [
+    {
+      "nodeType": "StartNode",
+      "nodeId": "1b5c89ddd7031019",
+      "controls": {},
+      "positionX": 440.29137658277216,
+      "positionY": -283.07349236367696
+    },
+    {
+      "nodeType": "ReadSessionMessagesNode",
+      "nodeId": "c1f46752893122c5",
+      "controls": {
+        "limit": -1
+      },
+      "positionX": 1834.0105203945386,
+      "positionY": 679.5362192829061
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "bfae0d640f203c2b",
+      "controls": {
+        "action": "block"
+      },
+      "positionX": 1222.188044072495,
+      "positionY": -493.75634322334184
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "2dd67d3399a9aed9",
+      "controls": {
+        "action": "unblock"
+      },
+      "positionX": 8734.833518315196,
+      "positionY": -964.3260872738532
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "e830212d195e7726",
+      "controls": {},
+      "positionX": 6206.839980822689,
+      "positionY": -326.7165496301319
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "a5f51dd644052a16",
+      "controls": {},
+      "positionX": 6727.786831480658,
+      "positionY": -733.199680304029
+    },
+    {
+      "nodeType": "TextNode",
+      "nodeId": "13c9b3409d85d750",
+      "controls": {
+        "val": "You are a helpful AI assistant. You give precise answers."
+      },
+      "positionX": 1579.0347891572112,
+      "positionY": 154.55842930677096
+    },
+    {
+      "nodeType": "OllamaChatCompletionNode",
+      "nodeId": "5e648ef5c0d80c44",
+      "controls": {
+        "model": "llama3:8b-instruct-q8_0",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": -1,
+        "json": "false"
+      },
+      "positionX": 2279.5212082812404,
+      "positionY": 82.53738801585132
+    },
+    {
+      "nodeType": "CheckForNextMessageNode",
+      "nodeId": "f47d7c7e2f65097a",
+      "controls": {
+        "waitTimeMs": 100
+      },
+      "positionX": 766.7163009231914,
+      "positionY": -456.28748969538924
+    },
+    {
+      "nodeType": "OllamaTextCompletionNode",
+      "nodeId": "b4768f748cfbdde6",
+      "controls": {
+        "model": "llama3:8b-instruct-q8_0",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": -1,
+        "json": "false",
+        "raw": "false"
+      },
+      "positionX": 4968.079360602366,
+      "positionY": 50.89571121959358
+    },
+    {
+      "nodeType": "TextNode",
+      "nodeId": "8b22542c14e471f8",
+      "controls": {
+        "val": "I am not allowed to provide information about anything related to radioactive substances or the nuclear industry."
+      },
+      "positionX": 6655.958983362767,
+      "positionY": -92.11746272190959
+    },
+    {
+      "nodeType": "TemplateBuilderNode",
+      "nodeId": "4767e9b46445294d",
+      "controls": {
+        "val": "Does the following text contain information involving radioactive substances or materials used in the nuclear industry? Answer YES or NO. Here is the text:\n```\n{text}\n```"
+      },
+      "positionX": 4234.151711709252,
+      "positionY": 398.7424469070859
+    },
+    {
+      "nodeType": "SlotNode",
+      "nodeId": "a6b8df85951c9262",
+      "controls": {},
+      "positionX": 3826.387095832907,
+      "positionY": 100.84094577846747
+    },
+    {
+      "nodeType": "RegexCheckNode",
+      "nodeId": "cc5cff9f74b37d4b",
+      "controls": {
+        "regex": "^.*NO.*"
+      },
+      "positionX": 5484.348160626477,
+      "positionY": -741.7120662359167
+    },
+    {
+      "nodeType": "GrabTextNode",
+      "nodeId": "1d544dc197c2af78",
+      "controls": {
+        "val": "Thorium, the element that's like the god of the periodic table (get it? Thor-ium? Like Thor from Marvel? Ah, nevermind...).\n\nAnyway, Thorium is used for some pretty cool stuff. It's a radioactive metal that's used as a fuel source in nuclear reactors, specifically in the Liquid Metal Fast Breeder Reactor (LMFBR) design. It's also used in some medical applications, like producing radioisotopes for cancer treatment and research.\n\nBut let's be real, the real reason Thorium is awesome is because it's like the ultimate party crasher. It's got a half-life of 74,000 years, which means it'll stick around for a loooong time, making it perfect for those who want to leave a lasting impression (or a lasting radiation signature...).\n\nAnd if you're wondering what Thorium is used for in the Marvel universe, well, let's just say it's not exactly a superpower... unless you count being able to make a really bad pun about being \"thor-oughly\" radioactive."
+      },
+      "positionX": 3026.7609128011727,
+      "positionY": -420.2460209924724
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "be767916e6536345",
+      "controls": {},
+      "positionX": 7335.631402897929,
+      "positionY": -447.94394542377705
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "ebb73b045fc1ac83",
+      "controls": {},
+      "positionX": 7311.569295838478,
+      "positionY": -154.21496452705102
+    },
+    {
+      "nodeType": "TemplateBuilderNode",
+      "nodeId": "e5f28df588e572b0",
+      "controls": {
+        "val": "You are an expert at detecting malicious content. You answer only with the words YES or NO. You do not add anything else to your answers."
+      },
+      "positionX": 4228.895810656926,
+      "positionY": -119.09840571729123
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "35c0ace4067b3207",
+      "controls": {},
+      "positionX": 8022.472032465971,
+      "positionY": -2238.3327259773005
+    },
+    {
+      "nodeType": "TextNode",
+      "nodeId": "cdebf1c44ba8363a",
+      "controls": {
+        "val": "An error has occurred. Please spam the admin."
+      },
+      "positionX": 7884.819963623566,
+      "positionY": -1881.8502248479508
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "ce54d57bff35fc43",
+      "controls": {},
+      "positionX": 8021.616115950102,
+      "positionY": -2583.4893656138524
+    },
+    {
+      "nodeType": "SaveStateNode",
+      "nodeId": "ea7530874f59650f",
+      "controls": {},
+      "positionX": 9165.650560524296,
+      "positionY": -1075.852294409363
+    },
+    {
+      "nodeType": "RouteStringNode",
+      "nodeId": "6bc262c9c928f0fc",
+      "controls": {},
+      "positionX": 5739.092292960821,
+      "positionY": -115.76552197481294
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "6aeb49a33f7738bf",
+      "controls": {
+        "val": "text"
+      },
+      "positionX": 3122.1586862036897,
+      "positionY": 312.02154226858124
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "032846ccc03a2b84",
+      "controls": {},
+      "positionX": 5517.160493909251,
+      "positionY": -1028.4489176585994
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "c0e4bf92257d3a68",
+      "controls": {},
+      "positionX": 6194.523255030054,
+      "positionY": -1003.8958267187701
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "8ea8ceeeece48781",
+      "controls": {},
+      "positionX": 7331.469799171613,
+      "positionY": -1108.3949174412319
+    },
+    {
+      "nodeType": "RegexCheckNode",
+      "nodeId": "3b3ce99b809e27ff",
+      "controls": {
+        "regex": "^.*NO.*"
+      },
+      "positionX": 1735.1916881212608,
+      "positionY": -626.3459853601513
+    },
+    {
+      "nodeType": "TemplateBuilderNode",
+      "nodeId": "45c691c1a16a2275",
+      "controls": {
+        "val": "Does the following text contain any information (or a query) involving (or asking about) anything harmful, crime, radioactive substances, or materials used in the nuclear industry? Answer YES or NO. Here is the text:\n```\n{text}\n```"
+      },
+      "positionX": -142.8317100900215,
+      "positionY": 670.2549895605814
+    },
+    {
+      "nodeType": "OllamaTextCompletionNode",
+      "nodeId": "8473744b84db6cfc",
+      "controls": {
+        "model": "llama3:8b-instruct-q8_0",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": -1,
+        "json": "false",
+        "raw": "false"
+      },
+      "positionX": 608.0219915121817,
+      "positionY": 119.20676518714629
+    },
+    {
+      "nodeType": "ReadCurrentMessageTextNode",
+      "nodeId": "04117028221ceb80",
+      "controls": {},
+      "positionX": -986.2773248194261,
+      "positionY": 739.7480307893129
+    },
+    {
+      "nodeType": "SlotNode",
+      "nodeId": "443266be0e137b01",
+      "controls": {},
+      "positionX": -567.0078899277079,
+      "positionY": 547.1946606908953
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "86f5c99ac96aa17e",
+      "controls": {
+        "val": "text"
+      },
+      "positionX": -1237.8389857544562,
+      "positionY": 530.1133133434548
+    },
+    {
+      "nodeType": "TextNode",
+      "nodeId": "2be6d42d7be8b405",
+      "controls": {
+        "val": "You are an expert at detecting malicious content. You answer only with the words YES or NO. You do not add anything else to your answers."
+      },
+      "positionX": -144.63277921288022,
+      "positionY": 149.6651224231922
+    },
+    {
+      "nodeType": "TextNode",
+      "nodeId": "6efe712790cd3461",
+      "controls": {
+        "val": "I am not allowed to provide information about anything related to radioactive substances or the nuclear industry."
+      },
+      "positionX": 1413.0797507078528,
+      "positionY": -1306.938622509325
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "0ef5077bd185061e",
+      "controls": {},
+      "positionX": 2633.213941810488,
+      "positionY": -946.9209824786981
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "3ef420228cb418a2",
+      "controls": {},
+      "positionX": 2096.2703830807172,
+      "positionY": -1341.8481469539147
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "121f56e40264cb28",
+      "controls": {
+        "action": "unblock"
+      },
+      "positionX": 3202.6843556150675,
+      "positionY": -1407.0126560986403
+    }
+  ],
+  "connections": [
+    {
+      "source": "e830212d195e7726",
+      "sourceOutput": "message",
+      "target": "a5f51dd644052a16",
+      "targetInput": "message"
+    },
+    {
+      "source": "f47d7c7e2f65097a",
+      "sourceOutput": "haveMsg",
+      "target": "bfae0d640f203c2b",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "f47d7c7e2f65097a",
+      "sourceOutput": "noMsg",
+      "target": "f47d7c7e2f65097a",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "1b5c89ddd7031019",
+      "sourceOutput": "triggerOut",
+      "target": "f47d7c7e2f65097a",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "13c9b3409d85d750",
+      "sourceOutput": "out",
+      "target": "5e648ef5c0d80c44",
+      "targetInput": "system"
+    },
+    {
+      "source": "a6b8df85951c9262",
+      "sourceOutput": "slot",
+      "target": "4767e9b46445294d",
+      "targetInput": "parts"
+    },
+    {
+      "source": "1d544dc197c2af78",
+      "sourceOutput": "triggerOut",
+      "target": "cc5cff9f74b37d4b",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "e5f28df588e572b0",
+      "sourceOutput": "result",
+      "target": "b4768f748cfbdde6",
+      "targetInput": "system"
+    },
+    {
+      "source": "6aeb49a33f7738bf",
+      "sourceOutput": "out",
+      "target": "a6b8df85951c9262",
+      "targetInput": "slotName"
+    },
+    {
+      "source": "1d544dc197c2af78",
+      "sourceOutput": "dataOut",
+      "target": "a6b8df85951c9262",
+      "targetInput": "value"
+    },
+    {
+      "source": "cc5cff9f74b37d4b",
+      "sourceOutput": "pass",
+      "target": "a5f51dd644052a16",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "cc5cff9f74b37d4b",
+      "sourceOutput": "fail",
+      "target": "be767916e6536345",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "6bc262c9c928f0fc",
+      "sourceOutput": "out",
+      "target": "e830212d195e7726",
+      "targetInput": "content"
+    },
+    {
+      "source": "1d544dc197c2af78",
+      "sourceOutput": "dataOut",
+      "target": "6bc262c9c928f0fc",
+      "targetInput": "in"
+    },
+    {
+      "source": "4767e9b46445294d",
+      "sourceOutput": "result",
+      "target": "b4768f748cfbdde6",
+      "targetInput": "prompt"
+    },
+    {
+      "source": "ebb73b045fc1ac83",
+      "sourceOutput": "message",
+      "target": "be767916e6536345",
+      "targetInput": "message"
+    },
+    {
+      "source": "2dd67d3399a9aed9",
+      "sourceOutput": "triggerOut",
+      "target": "ea7530874f59650f",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "ea7530874f59650f",
+      "sourceOutput": "triggerOut",
+      "target": "1b5c89ddd7031019",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "a5f51dd644052a16",
+      "sourceOutput": "triggerOut",
+      "target": "2dd67d3399a9aed9",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "cdebf1c44ba8363a",
+      "sourceOutput": "out",
+      "target": "35c0ace4067b3207",
+      "targetInput": "content"
+    },
+    {
+      "source": "35c0ace4067b3207",
+      "sourceOutput": "message",
+      "target": "ce54d57bff35fc43",
+      "targetInput": "message"
+    },
+    {
+      "source": "be767916e6536345",
+      "sourceOutput": "triggerOut",
+      "target": "2dd67d3399a9aed9",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "ce54d57bff35fc43",
+      "sourceOutput": "triggerOut",
+      "target": "2dd67d3399a9aed9",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "1d544dc197c2af78",
+      "sourceOutput": "error",
+      "target": "032846ccc03a2b84",
+      "targetInput": "in"
+    },
+    {
+      "source": "032846ccc03a2b84",
+      "sourceOutput": "out",
+      "target": "c0e4bf92257d3a68",
+      "targetInput": "in"
+    },
+    {
+      "source": "cc5cff9f74b37d4b",
+      "sourceOutput": "error",
+      "target": "c0e4bf92257d3a68",
+      "targetInput": "in"
+    },
+    {
+      "source": "a5f51dd644052a16",
+      "sourceOutput": "error",
+      "target": "8ea8ceeeece48781",
+      "targetInput": "in"
+    },
+    {
+      "source": "c0e4bf92257d3a68",
+      "sourceOutput": "out",
+      "target": "8ea8ceeeece48781",
+      "targetInput": "in"
+    },
+    {
+      "source": "8ea8ceeeece48781",
+      "sourceOutput": "out",
+      "target": "ce54d57bff35fc43",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "b4768f748cfbdde6",
+      "sourceOutput": "result",
+      "target": "cc5cff9f74b37d4b",
+      "targetInput": "dataIn"
+    },
+    {
+      "source": "be767916e6536345",
+      "sourceOutput": "error",
+      "target": "8ea8ceeeece48781",
+      "targetInput": "in"
+    },
+    {
+      "source": "8b22542c14e471f8",
+      "sourceOutput": "out",
+      "target": "ebb73b045fc1ac83",
+      "targetInput": "content"
+    },
+    {
+      "source": "c1f46752893122c5",
+      "sourceOutput": "messages",
+      "target": "5e648ef5c0d80c44",
+      "targetInput": "messages"
+    },
+    {
+      "source": "45c691c1a16a2275",
+      "sourceOutput": "result",
+      "target": "8473744b84db6cfc",
+      "targetInput": "prompt"
+    },
+    {
+      "source": "bfae0d640f203c2b",
+      "sourceOutput": "triggerOut",
+      "target": "3b3ce99b809e27ff",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "86f5c99ac96aa17e",
+      "sourceOutput": "out",
+      "target": "443266be0e137b01",
+      "targetInput": "slotName"
+    },
+    {
+      "source": "2be6d42d7be8b405",
+      "sourceOutput": "out",
+      "target": "8473744b84db6cfc",
+      "targetInput": "system"
+    },
+    {
+      "source": "443266be0e137b01",
+      "sourceOutput": "slot",
+      "target": "45c691c1a16a2275",
+      "targetInput": "parts"
+    },
+    {
+      "source": "04117028221ceb80",
+      "sourceOutput": "content",
+      "target": "443266be0e137b01",
+      "targetInput": "value"
+    },
+    {
+      "source": "8473744b84db6cfc",
+      "sourceOutput": "result",
+      "target": "3b3ce99b809e27ff",
+      "targetInput": "dataIn"
+    },
+    {
+      "source": "5e648ef5c0d80c44",
+      "sourceOutput": "result",
+      "target": "1d544dc197c2af78",
+      "targetInput": "dataIn"
+    },
+    {
+      "source": "3b3ce99b809e27ff",
+      "sourceOutput": "pass",
+      "target": "1d544dc197c2af78",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "3ef420228cb418a2",
+      "sourceOutput": "message",
+      "target": "0ef5077bd185061e",
+      "targetInput": "message"
+    },
+    {
+      "source": "6efe712790cd3461",
+      "sourceOutput": "out",
+      "target": "3ef420228cb418a2",
+      "targetInput": "content"
+    },
+    {
+      "source": "3b3ce99b809e27ff",
+      "sourceOutput": "fail",
+      "target": "0ef5077bd185061e",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "0ef5077bd185061e",
+      "sourceOutput": "triggerOut",
+      "target": "121f56e40264cb28",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "3b3ce99b809e27ff",
+      "sourceOutput": "error",
+      "target": "032846ccc03a2b84",
+      "targetInput": "in"
+    },
+    {
+      "source": "121f56e40264cb28",
+      "sourceOutput": "triggerOut",
+      "target": "1b5c89ddd7031019",
+      "targetInput": "triggerIn"
+    }
+  ],
+  "zoom": 0.14565223678180927,
+  "areaX": 264.33336639404155,
+  "areaY": 578.4283569335932,
+  "created": 1715184337336,
+  "execPersistence": "onChange"
+}
