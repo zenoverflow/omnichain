@@ -201,6 +201,31 @@ export const GlowIndicator: React.FC<{ node: any }> = (props) => {
     );
 };
 
+export const SocketTitle: React.FC<{
+    node: any;
+    title: string;
+    type: "output" | "input";
+}> = ({ node, title, type }) => {
+    const [graphs] = useOuterState(graphStorage);
+
+    const hidden = useMemo(
+        () => graphs[node.graphId].zoom < 0.5,
+        [graphs, node.graphId]
+    );
+
+    const _title = useMemo(() => (hidden ? "" : title), [hidden, title]);
+
+    return (
+        <div
+            className={`${type}-title`}
+            data-testid={`${type}-title`}
+            style={{ height: "26px" }}
+        >
+            {_title}
+        </div>
+    );
+};
+
 export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
     const [graphs] = useOuterState(graphStorage);
 
@@ -293,12 +318,17 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                             key={key}
                             data-testid={`output-${key}`}
                         >
-                            <div
+                            {/* <div
                                 className="output-title"
                                 data-testid="output-title"
                             >
                                 {output.label}
-                            </div>
+                            </div> */}
+                            <SocketTitle
+                                node={props.data}
+                                title={output.label || ""}
+                                type="output"
+                            />
                             <RefSocket
                                 name="output-socket"
                                 side="output"
@@ -330,12 +360,17 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                                 data-testid="input-socket"
                             />
                             {(!input.control || !input.showControl) && (
-                                <div
-                                    className="input-title"
-                                    data-testid="input-title"
-                                >
-                                    {input.label}
-                                </div>
+                                // <div
+                                //     className="input-title"
+                                //     data-testid="input-title"
+                                // >
+                                //     {input.label}
+                                // </div>
+                                <SocketTitle
+                                    node={props.data}
+                                    title={input.label || ""}
+                                    type="input"
+                                />
                             )}
                             {input.control && input.showControl && (
                                 <span className="input-control">
