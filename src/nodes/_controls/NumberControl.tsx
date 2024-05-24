@@ -39,7 +39,7 @@ export class NumberControl extends BaseControl<
                         disabled={self.readOnly || controlState.disabled}
                         value={controlState.value}
                         onChange={(val) => {
-                            const v = val ?? self.config.min ?? 0;
+                            const v = val ?? self.config.min ?? null;
                             self.value = v;
                             controlState.setValue(v);
                         }}

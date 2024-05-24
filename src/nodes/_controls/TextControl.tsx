@@ -91,6 +91,12 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                         onPointerDown={(e) => {
                             e.stopPropagation();
                         }}
+                        onPointerUp={(e) => {
+                            e.stopPropagation();
+                        }}
+                        onDoubleClick={(e) => {
+                            e.stopPropagation();
+                        }}
                         style={{
                             width: "100%",
                             height: "300px",
@@ -152,6 +158,12 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                     }}
                     className="c__nodecontrol"
                     onPointerDown={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onPointerUp={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onDoubleClick={(e) => {
                         e.stopPropagation();
                     }}
                     addonBefore={self.config.label ?? "text"}
