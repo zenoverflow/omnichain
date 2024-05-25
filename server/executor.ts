@@ -122,9 +122,11 @@ const runGraph = async (
     const _exec: {
         graph: SerializedGraph;
         currentMessage?: ChatMessage | null;
+        chatStores: Record<string, ChatMessage[]>;
     } = {
         graph: readJsonFile(graphPath) as SerializedGraph,
         currentMessage: null,
+        chatStores: {},
     };
 
     const saveOption = _exec.graph.execPersistence;
@@ -264,6 +266,25 @@ const runGraph = async (
                     case "saveGraph":
                         await saveGraph(dirData, _exec.graph);
                         break;
+                    case "mkChatStore":
+                        result = (() => {
+                            const storeId = uuid();
+                            _exec.chatStores[storeId] = [];
+                            return storeId;
+                        })();
+                        break;
+                    case "getChatStore":
+                        result = _exec.chatStores[action.args.id];
+                        break;
+                    case "addMessageToChatStore":
+                        _exec.chatStores[action.args.id].push(
+                            action.args.message
+                        );
+                        break;
+                    case "rmChatStore":
+                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                        delete _exec.chatStores[action.args.id];
+                        break;
                     default:
                         externalActionObservable.next(action);
                         break;
@@ -289,6 +310,10 @@ const runGraph = async (
                 if (!getFlowActive()) return;
 
                 updateActiveNode(_exec.graph.graphId, nodeId);
+                console.log(
+                    "Flowing to node",
+                    _exec.graph.nodes.find((n) => n.nodeId === nodeId)?.nodeType
+                );
             },
             // For uncaught errors during execution
             onError(error) {

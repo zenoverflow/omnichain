@@ -12,7 +12,14 @@ export type ExtraAction =
     | { type: "grabNextMessage"; args?: never }
     | { type: "readCurrentMessage"; args?: never }
     | { type: "addMessageToSession"; args: { message: ChatMessage } }
-    | { type: "saveGraph"; args?: never };
+    | { type: "saveGraph"; args?: never }
+    | { type: "mkChatStore"; args?: never }
+    | { type: "getChatStore"; args: { id: string } }
+    | { type: "rmChatStore"; args: { id: string } }
+    | {
+          type: "addMessageToChatStore";
+          args: { message: ChatMessage; id: string };
+      };
 
 export type ControlUpdate = {
     graphId: string;
