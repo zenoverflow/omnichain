@@ -16,6 +16,8 @@ export const useControlState = <T extends string | number | null>(
     const [executor] = useOuterState(executorStorage);
     const [graphs] = useOuterState(graphStorage);
 
+    const [debouncer, setDebouncer] = useState<NodeJS.Timeout | null>(null);
+
     const hidden = useMemo(() => graphs[graphId].zoom < 0.5, [graphs, graphId]);
 
     const disabled = useMemo(
@@ -26,10 +28,25 @@ export const useControlState = <T extends string | number | null>(
     const setValue = useCallback(
         (v: T) => {
             if (disabled) return;
+
             _setValue(v);
-            void updateNodeControl(graphId, nodeId, controlName, v as any);
+
+            if (debouncer) {
+                clearTimeout(debouncer);
+            }
+
+            setDebouncer(
+                setTimeout(() => {
+                    void updateNodeControl(
+                        graphId,
+                        nodeId,
+                        controlName,
+                        v as any
+                    );
+                }, 250)
+            );
         },
-        [controlName, disabled, graphId, nodeId]
+        [controlName, disabled, graphId, nodeId, debouncer]
     );
 
     // Keep track of external value updates
