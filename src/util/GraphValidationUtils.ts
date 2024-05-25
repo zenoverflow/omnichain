@@ -83,6 +83,10 @@ export const GraphValidationUtils = {
             additionalProperties: false,
         });
 
-        return baseConfigSchema(graph);
+        const errors = baseConfigSchema(graph);
+
+        // console.log("Graph validation result", ajv.errorsText());
+
+        return !errors;
     },
 };

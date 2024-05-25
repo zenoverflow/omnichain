@@ -85,6 +85,7 @@ export const importGraph = async (graph: SerializedGraph) => {
         const validatedGraph: SerializedGraph = {
             ...graph,
             graphId: uuid(),
+            created: Date.now(),
         };
 
         await backendSetGraph(validatedGraph.graphId, validatedGraph);
@@ -96,6 +97,7 @@ export const importGraph = async (graph: SerializedGraph) => {
 
         openEditor(validatedGraph.graphId);
     } catch (error: any) {
+        console.error(error);
         complexErrorObservable.next(["Import error!", error.message]);
     }
 };
