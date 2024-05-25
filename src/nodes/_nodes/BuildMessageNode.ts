@@ -18,7 +18,7 @@ export const BuildMessageNode = makeNode(
     {
         nodeName: "BuildMessageNode",
         nodeIcon: "CommentOutlined",
-        dimensions: [350, 255],
+        dimensions: [350, 290],
         doc,
     },
     {
@@ -29,11 +29,27 @@ export const BuildMessageNode = makeNode(
             { name: "avatarName", type: "string", label: "avatar name" },
         ],
         outputs: [{ name: "message", type: "chatMessage", label: "message" }],
-        controls: [],
+        controls: [
+            {
+                name: "role",
+                control: {
+                    type: "select",
+                    defaultValue: "assistant",
+                    config: {
+                        label: "role",
+                        values: [
+                            { label: "assistant", value: "assistant" },
+                            { label: "user", value: "user" },
+                        ],
+                    },
+                },
+            },
+        ],
     },
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
+            const role = context.getAllControls(nodeId).role as string;
 
             const avatarName: string | undefined =
                 (inputs.avatarName || [])[0] || undefined;
@@ -44,12 +60,24 @@ export const BuildMessageNode = makeNode(
             if (fileSingle) {
                 files.push(fileSingle);
             }
+
+            if (role === "user") {
+                const message = MsgUtils.freshFromUser(
+                    context.graphId,
+                    (inputs.content || [])[0] || "",
+                    avatarName,
+                    files
+                );
+                return { message };
+            }
+
             const message = MsgUtils.freshFromAssistant(
                 context.graphId,
                 (inputs.content || [])[0] || "",
                 avatarName,
                 files
             );
+
             return { message };
         },
     }
