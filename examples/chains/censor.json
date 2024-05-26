@@ -24,8 +24,8 @@
       "controls": {
         "action": "block"
       },
-      "positionX": 1222.188044072495,
-      "positionY": -493.75634322334184
+      "positionX": 1229.07001887677,
+      "positionY": -399.12918966455857
     },
     {
       "nodeType": "BlockChatNode",
@@ -39,7 +39,9 @@
     {
       "nodeType": "BuildMessageNode",
       "nodeId": "e830212d195e7726",
-      "controls": {},
+      "controls": {
+        "role": "assistant"
+      },
       "positionX": 6206.839980822689,
       "positionY": -326.7165496301319
     },
@@ -157,7 +159,7 @@
       "nodeType": "GrabTextNode",
       "nodeId": "1d544dc197c2af78",
       "controls": {
-        "val": "Thorium, the element that's like the god of the periodic table (get it? Thor-ium? Like Thor from Marvel? Ah, nevermind...).\n\nAnyway, Thorium is used for some pretty cool stuff. It's a radioactive metal that's used as a fuel source in nuclear reactors, specifically in the Liquid Metal Fast Breeder Reactor (LMFBR) design. It's also used in some medical applications, like producing radioisotopes for cancer treatment and research.\n\nBut let's be real, the real reason Thorium is awesome is because it's like the ultimate party crasher. It's got a half-life of 74,000 years, which means it'll stick around for a loooong time, making it perfect for those who want to leave a lasting impression (or a lasting radiation signature...).\n\nAnd if you're wondering what Thorium is used for in the Marvel universe, well, let's just say it's not exactly a superpower... unless you count being able to make a really bad pun about being \"thor-oughly\" radioactive."
+        "val": ""
       },
       "positionX": 3026.7609128011727,
       "positionY": -420.2460209924724
@@ -172,7 +174,9 @@
     {
       "nodeType": "BuildMessageNode",
       "nodeId": "ebb73b045fc1ac83",
-      "controls": {},
+      "controls": {
+        "role": "assistant"
+      },
       "positionX": 7311.569295838478,
       "positionY": -154.21496452705102
     },
@@ -188,9 +192,11 @@
     {
       "nodeType": "BuildMessageNode",
       "nodeId": "35c0ace4067b3207",
-      "controls": {},
-      "positionX": 8022.472032465971,
-      "positionY": -2238.3327259773005
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": 8071.815309915972,
+      "positionY": -1969.6859931939614
     },
     {
       "nodeType": "TextNode",
@@ -198,22 +204,15 @@
       "controls": {
         "val": "An error has occurred. Please spam the admin."
       },
-      "positionX": 7884.819963623566,
-      "positionY": -1881.8502248479508
+      "positionX": 7945.128413840233,
+      "positionY": -1580.3079737646112
     },
     {
       "nodeType": "ResponseNode",
       "nodeId": "ce54d57bff35fc43",
       "controls": {},
-      "positionX": 8021.616115950102,
-      "positionY": -2583.4893656138524
-    },
-    {
-      "nodeType": "SaveStateNode",
-      "nodeId": "ea7530874f59650f",
-      "controls": {},
-      "positionX": 9165.650560524296,
-      "positionY": -1075.852294409363
+      "positionX": 8081.924566166769,
+      "positionY": -2276.4645281471794
     },
     {
       "nodeType": "RouteStringNode",
@@ -235,8 +234,8 @@
       "nodeType": "RouteTriggerNode",
       "nodeId": "032846ccc03a2b84",
       "controls": {},
-      "positionX": 5517.160493909251,
-      "positionY": -1028.4489176585994
+      "positionX": 5507.638331016077,
+      "positionY": -990.3602660859037
     },
     {
       "nodeType": "RouteTriggerNode",
@@ -258,8 +257,8 @@
       "controls": {
         "regex": "^.*NO.*"
       },
-      "positionX": 1735.1916881212608,
-      "positionY": -626.3459853601513
+      "positionX": 1716.266257409504,
+      "positionY": -545.4827814099183
     },
     {
       "nodeType": "TemplateBuilderNode",
@@ -347,18 +346,25 @@
     {
       "nodeType": "BuildMessageNode",
       "nodeId": "3ef420228cb418a2",
-      "controls": {},
+      "controls": {
+        "role": "assistant"
+      },
       "positionX": 2096.2703830807172,
       "positionY": -1341.8481469539147
     },
     {
-      "nodeType": "BlockChatNode",
-      "nodeId": "121f56e40264cb28",
-      "controls": {
-        "action": "unblock"
-      },
-      "positionX": 3202.6843556150675,
-      "positionY": -1407.0126560986403
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "22fd0e095d86b928",
+      "controls": {},
+      "positionX": 6308.960241703142,
+      "positionY": -1501.9091348264437
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "221dccebd209dd86",
+      "controls": {},
+      "positionX": 2505.3588673487675,
+      "positionY": -231.19156838008044
     }
   ],
   "connections": [
@@ -457,18 +463,6 @@
       "sourceOutput": "message",
       "target": "be767916e6536345",
       "targetInput": "message"
-    },
-    {
-      "source": "2dd67d3399a9aed9",
-      "sourceOutput": "triggerOut",
-      "target": "ea7530874f59650f",
-      "targetInput": "triggerIn"
-    },
-    {
-      "source": "ea7530874f59650f",
-      "sourceOutput": "triggerOut",
-      "target": "1b5c89ddd7031019",
-      "targetInput": "triggerIn"
     },
     {
       "source": "a5f51dd644052a16",
@@ -633,27 +627,45 @@
       "targetInput": "triggerIn"
     },
     {
-      "source": "0ef5077bd185061e",
-      "sourceOutput": "triggerOut",
-      "target": "121f56e40264cb28",
-      "targetInput": "triggerIn"
-    },
-    {
       "source": "3b3ce99b809e27ff",
       "sourceOutput": "error",
       "target": "032846ccc03a2b84",
       "targetInput": "in"
     },
     {
-      "source": "121f56e40264cb28",
+      "source": "0ef5077bd185061e",
       "sourceOutput": "triggerOut",
+      "target": "22fd0e095d86b928",
+      "targetInput": "in"
+    },
+    {
+      "source": "22fd0e095d86b928",
+      "sourceOutput": "out",
+      "target": "2dd67d3399a9aed9",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "2dd67d3399a9aed9",
+      "sourceOutput": "triggerOut",
+      "target": "221dccebd209dd86",
+      "targetInput": "in"
+    },
+    {
+      "source": "221dccebd209dd86",
+      "sourceOutput": "out",
+      "target": "1d544dc197c2af78",
+      "targetInput": "triggerClear"
+    },
+    {
+      "source": "1d544dc197c2af78",
+      "sourceOutput": "triggerCleared",
       "target": "1b5c89ddd7031019",
       "targetInput": "triggerIn"
     }
   ],
-  "zoom": 0.14565223678180927,
-  "areaX": 264.33336639404155,
-  "areaY": 578.4283569335932,
+  "zoom": 0.16743286350865838,
+  "areaX": 277.175061035156,
+  "areaY": 584.5216827392576,
   "created": 1715184337336,
   "execPersistence": "onChange"
 }

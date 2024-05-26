@@ -1,6 +1,6 @@
 {
   "name": "Example - Linux Shell",
-  "graphId": "ee17f62e-546d-43e3-9509-1d9a5954a4ed",
+  "graphId": "e2f110d4-7908-4432-9010-8b27146f4055",
   "nodes": [
     {
       "nodeType": "StartNode",
@@ -37,7 +37,9 @@
     {
       "nodeType": "BuildMessageNode",
       "nodeId": "901a52190d0222a0",
-      "controls": {},
+      "controls": {
+        "role": "assistant"
+      },
       "positionX": 7641.274148150947,
       "positionY": 388.1237816176781
     },
@@ -294,7 +296,9 @@
     {
       "nodeType": "BuildMessageNode",
       "nodeId": "ea120fe63802b5cc",
-      "controls": {},
+      "controls": {
+        "role": "assistant"
+      },
       "positionX": 2157.30194010251,
       "positionY": -126.91413989777584
     },
@@ -595,9 +599,9 @@
       "targetInput": "triggerIn"
     }
   ],
-  "zoom": 0.14949063337333052,
-  "areaX": 352.80836029052773,
-  "areaY": 519.2133560180664,
-  "created": 1716315442301,
+  "zoom": 0.16336821689977496,
+  "areaX": 376.9967346191416,
+  "areaY": 475.4267013549802,
+  "created": 1716632899768,
   "execPersistence": "onChange"
 }
