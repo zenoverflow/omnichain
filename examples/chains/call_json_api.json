@@ -1,0 +1,292 @@
+{
+  "name": "Example - call json API",
+  "graphId": "e2cabb70-5f3a-4aca-a94d-f51480f0adab",
+  "nodes": [
+    {
+      "nodeType": "StartNode",
+      "nodeId": "bd31bd86551f513d",
+      "controls": {},
+      "positionX": -282.79561284453837,
+      "positionY": 6.801755442816216
+    },
+    {
+      "nodeType": "CheckForNextMessageNode",
+      "nodeId": "077bd9874b75514b",
+      "controls": {
+        "waitTimeMs": 100
+      },
+      "positionX": 93.50593675001751,
+      "positionY": -211.3257176328512
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "933c4ee3d5a0717f",
+      "controls": {
+        "action": "block"
+      },
+      "positionX": 607.6067428176705,
+      "positionY": -289.9529110291346
+    },
+    {
+      "nodeType": "MakeJSONRequestNode",
+      "nodeId": "3c19e4b692fc782c",
+      "controls": {
+        "timeout": 0
+      },
+      "positionX": 1161.4815763901693,
+      "positionY": 435.31822765722364
+    },
+    {
+      "nodeType": "ReadCurrentMessageTextNode",
+      "nodeId": "5b2d013f93bf9848",
+      "controls": {},
+      "positionX": -805.8263922207735,
+      "positionY": 443.26049975597533
+    },
+    {
+      "nodeType": "TemplateBuilderNode",
+      "nodeId": "95007bc0a2f85799",
+      "controls": {
+        "val": "{\n  \"model\": \"\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{content}\"\n    }\n  ],\n  \"stream\": false\n}"
+      },
+      "positionX": 339.3077203009672,
+      "positionY": 126.20989633671175
+    },
+    {
+      "nodeType": "SlotNode",
+      "nodeId": "a8d22ba977c734ad",
+      "controls": {},
+      "positionX": -201.8267889160461,
+      "positionY": 274.0726966627713
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "f1c4f6bd7e9630c9",
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": 2622.019180055551,
+      "positionY": 279.0647409882496
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "3ec73f05b5920b32",
+      "controls": {},
+      "positionX": 3035.6592226476723,
+      "positionY": -70.0404505865734
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "4c46ca8ddbd65e58",
+      "controls": {
+        "action": "unblock"
+      },
+      "positionX": 3512.7608975847984,
+      "positionY": -301.2682325270387
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "f0e576763e007502",
+      "controls": {
+        "val": "POST"
+      },
+      "positionX": -53.110882638691635,
+      "positionY": 1350.8672840061765
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "bcc83b74cb9691d5",
+      "controls": {
+        "val": "http://localhost:5000/v1/chat/completions"
+      },
+      "positionX": -56.61576360311518,
+      "positionY": 1590.1091371420405
+    },
+    {
+      "nodeType": "ReadFromJSONNode",
+      "nodeId": "0c22bce656860eb5",
+      "controls": {},
+      "positionX": 1901.203078455394,
+      "positionY": 547.7226271538627
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "939039c19eeaed84",
+      "controls": {
+        "val": "data.choices[0].message.content"
+      },
+      "positionX": 1252.4200047098418,
+      "positionY": 805.6647829382883
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "704998adef3c6957",
+      "controls": {
+        "val": "content"
+      },
+      "positionX": -1060.5748618284308,
+      "positionY": 235.06666476294197
+    },
+    {
+      "nodeType": "GetApiKeyNode",
+      "nodeId": "6db78c7c10344d8c",
+      "controls": {
+        "apiKeyName": "oai"
+      },
+      "positionX": -892.9805978778272,
+      "positionY": 1025.0944987859903
+    },
+    {
+      "nodeType": "SlotNode",
+      "nodeId": "92273c5609d1b321",
+      "controls": {},
+      "positionX": -497.61212841822805,
+      "positionY": 859.661198338622
+    },
+    {
+      "nodeType": "TemplateBuilderNode",
+      "nodeId": "fdd598b166b35084",
+      "controls": {
+        "val": "{\n  \"Authorization\": \"Bearer {key}\"\n}"
+      },
+      "positionX": -51.87577829554982,
+      "positionY": 836.0245054626657
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "d6d3b6452457d230",
+      "controls": {
+        "val": "key"
+      },
+      "positionX": -1215.481515435914,
+      "positionY": 799.0141937701035
+    }
+  ],
+  "connections": [
+    {
+      "source": "077bd9874b75514b",
+      "sourceOutput": "noMsg",
+      "target": "077bd9874b75514b",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "bd31bd86551f513d",
+      "sourceOutput": "triggerOut",
+      "target": "077bd9874b75514b",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "077bd9874b75514b",
+      "sourceOutput": "haveMsg",
+      "target": "933c4ee3d5a0717f",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "a8d22ba977c734ad",
+      "sourceOutput": "slot",
+      "target": "95007bc0a2f85799",
+      "targetInput": "parts"
+    },
+    {
+      "source": "95007bc0a2f85799",
+      "sourceOutput": "result",
+      "target": "3c19e4b692fc782c",
+      "targetInput": "body"
+    },
+    {
+      "source": "3c19e4b692fc782c",
+      "sourceOutput": "result",
+      "target": "0c22bce656860eb5",
+      "targetInput": "jsonStr"
+    },
+    {
+      "source": "939039c19eeaed84",
+      "sourceOutput": "out",
+      "target": "0c22bce656860eb5",
+      "targetInput": "path"
+    },
+    {
+      "source": "0c22bce656860eb5",
+      "sourceOutput": "data",
+      "target": "f1c4f6bd7e9630c9",
+      "targetInput": "content"
+    },
+    {
+      "source": "f1c4f6bd7e9630c9",
+      "sourceOutput": "message",
+      "target": "3ec73f05b5920b32",
+      "targetInput": "message"
+    },
+    {
+      "source": "933c4ee3d5a0717f",
+      "sourceOutput": "triggerOut",
+      "target": "3ec73f05b5920b32",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "3ec73f05b5920b32",
+      "sourceOutput": "triggerOut",
+      "target": "4c46ca8ddbd65e58",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "4c46ca8ddbd65e58",
+      "sourceOutput": "triggerOut",
+      "target": "bd31bd86551f513d",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "5b2d013f93bf9848",
+      "sourceOutput": "content",
+      "target": "a8d22ba977c734ad",
+      "targetInput": "value"
+    },
+    {
+      "source": "f0e576763e007502",
+      "sourceOutput": "out",
+      "target": "3c19e4b692fc782c",
+      "targetInput": "method"
+    },
+    {
+      "source": "bcc83b74cb9691d5",
+      "sourceOutput": "out",
+      "target": "3c19e4b692fc782c",
+      "targetInput": "url"
+    },
+    {
+      "source": "704998adef3c6957",
+      "sourceOutput": "out",
+      "target": "a8d22ba977c734ad",
+      "targetInput": "slotName"
+    },
+    {
+      "source": "6db78c7c10344d8c",
+      "sourceOutput": "key",
+      "target": "92273c5609d1b321",
+      "targetInput": "value"
+    },
+    {
+      "source": "d6d3b6452457d230",
+      "sourceOutput": "out",
+      "target": "92273c5609d1b321",
+      "targetInput": "slotName"
+    },
+    {
+      "source": "92273c5609d1b321",
+      "sourceOutput": "slot",
+      "target": "fdd598b166b35084",
+      "targetInput": "parts"
+    },
+    {
+      "source": "fdd598b166b35084",
+      "sourceOutput": "result",
+      "target": "3c19e4b692fc782c",
+      "targetInput": "headers"
+    }
+  ],
+  "zoom": 0.3362308142477945,
+  "areaX": 505.5850006103517,
+  "areaY": 314.913327026367,
+  "created": 1716137382860,
+  "execPersistence": "onChange"
+}
