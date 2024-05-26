@@ -88,6 +88,7 @@ const saveGraph = async (dirData: string, graph: SerializedGraph) => {
 const stopCurrentGraph = () => {
     if (!executorStorage.get()) return;
     executorStorage.set(null);
+    while (messageQueue.length) messageQueue.pop();
     console.log("Stopped current graph");
 };
 
@@ -423,12 +424,12 @@ export const setupExecutorApi = (
     setupOpenAiCompatibleAPI(
         portOpenAi,
         async (message, checkRequestActive) => {
+            // Ensure the correct chain is running
+            await runGraph(message.chainId, dirData, dirCustomNodes);
+
             messageQueue.push(message);
             addMessageToSession(message);
             console.log("Received message from OAI API:", message.content);
-
-            // Ensure the correct chain is running
-            await runGraph(message.chainId, dirData, dirCustomNodes);
 
             // If the graph did not run, something went wrong. Return null.
             if (!executorStorage.get()) return null;
