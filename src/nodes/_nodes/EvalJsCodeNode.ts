@@ -7,6 +7,9 @@ const doc = [
     "Params inside the code can be accessed via the 'params' object.",
     "All params are passed as strings, so you may need to parse them if you need a different type.",
     "The result is always returned as a string.",
+    "The id of the node and the flow context object are also available",
+    "to your code as 'nodeId' and 'context', making this node a simple alternative",
+    "to implementing a full custom node if dataflow is all you need.",
 ]
     .join(" ")
     .trim();
@@ -59,24 +62,17 @@ export const EvalJsCodeNode = makeNode(
             if (codeStr !== oldValue) {
                 await context.updateControl(nodeId, "val", codeStr);
             }
-
-            const stringifyParamValue = (p: any) => {
-                if (typeof p === "string") {
-                    return '"' + p + '"';
-                } else {
-                    return `${p}`;
-                }
-            };
-
             const params = inputs.params || [];
-            const paramString = params
-                .map((p) => p.name + ": " + stringifyParamValue(p.value))
-                .join(", ");
-            const paramObj = `{ ${paramString} }`;
+
+            const paramObj = Object.fromEntries(
+                params.map((p) => [p.name, p.value])
+            );
 
             try {
-                const result = eval(
-                    `(function(params) { ${codeStr} })(${paramObj})`
+                const result = eval(`(function(params) { ${codeStr} })`)(
+                    paramObj,
+                    nodeId,
+                    context
                 );
 
                 return { result: `${result}` };
