@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import styled from "styled-components";
 import { ClassicScheme, Presets } from "rete-react-plugin";
 const { useConnection } = Presets.classic;
@@ -98,6 +99,13 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
     const CustomConnection = (props: ConnectionProps) => {
         const { path, start, end } = useConnection();
 
+        const [hovered, setHovered] = useState(false);
+
+        const strokeColor = useMemo(
+            () => (hovered ? "#ffe58f" : stroke),
+            [hovered]
+        );
+
         // Remove connection on middle-click
         const handleClick = (e: any) => {
             e.preventDefault();
@@ -120,7 +128,13 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
                 <Path
                     //
                     styles={props.styles}
-                    stroke={stroke}
+                    stroke={strokeColor}
+                    onMouseOver={() => {
+                        setHovered(true);
+                    }}
+                    onMouseOut={() => {
+                        setHovered(false);
+                    }}
                     d={createSvgPath(start, end)}
                 />
             </Svg>
