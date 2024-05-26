@@ -40,9 +40,9 @@ export const ChatStoreGetNode = makeNode(
                 args: { id: storeId },
             });
 
-            console.log("---");
-            console.log(messages);
-            console.log("---");
+            // console.log("---");
+            // console.log(messages);
+            // console.log("---");
 
             return { messages };
         },
