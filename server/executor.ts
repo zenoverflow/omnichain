@@ -310,10 +310,10 @@ const runGraph = async (
                 if (!getFlowActive()) return;
 
                 updateActiveNode(_exec.graph.graphId, nodeId);
-                console.log(
-                    "Flowing to node",
-                    _exec.graph.nodes.find((n) => n.nodeId === nodeId)?.nodeType
-                );
+                // console.log(
+                //     "Flowing to node",
+                //     _exec.graph.nodes.find((n) => n.nodeId === nodeId)?.nodeType
+                // );
             },
             // For uncaught errors during execution
             onError(error) {

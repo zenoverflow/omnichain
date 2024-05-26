@@ -15,16 +15,22 @@ export const GrabTextNode = makeNode(
     {
         nodeName: "GrabTextNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [580, 585],
+        dimensions: [580, 670],
         doc,
     },
     {
         inputs: [
             { name: "triggerIn", type: "trigger", label: "trigger in" },
+            { name: "triggerClear", type: "trigger", label: "trigger clear" },
             { name: "dataIn", type: "string", label: "data in" },
         ],
         outputs: [
-            { name: "triggerOut", type: "trigger", label: "trigger out" },
+            { name: "triggerOut", type: "trigger", label: "trigger got data" },
+            {
+                name: "triggerCleared",
+                type: "trigger",
+                label: "trigger cleared",
+            },
             { name: "dataOut", type: "string", label: "data out" },
         ],
         controls: [
@@ -39,8 +45,13 @@ export const GrabTextNode = makeNode(
         ],
     },
     {
-        async controlFlow(nodeId, context) {
+        async controlFlow(nodeId, context, trigger) {
             try {
+                if (trigger === "triggerClear") {
+                    await context.updateControl(nodeId, "val", "");
+                    return "triggerCleared";
+                }
+
                 const inputs = await context.fetchInputs(nodeId);
 
                 const oldValue = context.getAllControls(nodeId).val as string;
