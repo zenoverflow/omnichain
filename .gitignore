@@ -8,7 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+# dist
 dist-ssr
 *.local
 
@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-/chains
 /data
-/custom_nodes
+
+/custom_nodes/*
+!/custom_nodes/.gitkeep
