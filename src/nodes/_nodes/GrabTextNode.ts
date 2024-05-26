@@ -7,6 +7,8 @@ const doc = [
     "stored in this node as many times as needed.",
     "This node will only grab new data and update itself if another",
     "node sends a signal via the 'trigger in' input.",
+    "To clear the node's data, send a signal via the 'trigger clear' input.",
+    "The 'trigger cleared' output will fire when the data is cleared.",
 ]
     .join(" ")
     .trim();

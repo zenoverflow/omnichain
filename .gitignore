@@ -27,3 +27,4 @@ dist-ssr
 
 /custom_nodes/*
 !/custom_nodes/.gitkeep
+!/custom_nodes/example

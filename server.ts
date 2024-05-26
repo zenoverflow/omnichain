@@ -12,6 +12,11 @@ import { ensureDirExists } from "./server/utils.ts";
 import { setupResourcesApi } from "./server/resources.ts";
 import { setupExecutorApi } from "./server/executor.ts";
 
+import { makeNode } from "./src/nodes/_nodes/_Base.ts";
+
+// Attach node maker for custom nodes to use
+(global as any).__ocMakeNode = makeNode;
+
 // Catch unhandled exceptions
 
 process.on("uncaughtException", function (err) {

@@ -20,8 +20,13 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     const [nodeRegistry] = useOuterState(nodeRegistryStorage);
 
     const items = useMemo(() => {
-        const r: CollapseProps["items"] = Object.values(nodeRegistry).map(
-            (node) => ({
+        const r: CollapseProps["items"] = Object.values(nodeRegistry)
+            .sort((a, b) =>
+                a.config.baseConfig.nodeName.localeCompare(
+                    b.config.baseConfig.nodeName
+                )
+            )
+            .map((node) => ({
                 key: node.config.baseConfig.nodeName,
                 label: (
                     <Space>
@@ -58,8 +63,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                         </Space>
                     </Space>
                 ),
-            })
-        );
+            }));
         return r;
     }, [nodeRegistry]);
 

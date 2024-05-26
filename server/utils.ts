@@ -28,7 +28,7 @@ const _buildCustomNodeRegistry = (
 
         for (const [name, rawJS] of registry) {
             try {
-                const customNodeObj = eval(rawJS)() as
+                const customNodeObj = eval(rawJS) as
                     | CustomNode
                     | null
                     | undefined;
