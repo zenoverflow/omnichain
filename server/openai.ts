@@ -23,12 +23,16 @@ export const setupOpenAiCompatibleAPI = (
     port: number,
     onMessage: (
         message: ChatMessage,
-        checkRequestActive: () => boolean
+        checkRequestActive: () => boolean,
+        clearSessionOnResponse?: boolean
     ) => Promise<ChatMessage | null>
 ) => {
     routerOpenAi.post("/v1/completions", async (ctx) => {
         try {
             const { model, prompt } = ctx.request.body;
+
+            const clearSessionOnResponse =
+                ctx.request.body._ocClearSession || true;
 
             let requestActive = true;
             ctx.req.on("close", () => {
@@ -36,7 +40,8 @@ export const setupOpenAiCompatibleAPI = (
             });
             const result = await onMessage(
                 MsgUtils.freshFromUser(model, prompt, null, []),
-                () => requestActive
+                () => requestActive,
+                clearSessionOnResponse
             );
             ctx.body = JSON.stringify({
                 id: uuid(),
@@ -68,11 +73,14 @@ export const setupOpenAiCompatibleAPI = (
         try {
             const { model, messages } = ctx.request.body;
 
+            const clearSessionOnResponse =
+                ctx.request.body._ocClearSession || true;
+
             let prompt = "";
             const files: ChatMessage["files"] = [];
 
             for (const message of messages) {
-                const content: string = message.content || "";
+                const content: string | any[] = message.content || "";
 
                 if (Array.isArray(content)) {
                     for (const subContent of content.filter((c) => !!c)) {
@@ -85,7 +93,7 @@ export const setupOpenAiCompatibleAPI = (
                             if (!data || !dataRegex.test(data)) continue;
 
                             const matches = data.match(dataRegex);
-                            if (!matches || matches.length !== 2) continue;
+                            if (!matches || matches.length !== 3) continue;
 
                             const extension = mime.extension(matches[1]);
                             if (!extension) continue;
@@ -110,7 +118,8 @@ export const setupOpenAiCompatibleAPI = (
             });
             const result = await onMessage(
                 MsgUtils.freshFromUser(model, prompt, null, files),
-                () => requestActive
+                () => requestActive,
+                clearSessionOnResponse
             );
 
             ctx.body = JSON.stringify({

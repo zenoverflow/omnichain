@@ -11,7 +11,12 @@ const result = await fetch("http://localhost:5002/v1/chat/completions", {
                 content: "Where does curry originate from?",
             },
         ],
-        // ...any other arguments are ignored
+        // ...any other OAI arguments are ignored
+        //
+        // Custom omnichain arguments...
+        //
+        // Clear the chat session after the request (default: true)
+        // _ocClearSession: false, //
     }),
 });
 

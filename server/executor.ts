@@ -286,6 +286,16 @@ const runGraph = async (
                         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                         delete _exec.chatStores[action.args.id];
                         break;
+                    case "clearSession":
+                        (() => {
+                            const storage = executorStorage.get();
+                            if (!storage) return;
+                            executorStorage.set({
+                                ...storage,
+                                sessionMessages: [],
+                            });
+                        })();
+                        break;
                     default:
                         externalActionObservable.next(action);
                         break;
@@ -423,13 +433,18 @@ export const setupExecutorApi = (
     // Runs as a separate app on a separate port
     setupOpenAiCompatibleAPI(
         portOpenAi,
-        async (message, checkRequestActive) => {
+        async (message, checkRequestActive, clearSessionOnResponse = true) => {
             // Ensure the correct chain is running
             await runGraph(message.chainId, dirData, dirCustomNodes);
 
             messageQueue.push(message);
             addMessageToSession(message);
-            console.log("Received message from OAI API:", message.content);
+            console.log(
+                "Received message from OAI API:",
+                message.content,
+                "files:",
+                message.files.length
+            );
 
             // If the graph did not run, something went wrong. Return null.
             if (!executorStorage.get()) return null;
@@ -451,6 +466,17 @@ export const setupExecutorApi = (
 
                 await new Promise((resolve) => setTimeout(resolve, 100));
             }
+
+            if (clearSessionOnResponse) {
+                const storage = executorStorage.get();
+                if (storage) {
+                    executorStorage.set({
+                        ...storage,
+                        sessionMessages: [],
+                    });
+                }
+            }
+
             return result;
         }
     );

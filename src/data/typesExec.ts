@@ -9,6 +9,7 @@ export type ExtraAction =
     | { type: "chatBlock"; args: { blocked: boolean } }
     | { type: "checkQueue"; args?: never }
     | { type: "readSessionMessages"; args?: never }
+    | { type: "clearSession"; args?: never }
     | { type: "grabNextMessage"; args?: never }
     | { type: "readCurrentMessage"; args?: never }
     | { type: "addMessageToSession"; args: { message: ChatMessage } }
