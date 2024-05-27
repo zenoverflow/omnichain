@@ -50,12 +50,25 @@ const _Modal: React.FC<{
         >
             <CodeMirror
                 value={value}
+                onKeyDown={(e) => {
+                    // stop propagation of del key
+                    if (e.key === "Delete") {
+                        e.stopPropagation();
+                    }
+                }}
+                onKeyUp={(e) => {
+                    // stop propagation of del key
+                    if (e.key === "Delete") {
+                        e.stopPropagation();
+                    }
+                }}
                 onChange={(val, _viewUpdate) => {
                     onChange(val);
                 }}
                 height="80vh"
                 maxHeight="80vh"
                 extensions={syntaxExtensions}
+                autoFocus
             />
         </Modal>
     );
