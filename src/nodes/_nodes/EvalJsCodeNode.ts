@@ -75,7 +75,12 @@ export const EvalJsCodeNode = makeNode(
                     context
                 );
 
-                return { result: `${result}` };
+                return {
+                    result:
+                        typeof result === "string" || typeof result === "number"
+                            ? `${result}`
+                            : JSON.stringify(result),
+                };
             } catch (error) {
                 return { result: `${error}` };
             }
