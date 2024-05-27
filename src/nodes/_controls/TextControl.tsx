@@ -139,7 +139,11 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                                 e.stopPropagation();
                                 setModalOpen(true);
                             }}
-                            disabled={modalOpen}
+                            disabled={
+                                self.readOnly ||
+                                controlState.disabled ||
+                                modalOpen
+                            }
                         >
                             <FullscreenOutlined style={{ color: "#000" }} />
                         </Button>
