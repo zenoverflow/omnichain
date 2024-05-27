@@ -46,11 +46,16 @@ const updateChecker = async () => {
             switch (message.type) {
                 case "executorUpdate":
                     // console.log("Executor update", message.data);
-                    // if (!message.data && !!executorStorage.get()) {
-                    //     // console.log("Executor stopped");
-                    //     await pullOnStop();
-                    // }
-                    executorStorage.set(message.data);
+                    await (async () => {
+                        const executor = executorStorage.get();
+                        const graphId = executor?.graphId;
+
+                        executorStorage.set(message.data);
+
+                        if (!message.data && !!graphId) {
+                            await pullOnStop(graphId);
+                        }
+                    })();
                     break;
                 case "notification":
                     showNotification(message.data);
@@ -80,9 +85,7 @@ const updateChecker = async () => {
         console.error(error);
     }
     setTimeout(() => {
-        if (executorStorage.get()) {
-            void updateChecker();
-        }
+        void updateChecker();
     }, 50);
 };
 
@@ -95,7 +98,6 @@ export const stopGraph = async () => {
     if (!graphId) return;
 
     await ExecutorUtils.stopGraph();
-    await pullOnStop(graphId);
 };
 
 export const runGraph = async (graphId: string) => {
@@ -109,8 +111,6 @@ export const runGraph = async (graphId: string) => {
 
     const executorUpdate = await ExecutorUtils.runGraph(graphId);
     executorStorage.set(executorUpdate as any);
-
-    void updateChecker();
 };
 
 export const addUserMessage = (
@@ -135,7 +135,5 @@ export const addUserMessage = (
 export const loadExecutor = async () => {
     const state = await ExecutorUtils.getState();
     executorStorage.set(state as any);
-    if (state) {
-        void updateChecker();
-    }
+    void updateChecker();
 };
