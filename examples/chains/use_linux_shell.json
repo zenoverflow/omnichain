@@ -349,6 +349,38 @@
       },
       "positionX": 5902.074223256334,
       "positionY": 358.38634090438256
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "93f8c4fe2b773085",
+      "controls": {},
+      "positionX": 6779.733736137448,
+      "positionY": -573.7575614760935
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "f2791cf9b8b8f89d",
+      "controls": {},
+      "positionX": 7334.504050693676,
+      "positionY": -1004.214883382696
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "d1f933196ae91958",
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": 7340.070309166606,
+      "positionY": -699.9260868625114
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "3e51fdca5330548e",
+      "controls": {
+        "val": "An error occurred. Please spam the admin."
+      },
+      "positionX": 7202.769266834327,
+      "positionY": -378.93851492353633
     }
   ],
   "connections": [
@@ -597,11 +629,47 @@
       "sourceOutput": "triggerOut",
       "target": "2d8cddaa2882666a",
       "targetInput": "triggerIn"
+    },
+    {
+      "source": "fac04135224b0614",
+      "sourceOutput": "error",
+      "target": "93f8c4fe2b773085",
+      "targetInput": "in"
+    },
+    {
+      "source": "53e2d2fe67c3025e",
+      "sourceOutput": "error",
+      "target": "93f8c4fe2b773085",
+      "targetInput": "in"
+    },
+    {
+      "source": "93f8c4fe2b773085",
+      "sourceOutput": "out",
+      "target": "f2791cf9b8b8f89d",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "d1f933196ae91958",
+      "sourceOutput": "message",
+      "target": "f2791cf9b8b8f89d",
+      "targetInput": "message"
+    },
+    {
+      "source": "3e51fdca5330548e",
+      "sourceOutput": "out",
+      "target": "d1f933196ae91958",
+      "targetInput": "content"
+    },
+    {
+      "source": "f2791cf9b8b8f89d",
+      "sourceOutput": "triggerOut",
+      "target": "2d8cddaa2882666a",
+      "targetInput": "triggerIn"
     }
   ],
-  "zoom": 0.16336821689977496,
-  "areaX": 376.9967346191416,
-  "areaY": 475.4267013549802,
+  "zoom": 0.18051934883833992,
+  "areaX": 425.13673095703206,
+  "areaY": 490.3300399780271,
   "created": 1716632899768,
   "execPersistence": "onChange"
 }

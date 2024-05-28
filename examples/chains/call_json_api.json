@@ -160,6 +160,31 @@
       },
       "positionX": -1215.481515435914,
       "positionY": 799.0141937701035
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "3f8628954820bba3",
+      "controls": {},
+      "positionX": 3649.6880045581947,
+      "positionY": 199.2158082969536
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "dba9ce8ee29a3183",
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": 3617.3631948069897,
+      "positionY": 513.3671035280258
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "4abd9700a6335980",
+      "controls": {
+        "val": "An error occurred. Please spam the admin."
+      },
+      "positionX": 3474.3280184328955,
+      "positionY": 884.2634254013572
     }
   ],
   "connections": [
@@ -282,11 +307,35 @@
       "sourceOutput": "result",
       "target": "3c19e4b692fc782c",
       "targetInput": "headers"
+    },
+    {
+      "source": "4abd9700a6335980",
+      "sourceOutput": "out",
+      "target": "dba9ce8ee29a3183",
+      "targetInput": "content"
+    },
+    {
+      "source": "dba9ce8ee29a3183",
+      "sourceOutput": "message",
+      "target": "3f8628954820bba3",
+      "targetInput": "message"
+    },
+    {
+      "source": "3ec73f05b5920b32",
+      "sourceOutput": "error",
+      "target": "3f8628954820bba3",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "3f8628954820bba3",
+      "sourceOutput": "triggerOut",
+      "target": "4c46ca8ddbd65e58",
+      "targetInput": "triggerIn"
     }
   ],
-  "zoom": 0.3362308142477945,
-  "areaX": 505.5850006103517,
-  "areaY": 314.913327026367,
+  "zoom": 0.25253031736201786,
+  "areaX": 709.8816741943361,
+  "areaY": 376.32000122070286,
   "created": 1716137382860,
   "execPersistence": "onChange"
 }

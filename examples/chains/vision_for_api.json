@@ -1,0 +1,208 @@
+{
+  "name": "Example - Vision for API",
+  "graphId": "8a4267fb-c6e4-425b-9f52-ab28bd0e3342",
+  "nodes": [
+    {
+      "nodeType": "StartNode",
+      "nodeId": "873dcb584d6a3ae3",
+      "controls": {},
+      "positionX": -412.8395061728395,
+      "positionY": -57.80246913580243
+    },
+    {
+      "nodeType": "CheckForNextMessageNode",
+      "nodeId": "f608e8bd2c8270c5",
+      "controls": {
+        "waitTimeMs": 100
+      },
+      "positionX": -21.234507619598766,
+      "positionY": -241.95473753375768
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "787d13d9d16f26f1",
+      "controls": {
+        "action": "block"
+      },
+      "positionX": 462.71610966435173,
+      "positionY": -292.572021484375
+    },
+    {
+      "nodeType": "OllamaTextCompletionNode",
+      "nodeId": "f7c1e815fbb461bd",
+      "controls": {
+        "model": "llava-llama3:latest",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": -1,
+        "json": "false",
+        "raw": "false"
+      },
+      "positionX": -344.3687051105326,
+      "positionY": 176.26720174147783
+    },
+    {
+      "nodeType": "ReadCurrentMessageTextNode",
+      "nodeId": "bc4b6cf189ed5840",
+      "controls": {},
+      "positionX": -912.3486179974327,
+      "positionY": 278.42879650294327
+    },
+    {
+      "nodeType": "ReadCurrentMessageFilesNode",
+      "nodeId": "18f1f8cfc6fd0d8d",
+      "controls": {
+        "type": "*/*"
+      },
+      "positionX": -886.663351793184,
+      "positionY": 445.42066519761187
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "36cc87ff6b242766",
+      "controls": {},
+      "positionX": 964.7880850090062,
+      "positionY": -244.91101429529255
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "a9786017764f6e79",
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": 444.2506912899469,
+      "positionY": 80.75279005370922
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "02b74e894b6bded1",
+      "controls": {
+        "action": "unblock"
+      },
+      "positionX": 1412.4431565985176,
+      "positionY": -288.510408365915
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "5872ee102c479c49",
+      "controls": {},
+      "positionX": 1390.8808588306251,
+      "positionY": -23.13787240561085
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "62865054ff9e11c4",
+      "controls": {
+        "val": "An error occurred. Please spam the admin."
+      },
+      "positionX": 673.3507603515544,
+      "positionY": 425.3042869057345
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "0de7e3bc8104ace3",
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": 1380.3328496027707,
+      "positionY": 275.22880504422267
+    }
+  ],
+  "connections": [
+    {
+      "source": "f608e8bd2c8270c5",
+      "sourceOutput": "noMsg",
+      "target": "f608e8bd2c8270c5",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "873dcb584d6a3ae3",
+      "sourceOutput": "triggerOut",
+      "target": "f608e8bd2c8270c5",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "f608e8bd2c8270c5",
+      "sourceOutput": "haveMsg",
+      "target": "787d13d9d16f26f1",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "bc4b6cf189ed5840",
+      "sourceOutput": "content",
+      "target": "f7c1e815fbb461bd",
+      "targetInput": "prompt"
+    },
+    {
+      "source": "18f1f8cfc6fd0d8d",
+      "sourceOutput": "files",
+      "target": "f7c1e815fbb461bd",
+      "targetInput": "images"
+    },
+    {
+      "source": "f7c1e815fbb461bd",
+      "sourceOutput": "result",
+      "target": "a9786017764f6e79",
+      "targetInput": "content"
+    },
+    {
+      "source": "a9786017764f6e79",
+      "sourceOutput": "message",
+      "target": "36cc87ff6b242766",
+      "targetInput": "message"
+    },
+    {
+      "source": "787d13d9d16f26f1",
+      "sourceOutput": "triggerOut",
+      "target": "36cc87ff6b242766",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "36cc87ff6b242766",
+      "sourceOutput": "triggerOut",
+      "target": "02b74e894b6bded1",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "02b74e894b6bded1",
+      "sourceOutput": "triggerOut",
+      "target": "873dcb584d6a3ae3",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "0de7e3bc8104ace3",
+      "sourceOutput": "message",
+      "target": "5872ee102c479c49",
+      "targetInput": "message"
+    },
+    {
+      "source": "62865054ff9e11c4",
+      "sourceOutput": "out",
+      "target": "0de7e3bc8104ace3",
+      "targetInput": "content"
+    },
+    {
+      "source": "36cc87ff6b242766",
+      "sourceOutput": "error",
+      "target": "5872ee102c479c49",
+      "targetInput": "triggerIn"
+    }
+  ],
+  "zoom": 0.49774952626127594,
+  "areaX": 813.8316757202147,
+  "areaY": 305.3983276367188,
+  "created": 1716749550725,
+  "execPersistence": "onChange"
+}

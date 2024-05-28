@@ -1,6 +1,6 @@
 {
-  "name": "Example - JS Agent",
-  "graphId": "3dde289f-5de2-43cf-b0b3-5658bc72d3b7",
+  "name": "Example - Linux Agent",
+  "graphId": "89e5b8c3-fcd5-4ee0-8a6f-3374963b1e69",
   "nodes": [
     {
       "nodeType": "StartNode",
@@ -56,19 +56,26 @@
       "nodeType": "RegexCheckNode",
       "nodeId": "2e9f5a09a9c86629",
       "controls": {
-        "regex": ".*TO_EXECUTOR.*\\s+(.+)"
+        "regex": "TO_EXECUTOR:?\\s?([\\s\\S]+)"
       },
       "positionX": 2801.751166163091,
       "positionY": 96.3202229402591
     },
     {
+      "nodeType": "RunCommandNode",
+      "nodeId": "b002259b87cb0844",
+      "controls": {},
+      "positionX": 5152.091764944067,
+      "positionY": 1551.8609981253692
+    },
+    {
       "nodeType": "RegexExtractorNode",
       "nodeId": "4b3c29e24e8c4227",
       "controls": {
-        "regex": "```javascript\\s([\\s\\S]+)\\s```"
+        "regex": "TO_EXECUTOR:?\\s?([\\s\\S]+)"
       },
-      "positionX": 4977.810792933189,
-      "positionY": 2414.682174153738
+      "positionX": 4991.345622995046,
+      "positionY": 2066.160300060899
     },
     {
       "nodeType": "PickStringArrayItemNode",
@@ -76,8 +83,8 @@
       "controls": {
         "index": 0
       },
-      "positionX": 5124.769960429663,
-      "positionY": 2116.7081735792704
+      "positionX": 5151.83962055338,
+      "positionY": 1781.721129548289
     },
     {
       "nodeType": "BuildMessageNode",
@@ -92,7 +99,7 @@
       "nodeType": "TemplateBuilderNode",
       "nodeId": "861bc1864e8ea0f1",
       "controls": {
-        "val": "THE_EXECUTOR:\n{result}"
+        "val": "THE_EXECUTOR: {result}"
       },
       "positionX": 5056.781300770119,
       "positionY": 646.103857598205
@@ -110,8 +117,8 @@
       "controls": {
         "val": "result"
       },
-      "positionX": 4493.281575036741,
-      "positionY": 1256.6086467398643
+      "positionX": 4491.589721279009,
+      "positionY": 1261.684208013061
     },
     {
       "nodeType": "RouteStringNode",
@@ -124,7 +131,7 @@
       "nodeType": "RegexCheckNode",
       "nodeId": "2e7f9edbf89455c2",
       "controls": {
-        "regex": ".*TO_USER.*\\s+(.+)"
+        "regex": "TO_USER:?\\s?([\\s\\S]+)"
       },
       "positionX": 3813.1233603047012,
       "positionY": 313.73954640264805
@@ -133,7 +140,7 @@
       "nodeType": "RegexExtractorNode",
       "nodeId": "4eebc74eb14a2d5e",
       "controls": {
-        "regex": ".*TO_USER:?\\s?([\\s\\S]+)"
+        "regex": "TO_USER:?\\s?([\\s\\S]+)"
       },
       "positionX": 4010.779517925953,
       "positionY": -546.4595256810125
@@ -142,8 +149,8 @@
       "nodeType": "ResponseNode",
       "nodeId": "6467afa214b25a0f",
       "controls": {},
-      "positionX": 5640.563878805242,
-      "positionY": -526.2539259362022
+      "positionX": 5642.389722901803,
+      "positionY": -511.6471731637144
     },
     {
       "nodeType": "BuildMessageNode",
@@ -190,8 +197,8 @@
       "nodeType": "ChatStoreAppendNode",
       "nodeId": "02073d6b46ba0938",
       "controls": {},
-      "positionX": 6112.257324322952,
-      "positionY": 308.1500121451415
+      "positionX": 6108.873616807487,
+      "positionY": 335.21967226885715
     },
     {
       "nodeType": "RouteStringNode",
@@ -204,7 +211,7 @@
       "nodeType": "ChatStoreInitNode",
       "nodeId": "c6ae39835036c856",
       "controls": {
-        "oldId": "9f70297b-f4de-4533-803d-296eaf622ab1"
+        "oldId": "6ab9e1b8-ee92-4ab0-864f-e1568032e4ec"
       },
       "positionX": -480.9175097064113,
       "positionY": 327.0812937112081
@@ -213,7 +220,7 @@
       "nodeType": "TextJoinNode",
       "nodeId": "d8dec5f3949c5872",
       "controls": {
-        "separator": "\\n"
+        "separator": " "
       },
       "positionX": -826.3010691228778,
       "positionY": 727.9195907909012
@@ -249,31 +256,24 @@
       "controls": {
         "val": ""
       },
-      "positionX": 1859.8576641353548,
-      "positionY": 248.7115555206831
+      "positionX": 1853.0458637967133,
+      "positionY": 333.8590597537012
     },
     {
       "nodeType": "TextNode",
       "nodeId": "67a41455baf02a30",
       "controls": {
-        "val": "You are an expert JavaScript backend developer using NodeJS.\nYou are in a chat with THE_USER and THE_EXECUTOR.\n\n\nTHE_USER will ask you to do something or to give THE_USER some information.\nIf you can do it using NodeJS, you can send code to THE_EXECUTOR.\nIf THE_USER is asking or saying something irrelevant (which cannot be done using NodeJS), you can send THE_USER a polite refusal message.\n\n\nYou can send messages to THE_USER by following this exact format:\n```\nTO_USER:\n(your message...)\n```\n\n\nYou can send code to THE_EXECUTOR by following this exact format:\n\nTO_EXECUTOR:\n```javascript\n// ... your code ...\nreturn yourResult;\n```\n\n\nRemember to ALWAYS wrap your code inside a code block.\nRemember to ALWAYS return a result from the code using a return statement. Do not use `console.log()`.\n\nTHE_EXECUTOR will reply with the result of your code.\nIf the result looks correct, you can use the information to reply to THE_USER.\nIf the result has an error, you can look at the error to decide whether to try again (send different code to THE_EXECUTOR), or tell THE_USER that you cannot perform the task.\n"
+        "val": "You are an expert at using the Linux shell (terminal).\nYou are in a chat with THE_USER and THE_EXECUTOR.\n\nTHE_USER will ask you to do something or to give THE_USER some information.\nIf you can do it using the shell, you can send a command to THE_EXECUTOR.\nIf THE_USER is asking or saying something irrelevant (which cannot be done using the shell), you can send THE_USER a polite refusal message.\n\nYou can send messages to THE_USER by following this exact format:\n```\nTO_USER: (your message...)\n```\n\nYou can send commands to THE_EXECUTOR by following this exact format:\n```\nTO_EXECUTOR: (your command...)\n```\n\nTHE_EXECUTOR will reply with a JSON string, containing an errors array and an output string.\nIf the output string has a result, you can use the information to reply to THE_USER.\nIf the output string contains an error, you can look at the error and the errors array to decide whether to try again (send another command to THE_EXECUTOR), or tell THE_USER that you cannot perform the task.\n"
       },
       "positionX": 242.00458122725848,
-      "positionY": 463.2549505164511
-    },
-    {
-      "nodeType": "RouteTriggerNode",
-      "nodeId": "f6ba06fbfb0bedaa",
-      "controls": {},
-      "positionX": 1278.5973928422645,
-      "positionY": 336.9412784907545
+      "positionY": 441.26085166593214
     },
     {
       "nodeType": "RouteTriggerNode",
       "nodeId": "f4430a1705540039",
       "controls": {},
-      "positionX": 1105.36677489434,
-      "positionY": 538.0431941053047
+      "positionX": 1365.9181378473766,
+      "positionY": 551.6667947825875
     },
     {
       "nodeType": "RouteTriggerNode",
@@ -283,13 +283,50 @@
       "positionY": -263.616922063984
     },
     {
-      "nodeType": "EvalJsCodeNode",
-      "nodeId": "5882d0e97a2e6a21",
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "c9e98722f61a35df",
+      "controls": {},
+      "positionX": 5360.858762458251,
+      "positionY": 22.225704385049994
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "cc12cc1aec0700ea",
+      "controls": {},
+      "positionX": 6580.549738886806,
+      "positionY": -406.49325054447445
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "421310bcb7445d92",
       "controls": {
-        "val": "function fibonacci(n) {\n  if (n <= 1) {\n    return n;\n  }\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}\n\nlet result = [];\nfor (let i = 0; i < 10; i++) {\n  result.push(fibonacci(i));\n}\n\nreturn JSON.stringify(result);"
+        "role": "assistant"
       },
-      "positionX": 5031.657750793586,
-      "positionY": 1508.964407826399
+      "positionX": 7023.156183179479,
+      "positionY": -61.35193227850769
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "7d1603f3258e79b4",
+      "controls": {
+        "val": "An error occurred. Please spam the admin."
+      },
+      "positionX": 6882.337965802431,
+      "positionY": 308.2761350642693
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "adb4a31c0beb1780",
+      "controls": {},
+      "positionX": 7199.870452313662,
+      "positionY": -585.9367556326641
+    },
+    {
+      "nodeType": "RouteTriggerNode",
+      "nodeId": "f3409e5c509f2780",
+      "controls": {},
+      "positionX": 1235.2251548710435,
+      "positionY": 339.5888676767268
     }
   ],
   "connections": [
@@ -318,6 +355,12 @@
       "targetInput": "array"
     },
     {
+      "source": "0a31ad0616f2535a",
+      "sourceOutput": "string",
+      "target": "b002259b87cb0844",
+      "targetInput": "command"
+    },
+    {
       "source": "1a5aeb4802d2cf93",
       "sourceOutput": "out",
       "target": "dc632d2df18825d8",
@@ -328,6 +371,12 @@
       "sourceOutput": "slot",
       "target": "861bc1864e8ea0f1",
       "targetInput": "parts"
+    },
+    {
+      "source": "b002259b87cb0844",
+      "sourceOutput": "result",
+      "target": "dc632d2df18825d8",
+      "targetInput": "value"
     },
     {
       "source": "f4bf81f794193b55",
@@ -498,24 +547,6 @@
       "targetInput": "textSingle2"
     },
     {
-      "source": "02073d6b46ba0938",
-      "sourceOutput": "triggerOut",
-      "target": "f6ba06fbfb0bedaa",
-      "targetInput": "in"
-    },
-    {
-      "source": "f6ba06fbfb0bedaa",
-      "sourceOutput": "out",
-      "target": "fcad5592f354307b",
-      "targetInput": "triggerIn"
-    },
-    {
-      "source": "6467afa214b25a0f",
-      "sourceOutput": "triggerOut",
-      "target": "f4430a1705540039",
-      "targetInput": "in"
-    },
-    {
       "source": "fcad5592f354307b",
       "sourceOutput": "triggerCleared",
       "target": "a2c164e7b8635ca0",
@@ -534,21 +565,69 @@
       "targetInput": "triggerClear"
     },
     {
-      "source": "0a31ad0616f2535a",
-      "sourceOutput": "string",
-      "target": "5882d0e97a2e6a21",
+      "source": "fcad5592f354307b",
+      "sourceOutput": "error",
+      "target": "c9e98722f61a35df",
       "targetInput": "in"
     },
     {
-      "source": "5882d0e97a2e6a21",
-      "sourceOutput": "result",
-      "target": "dc632d2df18825d8",
-      "targetInput": "value"
+      "source": "7d1603f3258e79b4",
+      "sourceOutput": "out",
+      "target": "421310bcb7445d92",
+      "targetInput": "content"
+    },
+    {
+      "source": "421310bcb7445d92",
+      "sourceOutput": "message",
+      "target": "cc12cc1aec0700ea",
+      "targetInput": "message"
+    },
+    {
+      "source": "c9e98722f61a35df",
+      "sourceOutput": "out",
+      "target": "cc12cc1aec0700ea",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "02073d6b46ba0938",
+      "sourceOutput": "error",
+      "target": "cc12cc1aec0700ea",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "cc12cc1aec0700ea",
+      "sourceOutput": "triggerOut",
+      "target": "adb4a31c0beb1780",
+      "targetInput": "in"
+    },
+    {
+      "source": "6467afa214b25a0f",
+      "sourceOutput": "triggerOut",
+      "target": "adb4a31c0beb1780",
+      "targetInput": "in"
+    },
+    {
+      "source": "02073d6b46ba0938",
+      "sourceOutput": "triggerOut",
+      "target": "f3409e5c509f2780",
+      "targetInput": "in"
+    },
+    {
+      "source": "f3409e5c509f2780",
+      "sourceOutput": "out",
+      "target": "fcad5592f354307b",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "adb4a31c0beb1780",
+      "sourceOutput": "out",
+      "target": "f4430a1705540039",
+      "targetInput": "in"
     }
   ],
-  "zoom": 0.20775500040039024,
-  "areaX": 406.5351425170876,
-  "areaY": 310.734982299804,
-  "created": 1716830126789,
+  "zoom": 0.2130053604003675,
+  "areaX": 424.2716964721649,
+  "areaY": 269.30832061767467,
+  "created": 1716649555069,
   "execPersistence": "onChange"
 }
