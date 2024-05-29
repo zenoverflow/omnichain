@@ -20,7 +20,7 @@ export const EvalJsExpressionNode = makeNode(
     {
         nodeName: "EvalJsExpressionNode",
         nodeIcon: "CodeOutlined",
-        dimensions: [580, 510],
+        dimensions: [580, 560],
         doc,
     },
     {
@@ -34,6 +34,20 @@ export const EvalJsExpressionNode = makeNode(
             { name: "result", type: "string", label: "result" },
         ],
         controls: [
+            {
+                name: "clearOnEval",
+                control: {
+                    type: "select",
+                    defaultValue: "false",
+                    config: {
+                        label: "Clear on eval",
+                        values: [
+                            { value: "true", label: "true" },
+                            { value: "false", label: "false" },
+                        ],
+                    },
+                },
+            },
             {
                 name: "val",
                 control: {
@@ -56,8 +70,9 @@ export const EvalJsExpressionNode = makeNode(
                     value: string;
                 }[];
             };
+            const controls = context.getAllControls(nodeId);
 
-            const oldValue = context.getAllControls(nodeId).val as string;
+            const oldValue = controls.val as string;
             const expr = (inputs.in || [])[0] || oldValue;
 
             // Update graph if necessary
@@ -77,6 +92,10 @@ export const EvalJsExpressionNode = makeNode(
                     nodeId,
                     context
                 );
+
+                if (controls.clearOnEval === "true") {
+                    await context.updateControl(nodeId, "val", "");
+                }
 
                 return {
                     result:

@@ -18,7 +18,7 @@ export const EvalJsCodeNode = makeNode(
     {
         nodeName: "EvalJsCodeNode",
         nodeIcon: "CodeOutlined",
-        dimensions: [580, 510],
+        dimensions: [580, 560],
         doc,
     },
     {
@@ -32,6 +32,20 @@ export const EvalJsCodeNode = makeNode(
             { name: "result", type: "string", label: "result" },
         ],
         controls: [
+            {
+                name: "clearOnEval",
+                control: {
+                    type: "select",
+                    defaultValue: "false",
+                    config: {
+                        label: "Clear on eval",
+                        values: [
+                            { value: "true", label: "true" },
+                            { value: "false", label: "false" },
+                        ],
+                    },
+                },
+            },
             {
                 name: "val",
                 control: {
@@ -54,8 +68,9 @@ export const EvalJsCodeNode = makeNode(
                     value: string;
                 }[];
             };
+            const controls = context.getAllControls(nodeId);
 
-            const oldValue = context.getAllControls(nodeId).val as string;
+            const oldValue = controls.val as string;
             const codeStr = (inputs.in || [])[0] || oldValue;
 
             // Update graph if necessary
@@ -74,6 +89,10 @@ export const EvalJsCodeNode = makeNode(
                     nodeId,
                     context
                 );
+
+                if (controls.clearOnEval === "true") {
+                    await context.updateControl(nodeId, "val", "");
+                }
 
                 return {
                     result:
