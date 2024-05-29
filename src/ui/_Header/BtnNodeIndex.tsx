@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Button, Modal, Space, Collapse, CollapseProps } from "antd";
+import { Button, Modal, Space, Collapse, CollapseProps, Input } from "antd";
 import { ReadOutlined } from "@ant-design/icons";
 
 import { useOuterState } from "../../util/ObservableUtilsReact";
@@ -18,6 +18,7 @@ const _typeLabelStyle: React.CSSProperties = {
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     const [nodeRegistry] = useOuterState(nodeRegistryStorage);
+    const [filter, setFilter] = useState("");
 
     const items = useMemo(() => {
         const r: CollapseProps["items"] = Object.values(nodeRegistry)
@@ -64,8 +65,16 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                     </Space>
                 ),
             }));
+
+        const filtered = r.filter((i) =>
+            filter.length
+                ? (i.key as string).toLowerCase().includes(filter.toLowerCase())
+                : true
+        );
+
+        if (filtered.length) return filtered;
         return r;
-    }, [nodeRegistry]);
+    }, [filter, nodeRegistry]);
 
     return (
         <Modal
@@ -88,6 +97,17 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
             //     </>
             // )}
         >
+            <Input
+                type="text"
+                value={filter}
+                onChange={(e) => {
+                    setFilter((e.target.value || "").toLowerCase());
+                }}
+                placeholder="Filter..."
+                // onMouseEnter={haltTimeout}
+                style={{ marginBottom: "10px" }}
+                autoFocus
+            />
             <div
                 style={{
                     width: "100%",
