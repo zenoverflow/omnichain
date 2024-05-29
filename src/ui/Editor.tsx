@@ -10,7 +10,6 @@ import { Sider } from "./Sider";
 import { ComplexErrorModal } from "./_Editor/ComplexErrorModal";
 import { EditorGraph } from "./EditorGraph";
 import { ChatInterface } from "./Chat";
-import { BtnOptions } from "./_Header/BtnOptions";
 import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
 import { BtnNodeIndex } from "./_Header/BtnNodeIndex";
@@ -103,7 +102,6 @@ export const Editor: React.FC = () => {
                             <BtnAvatars />
                             <BtnApiKeys />
                             <BtnNodeIndex />
-                            <BtnOptions />
                         </Space>
                     </Space>
                 </Header>

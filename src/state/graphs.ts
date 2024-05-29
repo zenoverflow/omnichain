@@ -8,7 +8,6 @@ import { GraphUtils } from "../util/GraphUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { BackendResourceUtils } from "../util/BackendResourceUtils";
 import { closeEditor, openEditor, editorTargetStorage } from "./editor";
-import { clearRedundantOptions } from "./options";
 import { executorStorage } from "./executor";
 import { nodeRegistryStorage } from "./nodeRegistry";
 import { complexErrorObservable } from "./watcher";
@@ -229,5 +228,4 @@ export const deleteGraph = async (graphId: string) => {
             Object.entries(graphStorage.get()).filter(([id]) => id !== graphId)
         )
     );
-    await clearRedundantOptions();
 };

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Button, Input, Modal, Avatar, Space, Empty } from "antd";
+import { Button, Input, Modal, Avatar, Space, Empty, Select } from "antd";
 import {
     DeleteOutlined,
     TeamOutlined,
@@ -14,7 +14,52 @@ import {
     updateAvatarImage,
     deleteAvatar,
 } from "../../state/avatars";
+import { optionsStorage, setUserAvatar } from "../../state/options";
 import { useOuterState } from "../../util/ObservableUtilsReact";
+
+const _UserAvatarSelector: React.FC = () => {
+    const [avatars] = useOuterState(avatarStorage);
+    const [{ userAvatarId }] = useOuterState(optionsStorage);
+
+    const avatarOptions = useMemo(
+        () =>
+            Object.values(avatars)
+                .sort((a, b) => b.created - a.created)
+                .map((c) => ({
+                    label: c.name,
+                    value: c.avatarId,
+                })),
+        [avatars]
+    );
+
+    return (
+        <Space
+            direction="vertical"
+            size="large"
+            style={{ width: "100%", marginTop: "10px", marginBottom: "10px" }}
+        >
+            <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                <span>User chat avatar</span>
+                <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select an avatar..."
+                    options={avatarOptions}
+                    onChange={(v) => {
+                        void setUserAvatar(v);
+                    }}
+                    value={userAvatarId}
+                />
+                <span
+                    className="c__mstyle"
+                    style={{ fontSize: "16px", opacity: 0.7 }}
+                >
+                    Info: Avatar for the user in the chat interface. Purely
+                    cosmetic.
+                </span>
+            </Space>
+        </Space>
+    );
+};
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     const [avatars] = useOuterState(avatarStorage);
@@ -79,6 +124,9 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                 >
                     {"Avatar"}
                 </Button>
+
+                {avatarsSorted.length ? <_UserAvatarSelector /> : null}
+
                 {!avatarsSorted.length ? (
                     <Empty />
                 ) : (
