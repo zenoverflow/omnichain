@@ -1,30 +1,13 @@
-# React + TypeScript + Vite
+# OmniChain - visual logic chains that guide, control, and empower LLMs to think, act, and remember things any way you want
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Screenshot](/screenshot.png)
 
-Currently, two official plugins are available:
+-   Build powerful custom workflows with LLMs doing all the heavy lifting, to create a more effective LLM experience.
+-   Use the chain's memory abilities to store and recall information, and make decisions based on that information.
+-   Create custom agents and regular logic chains wired together in a single workflow to create powerful and flexible systems.
+-   Give the LLM access to the underlying operating system to read/write files, and run commands.
+-   Have the LLM generate and run NodeJS code snippets, or even entire scripts, to use APIs, automate tasks, and more.
+-   Attach your creations to any existing framework (agentic or otherwise) via the OpenAI-compatible API, to empower and control its thought processes better than you ever could before.
+-   No coding skills required!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+To get started, check out [the documentation](https://omnichain.zenoverflow.com)!
