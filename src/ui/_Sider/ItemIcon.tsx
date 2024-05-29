@@ -13,7 +13,14 @@ export const ItemIcon: React.FC<{ graphId: string }> = (props) => {
     );
 
     if (isBeingExecuted) {
-        return <PlayCircleOutlined />;
+        return (
+            <PlayCircleOutlined
+                style={{
+                    color: "#52c41a",
+                    animation: "fadeIn 0.5s linear infinite alternate",
+                }}
+            />
+        );
     }
 
     return <PartitionOutlined />;
