@@ -105,7 +105,8 @@ export async function createEditor(container: HTMLElement) {
     setEditorState(editor, area, nodeSelectorPlugin.unselect);
 
     return {
-        // nodeContext,
+        editor,
+        area,
         readonly,
         destroy: () => {
             // Cleanup editor

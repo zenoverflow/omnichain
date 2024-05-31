@@ -18,7 +18,34 @@ export const editorStateStorage = new StatefulObservable<{
     unselect: (id: string) => any;
 } | null>(null);
 
+export const editorLassoStorage = new StatefulObservable<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+} | null>(null);
+
 // ACTIONS //
+
+export const startEditorLasso = (x: number, y: number) => {
+    editorLassoStorage.set({
+        x1: x,
+        y1: y,
+        x2: x,
+        y2: y,
+    });
+};
+
+export const setEditorLassoEnd = (x: number, y: number) => {
+    const lasso = editorLassoStorage.get();
+    if (lasso) {
+        editorLassoStorage.set({ ...lasso, x2: x, y2: y });
+    }
+};
+
+export const clearEditorLasso = () => {
+    editorLassoStorage.set(null);
+};
 
 export const setEditorState = (
     editor: CNodeEditor,
@@ -30,6 +57,7 @@ export const setEditorState = (
 
 export const clearEditorState = () => {
     editorStateStorage.set(null);
+    clearEditorLasso();
 };
 
 export const openEditor = (graphId: string) => {

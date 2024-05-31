@@ -24,6 +24,7 @@ import { deleteSelectedNodes, editorTargetStorage } from "../state/editor";
 import { nodeSelectionStorage } from "../state/nodeSelection";
 import { executorStorage, stopGraph, runGraph } from "../state/executor";
 import { controlDisabledObservable } from "../state/watcher";
+import { Lasso } from "./_EditorGraph/Lasso";
 
 const NodeDeleteButton: React.FC<{
     disabled?: boolean;
@@ -341,6 +342,10 @@ export const EditorGraph: React.FC = () => {
                     </Space>
                 </Space>
             </Drawer>
+
+            {editorData ? (
+                <Lasso editor={editorData.editor} area={editorData.area} />
+            ) : null}
         </>
     );
 };

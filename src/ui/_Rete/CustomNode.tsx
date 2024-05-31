@@ -290,6 +290,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
 
     return (
         <StyledWrapper
+            id={props.data.id}
             data-context-menu={props.data.id}
             selected={props.data.selected || false}
             width={props.data.width}
