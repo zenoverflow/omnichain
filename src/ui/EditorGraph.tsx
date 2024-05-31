@@ -343,9 +343,7 @@ export const EditorGraph: React.FC = () => {
                 </Space>
             </Drawer>
 
-            {editorData ? (
-                <Lasso editor={editorData.editor} area={editorData.area} />
-            ) : null}
+            <Lasso />
         </>
     );
 };

@@ -1,9 +1,7 @@
-import React, { useRef, useMemo, useEffect } from "react";
-
-import type { CAreaPlugin, CNodeEditor } from "../../data/typesRete";
+import React, { useMemo, useEffect } from "react";
 
 import { useOuterState } from "../../util/ObservableUtilsReact";
-import { editorLassoStorage } from "../../state/editor";
+import { editorLassoStorage, editorStateStorage } from "../../state/editor";
 
 type _LassoData = {
     top: number;
@@ -12,12 +10,8 @@ type _LassoData = {
     height: number;
 };
 
-export const Lasso: React.FC<{
-    area: CAreaPlugin;
-    editor: CNodeEditor;
-}> = ({ area }) => {
+export const Lasso: React.FC = () => {
     const [lasso] = useOuterState(editorLassoStorage);
-    const lassoRef = useRef<any>();
 
     const coords: _LassoData = useMemo(() => {
         if (!lasso) {
@@ -39,33 +33,47 @@ export const Lasso: React.FC<{
 
     useEffect(() => {
         // calculate which editor nodes are inside the selector's box
-        if (!lasso || !lassoRef.current) {
-            return;
-        }
+        if (!lasso) return;
+
+        const area = editorStateStorage.get()?.area;
+
+        if (!area) return;
 
         const nodes = area.nodeViews;
 
-        console.log("Nodes: ", nodes);
-        console.log("Lasso: ", lasso);
-        // console.log("EditorNodes", editor.getNodes());
+        // console.log("Nodes: ", nodes);
+        // console.log("Lasso: ", lasso);
+
+        const lassoLeft = Math.min(lasso.x1, lasso.x2);
+        const lassoRight = Math.max(lasso.x1, lasso.x2);
+        const lassoTop = Math.min(lasso.y1, lasso.y2);
+        const lassoBottom = Math.max(lasso.y1, lasso.y2);
 
         const selectedNodes = Array.from(nodes.entries())
             .filter(([_nodeId, nodeView]) => {
                 const nodeRect = nodeView.element.getBoundingClientRect();
 
                 return (
-                    nodeRect.left >= Math.min(lasso.x1, lasso.x2) &&
-                    nodeRect.right <= Math.max(lasso.x1, lasso.x2) &&
-                    nodeRect.top >= Math.min(lasso.y1, lasso.y2) &&
-                    nodeRect.bottom <= Math.max(lasso.y1, lasso.y2)
+                    nodeRect.bottom > lassoTop &&
+                    nodeRect.right > lassoLeft &&
+                    nodeRect.top < lassoBottom &&
+                    nodeRect.left < lassoRight
                 );
+
+                // Full containment (left here for reference)
+                // return (
+                //     nodeRect.left >= Math.min(lasso.x1, lasso.x2) &&
+                //     nodeRect.right <= Math.max(lasso.x1, lasso.x2) &&
+                //     nodeRect.top >= Math.min(lasso.y1, lasso.y2) &&
+                //     nodeRect.bottom <= Math.max(lasso.y1, lasso.y2)
+                // );
             })
             .map(([nodeId, _nodeView]) => nodeId);
 
         console.log("Selected nodes: ", JSON.stringify(selectedNodes));
 
         // TODO: update selection
-    }, [area.nodeViews, lasso, coords]);
+    }, [lasso]);
 
     if (!lasso) {
         return null;
@@ -73,7 +81,7 @@ export const Lasso: React.FC<{
 
     return (
         <div
-            ref={lassoRef}
+            // ref={lassoRef}
             style={{
                 position: "fixed",
                 zIndex: 9001,
