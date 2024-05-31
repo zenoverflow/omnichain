@@ -75,8 +75,6 @@ export const AreaSelectionWatcher = {
                     event.stopPropagation();
                     event.preventDefault();
 
-                    console.log(context.type, context);
-
                     if (context.type === "pointerdown") {
                         startEditorLasso(event.clientX, event.clientY);
                     } else if (context.type === "pointermove") {

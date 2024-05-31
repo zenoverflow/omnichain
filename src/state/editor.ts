@@ -15,6 +15,7 @@ export const editorTargetStorage = new StatefulObservable<string | null>(null);
 export const editorStateStorage = new StatefulObservable<{
     editor: CNodeEditor;
     area: CAreaPlugin;
+    select: (id: string) => any;
     unselect: (id: string) => any;
 } | null>(null);
 
@@ -50,9 +51,10 @@ export const clearEditorLasso = () => {
 export const setEditorState = (
     editor: CNodeEditor,
     area: CAreaPlugin,
+    select: (id: string) => any,
     unselect: (id: string) => any
 ) => {
-    editorStateStorage.set({ editor, area, unselect });
+    editorStateStorage.set({ editor, area, select, unselect });
 };
 
 export const clearEditorState = () => {

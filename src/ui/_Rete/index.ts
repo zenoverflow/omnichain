@@ -102,7 +102,14 @@ export async function createEditor(container: HTMLElement) {
         console.error(error);
     }
 
-    setEditorState(editor, area, nodeSelectorPlugin.unselect);
+    setEditorState(
+        editor,
+        area,
+        (id: string) => {
+            nodeSelectorPlugin.select(id, true);
+        },
+        nodeSelectorPlugin.unselect
+    );
 
     return {
         editor,

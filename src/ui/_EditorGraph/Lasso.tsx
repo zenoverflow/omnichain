@@ -32,17 +32,13 @@ export const Lasso: React.FC = () => {
     }, [lasso]);
 
     useEffect(() => {
-        // calculate which editor nodes are inside the selector's box
         if (!lasso) return;
 
-        const area = editorStateStorage.get()?.area;
+        const editorState = editorStateStorage.get();
 
-        if (!area) return;
+        if (!editorState) return;
 
-        const nodes = area.nodeViews;
-
-        // console.log("Nodes: ", nodes);
-        // console.log("Lasso: ", lasso);
+        const nodes = editorState.area.nodeViews;
 
         const lassoLeft = Math.min(lasso.x1, lasso.x2);
         const lassoRight = Math.max(lasso.x1, lasso.x2);
@@ -70,9 +66,14 @@ export const Lasso: React.FC = () => {
             })
             .map(([nodeId, _nodeView]) => nodeId);
 
-        console.log("Selected nodes: ", JSON.stringify(selectedNodes));
-
-        // TODO: update selection
+        // Unselect old selection
+        for (const id of nodes.keys()) {
+            editorState.unselect(id);
+        }
+        // Select new selection
+        for (const id of selectedNodes) {
+            editorState.select(id);
+        }
     }, [lasso]);
 
     if (!lasso) {
@@ -81,12 +82,11 @@ export const Lasso: React.FC = () => {
 
     return (
         <div
-            // ref={lassoRef}
             style={{
                 position: "fixed",
                 zIndex: 9001,
-                backgroundColor: "blue",
-                opacity: 0.5,
+                backgroundColor: "#1677ff",
+                opacity: 0.3,
                 top: coords.top,
                 left: coords.left,
                 width: coords.width,
