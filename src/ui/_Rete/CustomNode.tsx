@@ -125,35 +125,6 @@ type Props<S extends ClassicScheme> = {
     emit: RenderEmit<S>;
 };
 
-// export const ExecutionIndicator: React.FC<{ node: any }> = (props) => {
-//     const [executor] = useOuterState(executorStorage);
-//     const isActive = useMemo(() => {
-//         if (!executor) return false;
-//         return (
-//             executor.graphId === props.node.graphId &&
-//             executor.step === props.node.id
-//         );
-//     }, [executor, props.node.graphId, props.node.id]);
-
-//     return (
-//         <div
-//             style={{
-//                 display: isActive ? "block" : "none",
-//                 position: "absolute",
-//                 top: -6,
-//                 left: -6,
-//                 right: -6,
-//                 bottom: -6,
-//                 zIndex: -1,
-//                 borderRadius: "10px",
-//                 pointerEvents: "none",
-//                 boxSizing: "border-box",
-//                 animation: "glowYellow 1.2s ease-in infinite",
-//             }}
-//         ></div>
-//     );
-// };
-
 /**
  * Used to indicate either node activity, or an error in the node.
  */
@@ -272,6 +243,40 @@ export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
     );
 };
 
+export const CustomNodeControls: React.FC<{
+    node: ClassicScheme["Node"];
+    emit: RenderEmit<any>;
+}> = ({ node, emit }) => {
+    const [graphs] = useOuterState(graphStorage);
+
+    const graphId: string = (node as any).graphId;
+
+    const hidden = useMemo(() => graphs[graphId].zoom < 0.5, [graphs, graphId]);
+
+    const controls = useMemo(
+        () => sortByIndex(Object.entries(node.controls)),
+        [node.controls]
+    );
+
+    if (hidden) return null;
+
+    return (
+        <>
+            {controls.map(([key, control]) => {
+                return control ? (
+                    <RefControl
+                        key={key}
+                        name="control"
+                        emit={emit}
+                        payload={control}
+                        data-testid={`control-${key}`}
+                    />
+                ) : null;
+            })}
+        </>
+    );
+};
+
 export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     const inputs = useMemo(
         () => sortByIndex(Object.entries(props.data.inputs)),
@@ -281,11 +286,6 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     const outputs = useMemo(
         () => sortByIndex(Object.entries(props.data.outputs)),
         [props.data.outputs]
-    );
-
-    const controls = useMemo(
-        () => sortByIndex(Object.entries(props.data.controls)),
-        [props.data.controls]
     );
 
     return (
@@ -386,18 +386,7 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                         </div>
                     )
             )}
-            {/* Controls */}
-            {controls.map(([key, control]) => {
-                return control ? (
-                    <RefControl
-                        key={key}
-                        name="control"
-                        emit={props.emit}
-                        payload={control}
-                        data-testid={`control-${key}`}
-                    />
-                ) : null;
-            })}
+            <CustomNodeControls node={props.data} emit={props.emit} />
         </StyledWrapper>
     );
 }

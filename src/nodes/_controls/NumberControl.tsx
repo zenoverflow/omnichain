@@ -23,8 +23,6 @@ export class NumberControl extends BaseControl<
                 self.grabValue()
             );
 
-            if (controlState.hidden) return null;
-
             return (
                 <div
                     style={{

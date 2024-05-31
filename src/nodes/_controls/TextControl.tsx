@@ -88,8 +88,6 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
 
             const [modalOpen, setModalOpen] = useState(false);
 
-            if (controlState.hidden) return null;
-
             return self.config.large ?? false ? (
                 <>
                     <Input.TextArea

@@ -100,7 +100,7 @@ export const FileGrid: React.FC<{
         (index: number) => {
             const file = files[index];
             const link = document.createElement("a");
-            link.href = file.content;
+            link.href = `data:${file.mimetype};base64,${file.content}`;
             link.download = file.name;
             link.click();
         },
