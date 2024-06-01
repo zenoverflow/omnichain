@@ -50,17 +50,17 @@ const _Modal: React.FC<{
         >
             <CodeMirror
                 value={value}
+                onPointerDown={(e) => {
+                    e.stopPropagation();
+                }}
+                onDoubleClick={(e) => {
+                    e.stopPropagation();
+                }}
                 onKeyDown={(e) => {
-                    // stop propagation of del key
-                    if (e.key === "Delete") {
-                        e.stopPropagation();
-                    }
+                    e.stopPropagation();
                 }}
                 onKeyUp={(e) => {
-                    // stop propagation of del key
-                    if (e.key === "Delete") {
-                        e.stopPropagation();
-                    }
+                    e.stopPropagation();
                 }}
                 onChange={(val, _viewUpdate) => {
                     onChange(val);
@@ -97,17 +97,20 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                         value={controlState.value}
                         onChange={(e) => {
                             const v = e.target.value;
-                            controlState.setValue(v);
                             self.value = v;
+                            controlState.setValue(v);
                         }}
                         className="c__nodecontrol"
                         onPointerDown={(e) => {
                             e.stopPropagation();
                         }}
-                        onPointerUp={(e) => {
+                        onDoubleClick={(e) => {
                             e.stopPropagation();
                         }}
-                        onDoubleClick={(e) => {
+                        onKeyDown={(e) => {
+                            e.stopPropagation();
+                        }}
+                        onKeyUp={(e) => {
                             e.stopPropagation();
                         }}
                         style={{
@@ -158,8 +161,8 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                             }}
                             value={controlState.value}
                             onChange={(v) => {
-                                controlState.setValue(v);
                                 self.value = v;
+                                controlState.setValue(v);
                             }}
                         />
                     ) : null}
@@ -177,10 +180,13 @@ export class TextControl extends BaseControl<string, TextControlConfig> {
                     onPointerDown={(e) => {
                         e.stopPropagation();
                     }}
-                    onPointerUp={(e) => {
+                    onDoubleClick={(e) => {
                         e.stopPropagation();
                     }}
-                    onDoubleClick={(e) => {
+                    onKeyDown={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onKeyUp={(e) => {
                         e.stopPropagation();
                     }}
                     addonBefore={self.config.label ?? "text"}

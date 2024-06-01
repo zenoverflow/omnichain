@@ -44,6 +44,15 @@ export class SelectControl extends BaseControl<
                     onPointerDown={(e) => {
                         e.stopPropagation();
                     }}
+                    onDoubleClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onKeyDown={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onKeyUp={(e) => {
+                        e.stopPropagation();
+                    }}
                 >
                     <div
                         style={{

@@ -34,6 +34,15 @@ export class NumberControl extends BaseControl<
                     onPointerDown={(e) => {
                         e.stopPropagation();
                     }}
+                    onDoubleClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onKeyDown={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onKeyUp={(e) => {
+                        e.stopPropagation();
+                    }}
                 >
                     <InputNumber
                         disabled={self.readOnly || controlState.disabled}
