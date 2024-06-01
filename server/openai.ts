@@ -22,7 +22,7 @@ const routerOpenAi = new Router();
 export const setupOpenAiCompatibleAPI = (
     port: number,
     onMessage: (
-        message: ChatMessage,
+        messages: ChatMessage[],
         checkRequestActive: () => boolean,
         clearSessionOnResponse?: boolean
     ) => Promise<ChatMessage | null>
@@ -39,7 +39,10 @@ export const setupOpenAiCompatibleAPI = (
                 requestActive = false;
             });
             const result = await onMessage(
-                MsgUtils.freshFromUser(model, prompt, null, []),
+                [
+                    //
+                    MsgUtils.freshFromUser(model, prompt, null, []),
+                ],
                 () => requestActive,
                 clearSessionOnResponse
             );
@@ -76,11 +79,13 @@ export const setupOpenAiCompatibleAPI = (
             const clearSessionOnResponse =
                 ctx.request.body._ocClearSession || true;
 
-            let prompt = "";
-            const files: ChatMessage["files"] = [];
+            const chatMessages: ChatMessage[] = [];
 
             for (const message of messages) {
                 const content: string | any[] = message.content || "";
+
+                const files: ChatMessage["files"] = [];
+                let text = "";
 
                 if (Array.isArray(content)) {
                     for (const subContent of content.filter((c) => !!c)) {
@@ -104,20 +109,41 @@ export const setupOpenAiCompatibleAPI = (
                                 content: matches[2],
                             });
                         } else {
-                            prompt += `${subContent.text as string}\n\n`;
+                            text = subContent.text;
                         }
                     }
+                    chatMessages.push(
+                        message.role === "user"
+                            ? MsgUtils.freshFromUser(model, text, null, files)
+                            : MsgUtils.freshFromAssistant(
+                                  model,
+                                  text,
+                                  null,
+                                  files
+                              )
+                    );
                 } else {
-                    prompt += `${content}\n\n`;
+                    chatMessages.push(
+                        message.role === "user"
+                            ? MsgUtils.freshFromUser(model, content, null, [])
+                            : MsgUtils.freshFromAssistant(
+                                  model,
+                                  content,
+                                  null,
+                                  []
+                              )
+                    );
                 }
             }
+
+            if (!chatMessages.length) throw new Error("No messages provided");
 
             let requestActive = true;
             ctx.req.on("close", () => {
                 requestActive = false;
             });
             const result = await onMessage(
-                MsgUtils.freshFromUser(model, prompt, null, files),
+                chatMessages,
                 () => requestActive,
                 clearSessionOnResponse
             );

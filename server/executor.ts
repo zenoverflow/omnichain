@@ -433,18 +433,24 @@ export const setupExecutorApi = (
     // Runs as a separate app on a separate port
     setupOpenAiCompatibleAPI(
         portOpenAi,
-        async (message, checkRequestActive, clearSessionOnResponse = true) => {
-            // Ensure the correct chain is running
-            await runGraph(message.chainId, dirData, dirCustomNodes);
+        async (messages, checkRequestActive, clearSessionOnResponse = true) => {
+            const latestMessage = messages[messages.length - 1];
+            const chainId = latestMessage.chainId;
 
-            messageQueue.push(message);
-            addMessageToSession(message);
-            console.log(
-                "Received message from OAI API:",
-                message.content,
-                "files:",
-                message.files.length
-            );
+            // Ensure the correct chain is running
+            await runGraph(chainId, dirData, dirCustomNodes);
+
+            for (const message of messages) {
+                addMessageToSession(message);
+                console.log(
+                    "Received message from OAI API:",
+                    message.content,
+                    "files:",
+                    message.files.length
+                );
+            }
+
+            messageQueue.push(latestMessage);
 
             // If the graph did not run, something went wrong. Return null.
             if (!executorStorage.get()) return null;
