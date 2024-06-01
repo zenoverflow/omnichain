@@ -41,6 +41,13 @@ export class SelectControl extends BaseControl<
 
             return (
                 <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "stretch",
+                        width: "100%",
+                        maxWidth: "100%",
+                    }}
                     onPointerDown={(e) => {
                         e.stopPropagation();
                     }}
@@ -54,49 +61,40 @@ export class SelectControl extends BaseControl<
                         e.stopPropagation();
                     }}
                 >
-                    <div
+                    <span
                         style={{
                             display: "flex",
                             justifyContent: "center",
-                            alignItems: "stretch",
-                            width: "100%",
+                            alignItems: "center",
+                            padding: "0 10px",
+                            borderTopLeftRadius: "5px",
+                            borderBottomLeftRadius: "5px",
+                            backgroundColor: "#fafafa",
                         }}
                     >
-                        <span
-                            style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: "0 10px",
-                                borderTopLeftRadius: "5px",
-                                borderBottomLeftRadius: "5px",
-                                backgroundColor: "#fafafa",
-                            }}
-                        >
-                            {self.config.label ?? "Option"}
-                        </span>
-                        <Select
-                            disabled={self.readOnly || controlState.disabled}
-                            value={selectedOption}
-                            onSelect={(_, option) => {
-                                self.value = option.value;
-                                controlState.setValue(option.value);
-                            }}
-                            options={self.config.values}
-                            className="c__rmleftrad c__nodecontrol"
-                            style={{ flex: "1" }}
-                            showSearch={self.config.showSearch ?? false}
-                            // onSearch={() => {}}
-                            // optionFilterProp="children"
-                            // filterOption={(input, option) =>
-                            //     input.trim().length
-                            //         ? option.label
-                            //               .toLowerCase()
-                            //               .includes(input.toLowerCase())
-                            //         : true
-                            // }
-                        />
-                    </div>
+                        {self.config.label ?? "Option"}
+                    </span>
+                    <Select
+                        disabled={self.readOnly || controlState.disabled}
+                        value={selectedOption}
+                        onSelect={(_, option) => {
+                            self.value = option.value;
+                            controlState.setValue(option.value);
+                        }}
+                        options={self.config.values}
+                        className="c__rmleftrad c__nodecontrol"
+                        style={{ flex: "1" }}
+                        showSearch={self.config.showSearch ?? false}
+                        // onSearch={() => {}}
+                        // optionFilterProp="children"
+                        // filterOption={(input, option) =>
+                        //     input.trim().length
+                        //         ? option.label
+                        //               .toLowerCase()
+                        //               .includes(input.toLowerCase())
+                        //         : true
+                        // }
+                    />
                 </div>
             );
         };
