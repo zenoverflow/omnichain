@@ -1,3 +1,5 @@
+import { ClassicPreset } from "rete";
+
 import type { CustomNode } from "../data/typesCustomNodes";
 import type { CNodeEditor, CAreaPlugin } from "../data/typesRete";
 
@@ -11,11 +13,15 @@ import { complexErrorObservable } from "./watcher";
 import { SerializedGraph } from "../data/types";
 
 type EditorClipboard = {
-    nodeType: string;
-    nodeControls: { [key: string]: string | number | null };
-    deltaX: number;
-    deltaY: number;
-}[];
+    nodes: {
+        nodeType: string;
+        nodeControls: { [key: string]: string | number | null };
+        oldId: string;
+        deltaX: number;
+        deltaY: number;
+    }[];
+    connections: SerializedGraph["connections"];
+};
 
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
@@ -33,13 +39,12 @@ export const editorLassoStorage = new StatefulObservable<{
     y2: number;
 } | null>(null);
 
-export const editorClipboardStorage = new StatefulObservable<EditorClipboard>(
-    []
-);
+export const editorClipboardStorage =
+    new StatefulObservable<EditorClipboard | null>(null);
 
 // ACTIONS //
 
-export const copySelectedNodes = () => {
+export const copySelectedNodes = (copyConnections = false) => {
     const currentGraphId = editorTargetStorage.get();
     if (!currentGraphId) return;
 
@@ -51,7 +56,12 @@ export const copySelectedNodes = () => {
     const editorState = editorStateStorage.get();
     if (!editorState) return;
 
-    const selectedNodes = nodeSelectionStorage.get();
+    // Filter out special nodes
+    const selectedNodes = nodeSelectionStorage.get().filter((id) => {
+        const nodeData = currentGraph.nodes.find((n) => n.nodeId === id);
+        return nodeData && nodeData.nodeType !== "StartNode";
+    });
+
     if (selectedNodes.length === 0) return;
 
     const allXCoords: number[] = [];
@@ -68,25 +78,34 @@ export const copySelectedNodes = () => {
     const averageX = allXCoords.reduce((a, b) => a + b, 0) / allXCoords.length;
     const averageY = allYCoords.reduce((a, b) => a + b, 0) / allYCoords.length;
 
-    const clipboard: EditorClipboard = [];
+    const clipboardNodes: EditorClipboard["nodes"] = [];
 
     for (const nodeId of selectedNodes) {
         const nodeData = currentGraph.nodes.find((n) => n.nodeId === nodeId);
         const nodeView = editorState.area.nodeViews.get(nodeId);
         if (nodeData && nodeView) {
-            // Cannot copy the start node
-            if (nodeData.nodeType === "StartNode") continue;
-
-            clipboard.push({
+            clipboardNodes.push({
                 nodeType: nodeData.nodeType,
                 nodeControls: nodeData.controls,
                 deltaX: nodeView.position.x - averageX,
                 deltaY: nodeView.position.y - averageY,
+                oldId: nodeId,
             });
         }
     }
 
-    editorClipboardStorage.set(clipboard);
+    const clipboardConnections = copyConnections
+        ? currentGraph.connections.filter(
+              (conn) =>
+                  selectedNodes.includes(conn.source) &&
+                  selectedNodes.includes(conn.target)
+          )
+        : [];
+
+    editorClipboardStorage.set({
+        nodes: clipboardNodes,
+        connections: clipboardConnections,
+    });
 };
 
 export const pasteNodes = async (centerX: number, centerY: number) => {
@@ -94,12 +113,15 @@ export const pasteNodes = async (centerX: number, centerY: number) => {
     if (!currentGraphId) return;
 
     const clipboard = editorClipboardStorage.get();
-    if (clipboard.length === 0) return;
+    if (!clipboard) return;
 
     const editorState = editorStateStorage.get();
     if (!editorState) return;
 
-    for (const cbNode of clipboard) {
+    const mapOldIdToNewId: { [oldId: string]: string } = {};
+
+    // Paste nodes
+    for (const cbNode of clipboard.nodes) {
         const freshNode = GraphUtils.mkEditorNode(
             currentGraphId,
             cbNode.nodeType,
@@ -107,6 +129,8 @@ export const pasteNodes = async (centerX: number, centerY: number) => {
             undefined,
             cbNode.nodeControls
         );
+
+        mapOldIdToNewId[cbNode.oldId] = freshNode.id;
 
         await editorState.editor.addNode(freshNode);
 
@@ -116,6 +140,30 @@ export const pasteNodes = async (centerX: number, centerY: number) => {
                 centerX + cbNode.deltaX,
                 centerY + cbNode.deltaY
             );
+        }
+    }
+
+    const remappedConnections = clipboard.connections.map((conn) => ({
+        ...conn,
+        source: mapOldIdToNewId[conn.source],
+        target: mapOldIdToNewId[conn.target],
+    }));
+
+    // Paste connections
+    for (const c of remappedConnections) {
+        try {
+            // Add using the class
+            // Using a pure object throws a duplicate connection error
+            await editorState.editor.addConnection(
+                new ClassicPreset.Connection<any, any>(
+                    editorState.editor.getNode(c.source),
+                    c.sourceOutput,
+                    editorState.editor.getNode(c.target),
+                    c.targetInput
+                )
+            );
+        } catch (error) {
+            console.error(error);
         }
     }
 };

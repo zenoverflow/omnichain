@@ -176,7 +176,7 @@ export const EditorGraph: React.FC = () => {
     useEffect(() => {
         const handleCopyKey = (e: KeyboardEvent) => {
             if (e.key === "c" && e.ctrlKey) {
-                copySelectedNodes();
+                copySelectedNodes(e.altKey);
             }
         };
 
