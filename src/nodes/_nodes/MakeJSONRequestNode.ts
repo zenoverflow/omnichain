@@ -17,7 +17,7 @@ export const MakeJSONRequestNode = makeNode(
     {
         nodeName: "MakeJSONRequestNode",
         nodeIcon: "ApiOutlined",
-        dimensions: [620, 280],
+        dimensions: [620, 290],
         doc,
     },
     {
