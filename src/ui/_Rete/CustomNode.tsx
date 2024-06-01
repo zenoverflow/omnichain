@@ -180,7 +180,7 @@ export const SocketTitle: React.FC<{
     const [graphs] = useOuterState(graphStorage);
 
     const hidden = useMemo(
-        () => graphs[node.graphId].zoom < 0.5,
+        () => graphs[node.graphId].zoom < 0.4,
         [graphs, node.graphId]
     );
 
@@ -201,7 +201,7 @@ export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
     const [graphs] = useOuterState(graphStorage);
 
     const hidden = useMemo(
-        () => graphs[node.graphId].zoom < 0.5,
+        () => graphs[node.graphId].zoom < 0.4,
         [graphs, node.graphId]
     );
 
@@ -243,40 +243,6 @@ export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
     );
 };
 
-export const CustomNodeControls: React.FC<{
-    node: ClassicScheme["Node"];
-    emit: RenderEmit<any>;
-}> = ({ node, emit }) => {
-    const [graphs] = useOuterState(graphStorage);
-
-    const graphId: string = (node as any).graphId;
-
-    const hidden = useMemo(() => graphs[graphId].zoom < 0.5, [graphs, graphId]);
-
-    const controls = useMemo(
-        () => sortByIndex(Object.entries(node.controls)),
-        [node.controls]
-    );
-
-    if (hidden) return null;
-
-    return (
-        <>
-            {controls.map(([key, control]) => {
-                return control ? (
-                    <RefControl
-                        key={key}
-                        name="control"
-                        emit={emit}
-                        payload={control}
-                        data-testid={`control-${key}`}
-                    />
-                ) : null;
-            })}
-        </>
-    );
-};
-
 export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     const inputs = useMemo(
         () => sortByIndex(Object.entries(props.data.inputs)),
@@ -286,6 +252,11 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     const outputs = useMemo(
         () => sortByIndex(Object.entries(props.data.outputs)),
         [props.data.outputs]
+    );
+
+    const controls = useMemo(
+        () => sortByIndex(Object.entries(props.data.controls)),
+        [props.data.controls]
     );
 
     return (
@@ -387,7 +358,17 @@ export function CustomNode<Scheme extends ClassicScheme>(props: Props<Scheme>) {
                         </div>
                     )
             )}
-            <CustomNodeControls node={props.data} emit={props.emit} />
+            {controls.map(([key, control]) => {
+                return control ? (
+                    <RefControl
+                        key={key}
+                        name="control"
+                        emit={props.emit}
+                        payload={control}
+                        data-testid={`control-${key}`}
+                    />
+                ) : null;
+            })}
         </StyledWrapper>
     );
 }
