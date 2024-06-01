@@ -10,6 +10,13 @@ import { graphStorage } from "./graphs";
 import { complexErrorObservable } from "./watcher";
 import { SerializedGraph } from "../data/types";
 
+type EditorClipboard = {
+    nodeType: string;
+    nodeControls: { [key: string]: string | number | null };
+    deltaX: number;
+    deltaY: number;
+}[];
+
 export const editorTargetStorage = new StatefulObservable<string | null>(null);
 
 export const editorStateStorage = new StatefulObservable<{
@@ -26,7 +33,92 @@ export const editorLassoStorage = new StatefulObservable<{
     y2: number;
 } | null>(null);
 
+export const editorClipboardStorage = new StatefulObservable<EditorClipboard>(
+    []
+);
+
 // ACTIONS //
+
+export const copySelectedNodes = () => {
+    const currentGraphId = editorTargetStorage.get();
+    if (!currentGraphId) return;
+
+    const currentGraph = graphStorage.get()[currentGraphId] as
+        | SerializedGraph
+        | undefined;
+    if (!currentGraph) return;
+
+    const editorState = editorStateStorage.get();
+    if (!editorState) return;
+
+    const selectedNodes = nodeSelectionStorage.get();
+    if (selectedNodes.length === 0) return;
+
+    const allXCoords: number[] = [];
+    const allYCoords: number[] = [];
+
+    for (const nodeId of selectedNodes) {
+        const nodeView = editorState.area.nodeViews.get(nodeId);
+        if (nodeView) {
+            allXCoords.push(nodeView.position.x);
+            allYCoords.push(nodeView.position.y);
+        }
+    }
+
+    const averageX = allXCoords.reduce((a, b) => a + b, 0) / allXCoords.length;
+    const averageY = allYCoords.reduce((a, b) => a + b, 0) / allYCoords.length;
+
+    const clipboard: EditorClipboard = [];
+
+    for (const nodeId of selectedNodes) {
+        const nodeData = currentGraph.nodes.find((n) => n.nodeId === nodeId);
+        const nodeView = editorState.area.nodeViews.get(nodeId);
+        if (nodeData && nodeView) {
+            // Cannot copy the start node
+            if (nodeData.nodeType === "StartNode") continue;
+
+            clipboard.push({
+                nodeType: nodeData.nodeType,
+                nodeControls: nodeData.controls,
+                deltaX: nodeView.position.x - averageX,
+                deltaY: nodeView.position.y - averageY,
+            });
+        }
+    }
+
+    editorClipboardStorage.set(clipboard);
+};
+
+export const pasteNodes = async (centerX: number, centerY: number) => {
+    const currentGraphId = editorTargetStorage.get();
+    if (!currentGraphId) return;
+
+    const clipboard = editorClipboardStorage.get();
+    if (clipboard.length === 0) return;
+
+    const editorState = editorStateStorage.get();
+    if (!editorState) return;
+
+    for (const cbNode of clipboard) {
+        const freshNode = GraphUtils.mkEditorNode(
+            currentGraphId,
+            cbNode.nodeType,
+            nodeRegistryStorage.get(),
+            undefined,
+            cbNode.nodeControls
+        );
+
+        await editorState.editor.addNode(freshNode);
+
+        const nodeView = editorState.area.nodeViews.get(freshNode.id);
+        if (nodeView) {
+            await nodeView.translate(
+                centerX + cbNode.deltaX,
+                centerY + cbNode.deltaY
+            );
+        }
+    }
+};
 
 export const startEditorLasso = (x: number, y: number) => {
     editorLassoStorage.set({

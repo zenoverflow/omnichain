@@ -20,7 +20,12 @@ import {
     updateGraphExecPersistence,
     deleteGraph,
 } from "../state/graphs";
-import { deleteSelectedNodes, editorTargetStorage } from "../state/editor";
+import {
+    copySelectedNodes,
+    deleteSelectedNodes,
+    editorTargetStorage,
+    pasteNodes,
+} from "../state/editor";
 import { nodeSelectionStorage } from "../state/nodeSelection";
 import { executorStorage, stopGraph, runGraph } from "../state/executor";
 import { controlDisabledObservable } from "../state/watcher";
@@ -166,6 +171,32 @@ export const EditorGraph: React.FC = () => {
             console.error(error);
         }
     }, [currentGraph]);
+
+    // Copy/paste key listeners
+    useEffect(() => {
+        const handleCopyKey = (e: KeyboardEvent) => {
+            if (e.key === "c" && e.ctrlKey) {
+                copySelectedNodes();
+            }
+        };
+
+        const handlePasteKey = (e: KeyboardEvent) => {
+            const area = editorData?.area;
+            if (!area) return;
+
+            if (e.key === "v" && e.ctrlKey) {
+                void pasteNodes(area.area.pointer.x, area.area.pointer.y);
+            }
+        };
+
+        window.addEventListener("keyup", handleCopyKey);
+        window.addEventListener("keyup", handlePasteKey);
+
+        return () => {
+            window.removeEventListener("keyup", handleCopyKey);
+            window.removeEventListener("keyup", handlePasteKey);
+        };
+    }, [editorData]);
 
     // Disable/enable controls manually
     useEffect(() => {
