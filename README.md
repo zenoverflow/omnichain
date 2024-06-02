@@ -1,4 +1,4 @@
-# OmniChain - visual logic chains that guide, control, and empower AI models to think, act, and remember things any way you want
+# OmniChain - visual logic chains that guide, control, and empower AI models to think, act, and even learn
 
 ![Screenshot](/screenshot.png)
 
