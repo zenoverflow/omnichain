@@ -9,6 +9,7 @@ export { ChatStoreGetNode } from "./_nodes/ChatStoreGetNode";
 export { ChatStoreInitNode } from "./_nodes/ChatStoreInitNode";
 export { ChatStoreRemoveNode } from "./_nodes/ChatStoreRemoveNode";
 export { CheckForNextMessageNode } from "./_nodes/CheckForNextMessageNode";
+export { DecodeBase64Node } from "./_nodes/DecodeBase64Node";
 export { DelayOutputNode } from "./_nodes/DelayOutputNode";
 export { EvalJsCodeNode } from "./_nodes/EvalJsCodeNode";
 export { EvalJsExpressionNode } from "./_nodes/EvalJsExpressionNode";
