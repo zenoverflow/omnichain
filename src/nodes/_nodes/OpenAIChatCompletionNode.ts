@@ -178,7 +178,7 @@ export const OpenAIChatCompletionNode = makeNode(
                 name: "baseUrl",
                 control: {
                     type: "text",
-                    defaultValue: "",
+                    defaultValue: "https://api.openai.com",
                     config: {
                         label: "base_url",
                     },
