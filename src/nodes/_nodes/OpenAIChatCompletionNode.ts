@@ -237,7 +237,9 @@ export const OpenAIChatCompletionNode = makeNode(
 
             const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
 
-            const baseUrl = ((controls.baseUrl as string) || "https://api.openai.com").trim();
+            const baseUrl = (
+                (controls.baseUrl as string) || "https://api.openai.com"
+            ).trim();
 
             const model = ((controls.model as string) || "").trim();
 
