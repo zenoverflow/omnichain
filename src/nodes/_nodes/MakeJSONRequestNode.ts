@@ -77,37 +77,45 @@ export const MakeJSONRequestNode = makeNode(
                 const method = (inputs.method || [])[0];
                 const url = (inputs.url || [])[0];
 
-                if (!body || !method || !url) {
+                if (!method || !url) {
                     throw new Error("Missing required inputs!");
                 }
-
-                const defaultHeaders = {
-                    "Content-Type": "application/json",
-                };
-
-                const reqHeaders = {
-                    ...defaultHeaders,
-                    ...JSON.parse(headers),
-                };
 
                 const abortSignal =
                     controls.timeout === 0
                         ? undefined
                         : AbortSignal.timeout(controls.timeout as number);
 
-                const result = await fetch(url, {
+                const req: RequestInit = {
                     method,
-                    headers: reqHeaders,
-                    body,
-                    signal: abortSignal,
-                });
+                };
 
-                let resultData: any = null;
+                const reqHeaders = JSON.parse(headers);
+
+                if (Object.keys(reqHeaders).length > 0) {
+                    req.headers = reqHeaders;
+                }
+
+                if (body?.length > 0) {
+                    req.body = body;
+                    req.headers = {
+                        "Content-Type": "application/json",
+                        ...reqHeaders,
+                    };
+                }
+
+                if (abortSignal !== undefined) {
+                    req.signal = abortSignal;
+                }
+
+                const result = await fetch(url, req);
+
+                let resultData = await result.text();
 
                 try {
-                    resultData = await result.json();
+                    resultData = JSON.parse(resultData);
                 } catch (error) {
-                    resultData = await result.text();
+                    // ignore, data is allowed to be non-JSON
                 }
 
                 return {
@@ -118,6 +126,7 @@ export const MakeJSONRequestNode = makeNode(
                     }),
                 };
             } catch (error: any) {
+                console.error(error);
                 return {
                     result: JSON.stringify({
                         code: error.status || 0,
