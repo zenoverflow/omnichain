@@ -1,4 +1,4 @@
-# OmniChain - efficient visual workflows for large language models - build automation, chatbots, agents, and integrate with existing frameworks
+# OmniChain - efficient self-updating visual workflows for large language models - build automations, chatbots, agents, and integrate with existing frameworks
 
 ![Screenshot](/screenshot.png)
 
