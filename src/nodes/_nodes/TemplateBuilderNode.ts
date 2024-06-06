@@ -5,7 +5,7 @@ export const TemplateBuilderNode = makeNode(
         nodeName: "TemplateBuilderNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [580, 475],
-        doc: "Build a prompt by combining a template with values.",
+        doc: "Put values into a template. Accepts connections from multiple Slot nodes.",
     },
     {
         inputs: [{ name: "parts", type: "slot", multi: true }],
@@ -15,7 +15,7 @@ export const TemplateBuilderNode = makeNode(
                 name: "val",
                 control: {
                     type: "text",
-                    defaultValue: "",
+                    defaultValue: "Example template: the value is {value}",
                     config: { large: true },
                 },
             },
