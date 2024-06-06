@@ -21,3 +21,5 @@
 -   Private (self-hosted), fully open-source, and available for commercial use via the non-restrictive MIT license.
 
 -   No coding skills required!
+
+Get started by reading [the docs](https://omnichain.zenoverflow.com).
