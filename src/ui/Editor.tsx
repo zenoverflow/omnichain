@@ -71,22 +71,39 @@ export const Editor: React.FC = () => {
                         color: "#f2f2f2",
                     }}
                 >
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            cursor: "pointer",
-                        }}
-                        onClick={() => {
-                            setSiderCollapsed(!siderCollapsed);
-                        }}
-                    >
-                        {siderCollapsed ? (
-                            <MenuUnfoldOutlined style={{ fontSize: "32px" }} />
-                        ) : (
-                            <MenuFoldOutlined style={{ fontSize: "32px" }} />
-                        )}
-                    </div>
+                    <Space>
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => {
+                                setSiderCollapsed(!siderCollapsed);
+                            }}
+                        >
+                            {siderCollapsed ? (
+                                <MenuUnfoldOutlined
+                                    style={{ fontSize: "32px" }}
+                                />
+                            ) : (
+                                <MenuFoldOutlined
+                                    style={{ fontSize: "32px" }}
+                                />
+                            )}
+                        </div>
+                        <span
+                            style={{
+                                margin: 0,
+                                marginLeft: 10,
+                                fontSize: "14px",
+                            }}
+                        >
+                            {`OmniChain v${
+                                (import.meta as any).env.PACKAGE_VERSION
+                            }`}
+                        </span>
+                    </Space>
                     <Space align="center">
                         {graphId ? (
                             <Button

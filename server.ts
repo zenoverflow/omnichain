@@ -13,6 +13,7 @@ import { setupResourcesApi } from "./server/resources.ts";
 import { setupExecutorApi } from "./server/executor.ts";
 
 import { makeNode } from "./src/nodes/_nodes/_Base.ts";
+import { AppVersionUtils } from "./src/util/AppVersionUtils.ts";
 
 // Attach node maker for custom nodes to use
 (global as any).__ocMakeNode = makeNode;
@@ -56,6 +57,30 @@ appMain
 
 const port: number = argv.port || 12538;
 
+void (async () => {
+    // Check for updates
+    try {
+        const latestVersion = await AppVersionUtils.getVersionFromGithub();
+        const currentVersion = process.env.npm_package_version;
+        // eslint-disable-next-line @typescript-eslint/no-useless-template-literals
+        if (`${latestVersion}` !== `${currentVersion}`) {
+            console.log("---");
+            console.log(
+                [
+                    `A new update is available (v${currentVersion} => v${latestVersion}).`,
+                    "To get the latest fixes and features, shut down the app",
+                    "and run 'git pull' followed by 'npm install'.",
+                ].join(" ")
+            );
+            console.log("---");
+        }
+    } catch (error) {
+        console.error("Failed to check for updates:", error);
+    }
+})();
+
 appMain.listen(port, () => {
-    console.log(`App started on http://localhost:${port}`);
+    console.log(
+        `OmniChain v${process.env.npm_package_version} started on http://localhost:${port}`
+    );
 });

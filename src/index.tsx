@@ -8,6 +8,7 @@ import { loadOptions } from "./state/options";
 import { loadApiKeys } from "./state/apiKeys";
 import { loadNodeRegistry } from "./state/nodeRegistry";
 import { loadExecutor } from "./state/executor";
+import { checkForUpdatesAndNotify } from "./state/appVersion";
 
 import { QueueUtils } from "./util/QueueUtils";
 
@@ -27,6 +28,8 @@ export const run = async () => {
     await loadApiKeys();
     await loadOptions();
     await loadExecutor();
+
+    void checkForUpdatesAndNotify();
 
     QueueUtils.runQueue();
 

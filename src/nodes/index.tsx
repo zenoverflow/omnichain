@@ -75,4 +75,5 @@ export { TextIsMaxLengthNode } from "./_nodes/TextIsMaxLengthNode";
 export { TextJoinNode } from "./_nodes/TextJoinNode";
 export { TextNode } from "./_nodes/TextNode";
 export { TextSplitNode } from "./_nodes/TextSplitNode";
+export { TextSplitRegexNode } from "./_nodes/TextSplitRegexNode";
 export { WriteFileNode } from "./_nodes/WriteFileNode";
