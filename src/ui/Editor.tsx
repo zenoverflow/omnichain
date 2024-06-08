@@ -17,6 +17,7 @@ import { BtnNodeIndex } from "./_Header/BtnNodeIndex";
 import { editorTargetStorage, closeEditor } from "../state/editor";
 import { loaderStorage } from "../state/loader";
 import { useOuterState } from "../util/ObservableUtilsReact";
+import { versionStorage } from "../state/appVersion";
 
 const { Header, Content } = Layout;
 
@@ -55,6 +56,7 @@ export const Editor: React.FC = () => {
     const [siderCollapsed, setSiderCollapsed] = useState(false);
     const [graphId] = useOuterState(editorTargetStorage);
     const [loading] = useOuterState(loaderStorage);
+    const [version] = useOuterState(versionStorage);
 
     return (
         <>
@@ -99,9 +101,7 @@ export const Editor: React.FC = () => {
                                 fontSize: "14px",
                             }}
                         >
-                            {`OmniChain v${
-                                (import.meta as any).env.PACKAGE_VERSION
-                            }`}
+                            {`OmniChain v${version}`}
                         </span>
                     </Space>
                     <Space align="center">

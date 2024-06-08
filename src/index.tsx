@@ -8,7 +8,7 @@ import { loadOptions } from "./state/options";
 import { loadApiKeys } from "./state/apiKeys";
 import { loadNodeRegistry } from "./state/nodeRegistry";
 import { loadExecutor } from "./state/executor";
-import { checkForUpdatesAndNotify } from "./state/appVersion";
+import { checkForUpdatesAndNotify, loadAppVersion } from "./state/appVersion";
 
 import { QueueUtils } from "./util/QueueUtils";
 
@@ -22,6 +22,8 @@ import { Editor } from "./ui/Editor";
 // ]);
 
 export const run = async () => {
+    await loadAppVersion();
+
     await loadNodeRegistry();
     await loadGraphs();
     await loadAvatars();

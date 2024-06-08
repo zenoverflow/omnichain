@@ -43,6 +43,11 @@ const routerMain = new Router();
 
 const portOpenAi: number = argv.port_openai || 5002;
 
+// Setup a simple route to return the version of the app
+routerMain.get("/app-version", (ctx) => {
+    ctx.body = { version: process.env.npm_package_version };
+});
+
 setupResourcesApi(routerMain, DIR_DATA, DIR_CUSTOM_NODES);
 setupExecutorApi(routerMain, DIR_DATA, DIR_CUSTOM_NODES, portOpenAi);
 

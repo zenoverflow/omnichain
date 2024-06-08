@@ -1,10 +1,21 @@
 import { AppVersionUtils } from "../util/AppVersionUtils";
 import { showNotification } from "./notifications";
+import { StatefulObservable } from "../util/ObservableUtils";
+
+export const versionStorage = new StatefulObservable<string>("");
+
+export const loadAppVersion = async () => {
+    const currentVersion = await fetch("/app-version")
+        .then((res) => res.json())
+        .then((data) => data.version as string);
+    versionStorage.set(currentVersion);
+};
 
 export const checkForUpdatesAndNotify = async () => {
+    const currentVersion = versionStorage.get();
     try {
         const latestVersion = await AppVersionUtils.getVersionFromGithub();
-        const currentVersion = (import.meta as any).env.PACKAGE_VERSION;
+
         // eslint-disable-next-line @typescript-eslint/no-useless-template-literals
         if (`${latestVersion}` !== `${currentVersion}`) {
             showNotification({
