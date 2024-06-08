@@ -6,8 +6,8 @@ import { makeNode } from "./_Base";
 
 const doc = [
     //
-    "Extracts text from an office file.",
-    "Expects a native OmniChain file object as input.",
+    "Extracts text from an array of office files.",
+    "Expects an array of native OmniChain file objects as input.",
     "Supports: docx, pptx, xlsx, odt, odp, ods, pdf.",
     "If a plain text file is passed, the content will simply be decoded as UTF-8.",
     "If an unsupported file type is passed, the content will be returned as is.",
@@ -25,9 +25,9 @@ const SUPPORTED_MIME_TYPES = [
     "application/pdf",
 ];
 
-export const ExtractOfficeFileText = makeNode(
+export const ExtractOfficeFileTextMultiNode = makeNode(
     {
-        nodeName: "ExtractOfficeFileText",
+        nodeName: "ExtractOfficeFileTextMultiNode",
         nodeIcon: "FileTextOutlined",
         dimensions: [330, 130],
         doc,
@@ -36,17 +36,17 @@ export const ExtractOfficeFileText = makeNode(
         inputs: [
             //
             {
-                name: "file",
-                type: "file",
-                label: "file",
+                name: "files",
+                type: "fileArray",
+                label: "files (array)",
             },
         ],
         outputs: [
             //
             {
-                name: "text",
-                type: "string",
-                label: "text",
+                name: "results",
+                type: "stringArray",
+                label: "results (array)",
             },
         ],
         controls: [],
@@ -55,31 +55,27 @@ export const ExtractOfficeFileText = makeNode(
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
 
-            const file: ChatMessageFile | undefined = (inputs.file || [])[0];
+            const files: ChatMessageFile[] = (inputs.file || [])[0] || [];
 
-            if (!file) {
-                throw new Error("Missing file input");
-            }
-
-            if (!SUPPORTED_MIME_TYPES.includes(file.mimetype)) {
-                // throw new Error(`Unsupported file type: ${file.mimetype}`);
-                if (file.mimetype.startsWith("text/")) {
-                    return {
-                        text: Buffer.from(file.content, "base64").toString(
-                            "utf-8"
-                        ),
-                    };
+            const results: string[] = [];
+            for (const file of files) {
+                if (!SUPPORTED_MIME_TYPES.includes(file.mimetype)) {
+                    // throw new Error(`Unsupported file type: ${file.mimetype}`);
+                    if (file.mimetype.startsWith("text/")) {
+                        results.push(
+                            Buffer.from(file.content, "base64").toString(
+                                "utf-8"
+                            )
+                        );
+                    }
+                    results.push(file.content);
                 }
-                return {
-                    text: file.content,
-                };
+
+                const bfr = Buffer.from(file.content, "base64");
+                results.push(await officeParser.parseOfficeAsync(bfr));
             }
 
-            const bfr = Buffer.from(file.content, "base64");
-
-            return {
-                text: await officeParser.parseOfficeAsync(bfr),
-            };
+            return { results };
         },
     }
 );
