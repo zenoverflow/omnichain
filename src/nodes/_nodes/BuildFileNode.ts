@@ -15,7 +15,7 @@ export const BuildFileNode = makeNode(
     {
         nodeName: "BuildFileNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [330, 180],
+        dimensions: [330, 220],
         doc,
     },
     {

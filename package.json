@@ -1,7 +1,7 @@
 {
     "name": "omnichain",
     "private": true,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "type": "module",
     "engines": {
         "node": ">=20.11.0"
@@ -17,6 +17,7 @@
         "@codemirror/lang-javascript": "^6.2.2",
         "@codemirror/lang-json": "^6.0.1",
         "@codemirror/lang-markdown": "^6.2.5",
+        "@langchain/textsplitters": "^0.0.3",
         "@stdlib/assert-is-uint8array": "^0.2.1",
         "@types/koa-router": "^7.4.8",
         "@types/koa-static": "^4.0.4",
@@ -38,6 +39,7 @@
         "mime-db": "^1.52.0",
         "mime-types": "^2.1.35",
         "minimist": "^1.2.8",
+        "officeparser": "^4.1.1",
         "ollama": "^0.5.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",

@@ -2,14 +2,14 @@ import { makeNode } from "./_Base";
 
 const doc = [
     //
-    "Takes a base64 string, and decodes it into text content.",
+    "Encodes text content into a base64 string.",
 ]
     .join(" ")
     .trim();
 
-export const DecodeBase64Node = makeNode(
+export const EncodeBase64Node = makeNode(
     {
-        nodeName: "DecodeBase64Node",
+        nodeName: "EncodeBase64Node",
         nodeIcon: "FileTextOutlined",
         dimensions: [330, 130],
         doc,
@@ -20,7 +20,7 @@ export const DecodeBase64Node = makeNode(
             {
                 name: "in",
                 type: "string",
-                label: "text (string - base64)",
+                label: "text (string)",
             },
         ],
         outputs: [
@@ -28,7 +28,7 @@ export const DecodeBase64Node = makeNode(
             {
                 name: "out",
                 type: "string",
-                label: "result (string)",
+                label: "result (string - base64)",
             },
         ],
         controls: [],
@@ -37,14 +37,10 @@ export const DecodeBase64Node = makeNode(
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
 
-            const strBase64 = (inputs.in || [])[0] || "";
-
-            if (!strBase64) {
-                throw new Error("Missing input string!");
-            }
+            const strBase = (inputs.in || [])[0] || "";
 
             return {
-                out: Buffer.from(strBase64, "base64").toString("utf-8"),
+                out: Buffer.from(strBase).toString("base64"),
             };
         },
     }
