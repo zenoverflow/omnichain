@@ -23,8 +23,9 @@ export const BtnCreateGraph: React.FC = () => {
     };
 
     const handleCreate = () => {
-        setModalOpen(false);
         void createGraph(valOfName);
+        setValOfName("New Chain");
+        setModalOpen(false);
     };
 
     return (
