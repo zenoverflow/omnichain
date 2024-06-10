@@ -1,10 +1,11 @@
 export const AppVersionUtils = {
     async getVersionFromGithub() {
         const response = await fetch(
-            "https://raw.githubusercontent.com/zenoverflow/omnichain/main/package.json"
+            "https://api.github.com/repos/zenoverflow/omnichain/contents/package.json"
         );
         // Then, parse the version from the file
         const json = await response.json();
-        return json.version as string;
+        const packageJson = JSON.parse(atob(json.content));
+        return packageJson.version as string;
     },
 };
