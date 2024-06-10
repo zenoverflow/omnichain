@@ -4,11 +4,11 @@ import type { ChatMessage } from "../../data/types";
 
 const doc = [
     "Checks if a new user message has appeared on the message queue.",
-    "If a new message is detected, this node saves it to the session,",
+    "If a new message is detected, this node saves it as the current message,",
     "so it can be read by other nodes, and triggers the 'yes' output.",
     "If no message is detected, it triggers the 'no' output.",
     "Every time a new message is detected, it replaces the previous one",
-    "in the session. The node stores the ID of the last new message it confirmed.",
+    "as the one considered the current message.",
 ]
     .join(" ")
     .trim();
