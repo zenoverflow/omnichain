@@ -242,6 +242,8 @@ const SingleMessage: React.FC<{ message: ChatMessage }> = ({ message }) => {
 
 export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<any>(null);
+
     const [{ userAvatarId }] = useOuterState(optionsStorage);
     const [executor] = useOuterState(executorStorage);
     const [avatars] = useOuterState(avatarStorage);
@@ -368,6 +370,12 @@ export const ChatInterface: React.FC = () => {
         }
     }, [messages.length]);
 
+    useEffect(() => {
+        if (inputRef.current && !blocked) {
+            inputRef.current.focus();
+        }
+    }, [blocked]);
+
     return (
         <div
             style={{
@@ -437,6 +445,7 @@ export const ChatInterface: React.FC = () => {
                     >
                         <div style={{ width: "5px" }} />
                         <TextArea
+                            ref={inputRef}
                             value={message}
                             onChange={(e) => {
                                 setMessage(e.target.value);
