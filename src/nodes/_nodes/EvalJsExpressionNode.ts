@@ -75,13 +75,12 @@ export const EvalJsExpressionNode = makeNode(
             const controls = context.getAllControls(nodeId);
 
             const oldValue = controls.val as string;
-            const expr = (inputs.in || [])[0] || oldValue;
+            const codeStr = (inputs.in || [])[0] || oldValue;
 
             // Update graph if necessary
-            if (expr !== oldValue) {
-                await context.updateControl(nodeId, "val", expr);
+            if (codeStr !== oldValue) {
+                await context.updateControl(nodeId, "val", codeStr);
             }
-
             const params = inputs.params || [];
 
             const paramObj = Object.fromEntries(
@@ -90,20 +89,53 @@ export const EvalJsExpressionNode = makeNode(
 
             try {
                 const require = createRequire(import.meta.url);
-                const result = eval(
-                    `(function(_params, _nodeId, _context, _require) { return (${expr}); })`
-                )(paramObj, nodeId, context, require);
+
+                let result = "";
+
+                const fakeConsole = {
+                    log: (...msg: any[]) => {
+                        try {
+                            result += `${msg.join(" ")}\n`;
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    },
+                    error: (...msg: any[]) => {
+                        try {
+                            result += `${msg.join(" ")}\n`;
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    },
+                    warn: (...msg: any[]) => {
+                        try {
+                            result += `${msg.join(" ")}\n`;
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    },
+                };
+
+                const evalResult = eval(
+                    `(function(_params, _nodeId, _context, _require, console) { return ${codeStr} })`
+                )(paramObj, nodeId, context, require, fakeConsole);
+
+                if (evalResult) {
+                    if (result.length > 0) {
+                        result += "\n";
+                    }
+                    result +=
+                        typeof evalResult === "string" ||
+                        typeof evalResult === "number"
+                            ? `${evalResult}`
+                            : JSON.stringify(evalResult);
+                }
 
                 if (controls.clearOnEval === "true") {
                     await context.updateControl(nodeId, "val", "");
                 }
 
-                return {
-                    result:
-                        typeof result === "string" || typeof result === "number"
-                            ? `${result}`
-                            : JSON.stringify(result),
-                };
+                return { result };
             } catch (error) {
                 return { result: `${error}` };
             }
