@@ -1,14 +1,16 @@
+import { createRequire } from "module";
+
 import { makeNode } from "./_Base";
 
 const doc = [
     //
     "Evaluate JavaScript code (multiline).",
     "If the 'in' input is used, an expression can be passed in.",
-    "Params inside the code can be accessed via the 'params' object.",
+    "Params inside the code can be accessed via the '__params' object.",
     "All params are passed as strings, so you may need to parse them if you need a different type.",
     "The result is always returned as a string.",
     "The id of the node and the flow context object are also available",
-    "to your code as 'nodeId' and 'context', making this node a simple alternative",
+    "to your code as '__nodeId' and '__context', making this node a simple alternative",
     "to implementing a full custom node if dataflow is all you need.",
 ]
     .join(" ")
@@ -84,11 +86,10 @@ export const EvalJsCodeNode = makeNode(
             );
 
             try {
-                const result = eval(`(function(params) { ${codeStr} })`)(
-                    paramObj,
-                    nodeId,
-                    context
-                );
+                const require = createRequire(import.meta.url);
+                const result = eval(
+                    `(function(_params, _nodeId, _context, _require) { ${codeStr} })`
+                )(paramObj, nodeId, context, require);
 
                 if (controls.clearOnEval === "true") {
                     await context.updateControl(nodeId, "val", "");
