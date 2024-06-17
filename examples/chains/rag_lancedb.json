@@ -1,0 +1,609 @@
+{
+  "name": "Example - RAG",
+  "graphId": "4b109e01-a4b0-497a-a979-37a3de164fd6",
+  "nodes": [
+    {
+      "nodeType": "StartNode",
+      "nodeId": "338bf42ab8d67ffa",
+      "controls": {},
+      "positionX": -4080.0727463515027,
+      "positionY": -759.9769755697201
+    },
+    {
+      "nodeType": "CheckForNextMessageNode",
+      "nodeId": "ae6b41282a314724",
+      "controls": {
+        "waitTimeMs": 100
+      },
+      "positionX": -2294.6777171744925,
+      "positionY": -276.3994330940359
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "a718f4ead3fc299b",
+      "controls": {
+        "action": "block"
+      },
+      "positionX": -1842.082414967851,
+      "positionY": -347.98574276905157
+    },
+    {
+      "nodeType": "ReadSessionMessagesNode",
+      "nodeId": "510d3595419f15b1",
+      "controls": {
+        "limit": -1
+      },
+      "positionX": -2217.5255866283424,
+      "positionY": 1509.6987553492943
+    },
+    {
+      "nodeType": "OllamaChatCompletionNode",
+      "nodeId": "e12b545d6ad6cf85",
+      "controls": {
+        "model": "llama3:8b-instruct-q8_0",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": 0,
+        "json": "false"
+      },
+      "positionX": -1804.675774573889,
+      "positionY": 907.2703993852804
+    },
+    {
+      "nodeType": "TemplateBuilderNode",
+      "nodeId": "89d25b558e3801d4",
+      "controls": {
+        "val": "You are a specialized research agent. You are provided with a library to help you to answer the user's questions.\n-- BEGIN LIBRARY --\n{library}\n-- END LIBRARY --\nYou will now be asked a question."
+      },
+      "positionX": -2933.81708530311,
+      "positionY": 914.0897960498701
+    },
+    {
+      "nodeType": "SlotNode",
+      "nodeId": "aff669d26e1deac8",
+      "controls": {},
+      "positionX": -3541.6449180581894,
+      "positionY": 1100.6064849118873
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "716ca9c6640921f7",
+      "controls": {
+        "val": "library"
+      },
+      "positionX": -4222.992896946782,
+      "positionY": 1001.9902993325261
+    },
+    {
+      "nodeType": "ReadCurrentMessageFilesNode",
+      "nodeId": "c341c0612e857ecf",
+      "controls": {
+        "type": "*/*"
+      },
+      "positionX": -2702.7668620062273,
+      "positionY": 296.54680969153077
+    },
+    {
+      "nodeType": "ChunkTextForEmbedding",
+      "nodeId": "b16eafe07cdec316",
+      "controls": {
+        "size": 1000,
+        "overlap": 200
+      },
+      "positionX": -620.873052278235,
+      "positionY": -278.2147145236799
+    },
+    {
+      "nodeType": "OllamaEmbeddingsNode",
+      "nodeId": "128d05afcf239a5c",
+      "controls": {
+        "model": "nomic-embed-text",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": -1
+      },
+      "positionX": 219.01795279555105,
+      "positionY": -436.391695292246
+    },
+    {
+      "nodeType": "LanceDBAddToTable",
+      "nodeId": "6ecdb984e46a9ad2",
+      "controls": {},
+      "positionX": 1291.3018855732387,
+      "positionY": -1276.5818124116884
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "2a93ee77b8c86e7d",
+      "controls": {
+        "val": "/home/user/Downloads/testdb"
+      },
+      "positionX": -5447.430865541248,
+      "positionY": -110.55692343409048
+    },
+    {
+      "nodeType": "LanceDBCreateTable",
+      "nodeId": "ee2ec6e5dc0afd78",
+      "controls": {
+        "overwrite": "true"
+      },
+      "positionX": -3451.807305930781,
+      "positionY": 10.88607693590077
+    },
+    {
+      "nodeType": "RouteStringNode",
+      "nodeId": "1b558ad420d4718f",
+      "controls": {},
+      "positionX": -2880.6391279676072,
+      "positionY": -740.4390335687219
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "5b3b456efcfe1899",
+      "controls": {
+        "val": "library"
+      },
+      "positionX": -5603.528367714781,
+      "positionY": 209.26876756627894
+    },
+    {
+      "nodeType": "RouteStringNode",
+      "nodeId": "c57f340e48431ad5",
+      "controls": {},
+      "positionX": -2886.3354714270617,
+      "positionY": -566.6693814366017
+    },
+    {
+      "nodeType": "ArrayFromStringNode",
+      "nodeId": "3e771b52e983b739",
+      "controls": {},
+      "positionX": 953.5949565210781,
+      "positionY": -682.846836773511
+    },
+    {
+      "nodeType": "LoopFileArrayNode",
+      "nodeId": "6d911ee442b63ea9",
+      "controls": {},
+      "positionX": -1408.7615853085322,
+      "positionY": -388.57805579814817
+    },
+    {
+      "nodeType": "ExtractOfficeFileText",
+      "nodeId": "fecce7d60102cea0",
+      "controls": {},
+      "positionX": -1022.4261993666673,
+      "positionY": -273.2945807971251
+    },
+    {
+      "nodeType": "LoopStringArrayNode",
+      "nodeId": "2a378bf8fe48fcec",
+      "controls": {},
+      "positionX": -196.4629750425547,
+      "positionY": -603.5419779113906
+    },
+    {
+      "nodeType": "ArrayFromStringNode",
+      "nodeId": "104251717fce693d",
+      "controls": {},
+      "positionX": 443.79709407287623,
+      "positionY": -684.6179935732541
+    },
+    {
+      "nodeType": "LanceDBQueryTable",
+      "nodeId": "2cce95cb5bfee8d6",
+      "controls": {
+        "metric": "cosine",
+        "limit": 10
+      },
+      "positionX": -4612.887009560585,
+      "positionY": 1420.8812677811363
+    },
+    {
+      "nodeType": "ReadCurrentMessageTextNode",
+      "nodeId": "3181ad39578d8a38",
+      "controls": {},
+      "positionX": -6056.19696151062,
+      "positionY": 1740.9407435178712
+    },
+    {
+      "nodeType": "OllamaEmbeddingsNode",
+      "nodeId": "e98ffcc6a7e2f8cd",
+      "controls": {
+        "model": "nomic-embed-text",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": 0
+      },
+      "positionX": -5504.791274941664,
+      "positionY": 1723.836741517044
+    },
+    {
+      "nodeType": "TextJoinNode",
+      "nodeId": "6fa0581e6c5956eb",
+      "controls": {
+        "separator": "\\n\\n"
+      },
+      "positionX": -3884.1147091030484,
+      "positionY": 1276.900733741211
+    },
+    {
+      "nodeType": "ResponseNode",
+      "nodeId": "adc74396d10deab4",
+      "controls": {},
+      "positionX": -509.57938206712515,
+      "positionY": 236.01825544144236
+    },
+    {
+      "nodeType": "BuildMessageNode",
+      "nodeId": "63b35dbf88efd6c7",
+      "controls": {
+        "role": "assistant"
+      },
+      "positionX": -1101.33167497627,
+      "positionY": 482.2863221039085
+    },
+    {
+      "nodeType": "OllamaEmbeddingsNode",
+      "nodeId": "1c43c1890f3bec35",
+      "controls": {
+        "model": "nomic-embed-text",
+        "mirostat": "0",
+        "mirostatEta": 0.1,
+        "mirostatTau": 5,
+        "numCtx": 8192,
+        "repeatLastN": 0,
+        "repeatPenalty": 1.1,
+        "temperature": 0.8,
+        "seed": null,
+        "stop": null,
+        "tfsZ": 1,
+        "numPredict": -2,
+        "topK": 1,
+        "topP": 1,
+        "host": "http://localhost:11434",
+        "keepAlive": 0
+      },
+      "positionX": -5701.959336619604,
+      "positionY": 683.0108100001938
+    },
+    {
+      "nodeType": "TextFieldNode",
+      "nodeId": "38ad99fbb43658c8",
+      "controls": {
+        "val": "Empty Content."
+      },
+      "positionX": -6481.409853842923,
+      "positionY": 554.1236903881155
+    },
+    {
+      "nodeType": "ArrayFromStringNode",
+      "nodeId": "0259fcb519098547",
+      "controls": {},
+      "positionX": -4049.275409291752,
+      "positionY": 390.50050212416176
+    },
+    {
+      "nodeType": "ArrayFromStringNode",
+      "nodeId": "19e170b685935e7d",
+      "controls": {},
+      "positionX": -4057.767086546223,
+      "positionY": 644.2779583655442
+    },
+    {
+      "nodeType": "BlockChatNode",
+      "nodeId": "fc79ff74adb08971",
+      "controls": {
+        "action": "unblock"
+      },
+      "positionX": -2729.20647148424,
+      "positionY": -332.50022706885403
+    }
+  ],
+  "connections": [
+    {
+      "source": "ae6b41282a314724",
+      "sourceOutput": "haveMsg",
+      "target": "a718f4ead3fc299b",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "ae6b41282a314724",
+      "sourceOutput": "noMsg",
+      "target": "ae6b41282a314724",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "510d3595419f15b1",
+      "sourceOutput": "messages",
+      "target": "e12b545d6ad6cf85",
+      "targetInput": "messages"
+    },
+    {
+      "source": "716ca9c6640921f7",
+      "sourceOutput": "out",
+      "target": "aff669d26e1deac8",
+      "targetInput": "slotName"
+    },
+    {
+      "source": "aff669d26e1deac8",
+      "sourceOutput": "slot",
+      "target": "89d25b558e3801d4",
+      "targetInput": "parts"
+    },
+    {
+      "source": "ee2ec6e5dc0afd78",
+      "sourceOutput": "triggerOut",
+      "target": "ae6b41282a314724",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "338bf42ab8d67ffa",
+      "sourceOutput": "triggerOut",
+      "target": "ee2ec6e5dc0afd78",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "2a93ee77b8c86e7d",
+      "sourceOutput": "out",
+      "target": "ee2ec6e5dc0afd78",
+      "targetInput": "uri"
+    },
+    {
+      "source": "2a93ee77b8c86e7d",
+      "sourceOutput": "out",
+      "target": "1b558ad420d4718f",
+      "targetInput": "in"
+    },
+    {
+      "source": "1b558ad420d4718f",
+      "sourceOutput": "out",
+      "target": "6ecdb984e46a9ad2",
+      "targetInput": "uri"
+    },
+    {
+      "source": "5b3b456efcfe1899",
+      "sourceOutput": "out",
+      "target": "ee2ec6e5dc0afd78",
+      "targetInput": "table"
+    },
+    {
+      "source": "5b3b456efcfe1899",
+      "sourceOutput": "out",
+      "target": "c57f340e48431ad5",
+      "targetInput": "in"
+    },
+    {
+      "source": "c57f340e48431ad5",
+      "sourceOutput": "out",
+      "target": "6ecdb984e46a9ad2",
+      "targetInput": "table"
+    },
+    {
+      "source": "128d05afcf239a5c",
+      "sourceOutput": "result",
+      "target": "3e771b52e983b739",
+      "targetInput": "sourceStr1"
+    },
+    {
+      "source": "3e771b52e983b739",
+      "sourceOutput": "outArr",
+      "target": "6ecdb984e46a9ad2",
+      "targetInput": "embeddings"
+    },
+    {
+      "source": "a718f4ead3fc299b",
+      "sourceOutput": "triggerOut",
+      "target": "6d911ee442b63ea9",
+      "targetInput": "run"
+    },
+    {
+      "source": "c341c0612e857ecf",
+      "sourceOutput": "files",
+      "target": "6d911ee442b63ea9",
+      "targetInput": "sourceArr"
+    },
+    {
+      "source": "6d911ee442b63ea9",
+      "sourceOutput": "item",
+      "target": "fecce7d60102cea0",
+      "targetInput": "file"
+    },
+    {
+      "source": "fecce7d60102cea0",
+      "sourceOutput": "text",
+      "target": "b16eafe07cdec316",
+      "targetInput": "text"
+    },
+    {
+      "source": "b16eafe07cdec316",
+      "sourceOutput": "chunks",
+      "target": "2a378bf8fe48fcec",
+      "targetInput": "sourceArr"
+    },
+    {
+      "source": "6d911ee442b63ea9",
+      "sourceOutput": "next",
+      "target": "2a378bf8fe48fcec",
+      "targetInput": "run"
+    },
+    {
+      "source": "2a378bf8fe48fcec",
+      "sourceOutput": "next",
+      "target": "6ecdb984e46a9ad2",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "2a378bf8fe48fcec",
+      "sourceOutput": "item",
+      "target": "104251717fce693d",
+      "targetInput": "sourceStr1"
+    },
+    {
+      "source": "104251717fce693d",
+      "sourceOutput": "outArr",
+      "target": "6ecdb984e46a9ad2",
+      "targetInput": "texts"
+    },
+    {
+      "source": "6ecdb984e46a9ad2",
+      "sourceOutput": "triggerOut",
+      "target": "2a378bf8fe48fcec",
+      "targetInput": "run"
+    },
+    {
+      "source": "2a378bf8fe48fcec",
+      "sourceOutput": "done",
+      "target": "6d911ee442b63ea9",
+      "targetInput": "run"
+    },
+    {
+      "source": "2a378bf8fe48fcec",
+      "sourceOutput": "item",
+      "target": "128d05afcf239a5c",
+      "targetInput": "prompt"
+    },
+    {
+      "source": "3181ad39578d8a38",
+      "sourceOutput": "content",
+      "target": "e98ffcc6a7e2f8cd",
+      "targetInput": "prompt"
+    },
+    {
+      "source": "e98ffcc6a7e2f8cd",
+      "sourceOutput": "result",
+      "target": "2cce95cb5bfee8d6",
+      "targetInput": "embedding"
+    },
+    {
+      "source": "2cce95cb5bfee8d6",
+      "sourceOutput": "results",
+      "target": "6fa0581e6c5956eb",
+      "targetInput": "textArr"
+    },
+    {
+      "source": "6fa0581e6c5956eb",
+      "sourceOutput": "result",
+      "target": "aff669d26e1deac8",
+      "targetInput": "value"
+    },
+    {
+      "source": "6d911ee442b63ea9",
+      "sourceOutput": "done",
+      "target": "adc74396d10deab4",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "63b35dbf88efd6c7",
+      "sourceOutput": "message",
+      "target": "adc74396d10deab4",
+      "targetInput": "message"
+    },
+    {
+      "source": "e12b545d6ad6cf85",
+      "sourceOutput": "result",
+      "target": "63b35dbf88efd6c7",
+      "targetInput": "content"
+    },
+    {
+      "source": "38ad99fbb43658c8",
+      "sourceOutput": "out",
+      "target": "1c43c1890f3bec35",
+      "targetInput": "prompt"
+    },
+    {
+      "source": "38ad99fbb43658c8",
+      "sourceOutput": "out",
+      "target": "0259fcb519098547",
+      "targetInput": "sourceStr1"
+    },
+    {
+      "source": "0259fcb519098547",
+      "sourceOutput": "outArr",
+      "target": "ee2ec6e5dc0afd78",
+      "targetInput": "texts"
+    },
+    {
+      "source": "1c43c1890f3bec35",
+      "sourceOutput": "result",
+      "target": "19e170b685935e7d",
+      "targetInput": "sourceStr1"
+    },
+    {
+      "source": "19e170b685935e7d",
+      "sourceOutput": "outArr",
+      "target": "ee2ec6e5dc0afd78",
+      "targetInput": "embeddings"
+    },
+    {
+      "source": "2a93ee77b8c86e7d",
+      "sourceOutput": "out",
+      "target": "2cce95cb5bfee8d6",
+      "targetInput": "uri"
+    },
+    {
+      "source": "5b3b456efcfe1899",
+      "sourceOutput": "out",
+      "target": "2cce95cb5bfee8d6",
+      "targetInput": "table"
+    },
+    {
+      "source": "89d25b558e3801d4",
+      "sourceOutput": "result",
+      "target": "e12b545d6ad6cf85",
+      "targetInput": "system"
+    },
+    {
+      "source": "adc74396d10deab4",
+      "sourceOutput": "triggerOut",
+      "target": "fc79ff74adb08971",
+      "targetInput": "triggerIn"
+    },
+    {
+      "source": "fc79ff74adb08971",
+      "sourceOutput": "triggerOut",
+      "target": "ae6b41282a314724",
+      "targetInput": "triggerIn"
+    }
+  ],
+  "zoom": 0.26432662067465884,
+  "areaX": 1971.5038925170952,
+  "areaY": 415.1206634521471,
+  "created": 1717863314322,
+  "execPersistence": "onChange"
+}
