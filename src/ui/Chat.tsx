@@ -6,7 +6,7 @@ import {
     useCallback,
     KeyboardEvent,
 } from "react";
-import { Input, Avatar, Space, Button } from "antd";
+import { Input, Avatar, Space, Button, Spin } from "antd";
 import {
     UserOutlined,
     SendOutlined,
@@ -14,6 +14,7 @@ import {
     FileImageOutlined,
     CloseOutlined,
     DownloadOutlined,
+    LoadingOutlined,
 } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -368,7 +369,7 @@ export const ChatInterface: React.FC = () => {
         if (listRef.current) {
             listRef.current.scrollTop = listRef.current.scrollHeight;
         }
-    }, [messages.length]);
+    }, [messages.length, blocked]);
 
     useEffect(() => {
         if (inputRef.current && !blocked) {
@@ -402,6 +403,24 @@ export const ChatInterface: React.FC = () => {
                         {messages.map((m) => (
                             <SingleMessage key={m.messageId} message={m} />
                         ))}
+                        {blocked ? (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Spin
+                                    indicator={
+                                        <LoadingOutlined
+                                            style={{ fontSize: 48 }}
+                                            spin
+                                        />
+                                    }
+                                />
+                            </div>
+                        ) : null}
                     </div>
 
                     {/* Images list */}
@@ -445,6 +464,7 @@ export const ChatInterface: React.FC = () => {
                     >
                         <div style={{ width: "5px" }} />
                         <TextArea
+                            className="c__mstyle"
                             ref={inputRef}
                             value={message}
                             onChange={(e) => {

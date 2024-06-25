@@ -46,7 +46,8 @@ const _Modal: React.FC<{
             //         <OkBtn /> */}
             //     </>
             // )}
-            width={"80vw"}
+            width={"90vw"}
+            style={{ top: "10px" }}
         >
             <CodeMirror
                 value={value}
@@ -65,8 +66,8 @@ const _Modal: React.FC<{
                 onChange={(val, _viewUpdate) => {
                     onChange(val);
                 }}
-                height="80vh"
-                maxHeight="80vh"
+                // height="80vh"
+                // maxHeight="80vh"
                 extensions={syntaxExtensions}
                 autoFocus
             />
