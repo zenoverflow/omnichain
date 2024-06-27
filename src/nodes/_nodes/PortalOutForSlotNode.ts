@@ -58,8 +58,6 @@ export const PortalOutForSlotNode = makeNode(
 
             const sourceInputs = await context.fetchInputs(sourceNodeId);
 
-            console.log("sourceInputs", sourceInputs);
-
             const source = (sourceInputs.source || [])[0];
 
             if (!source) {
