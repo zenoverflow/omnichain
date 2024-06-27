@@ -20,7 +20,7 @@ export const StringifyFileNode = makeNode(
             {
                 name: "in",
                 type: "file",
-                label: "message",
+                label: "file",
             },
         ],
         outputs: [

@@ -144,6 +144,19 @@ export const updateGraph = (
             // preserve metadata
             graph
         );
+        // Use control values from outside the editor
+        // Editor values can be outdated
+        // There is no better patch for this right now
+        update.nodes = update.nodes.map((n) => {
+            const ogNode = graph.nodes.find((og) => og.nodeId === n.nodeId);
+            if (!ogNode) return n;
+            return {
+                ...n,
+                controls: {
+                    ...ogNode.controls,
+                },
+            };
+        });
 
         await backendSetGraph(graphId, update);
         graphStorage.set({
