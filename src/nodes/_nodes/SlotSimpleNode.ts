@@ -1,24 +1,23 @@
 import { makeNode } from "./_Base";
 
 const doc = [
-    "Takes a string input and combines it with the slot name input",
+    "Takes a string input and combines it with the 'slot name' control",
     "to create a slot output that can be used, for example, in a",
     "TemplateBuilder node, or one of the JS eval nodes.",
 ]
     .join(" ")
     .trim();
 
-export const SlotNode = makeNode(
+export const SlotSimpleNode = makeNode(
     {
-        nodeName: "SlotNode",
+        nodeName: "SlotSimpleNode",
         nodeIcon: "BuildOutlined",
-        dimensions: [330, 190],
+        dimensions: [330, 180],
         doc,
     },
     {
         inputs: [
             //
-            { name: "slotName", type: "string", label: "slot name" },
             { name: "value", type: "string", label: "value" },
         ],
         outputs: [
@@ -28,14 +27,27 @@ export const SlotNode = makeNode(
                 label: "slot",
             },
         ],
-        controls: [],
+        controls: [
+            {
+                name: "slotName",
+                control: {
+                    type: "text",
+                    defaultValue: "slotName",
+                    config: {
+                        label: "name",
+                    },
+                },
+            },
+        ],
     },
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
+            const controls = context.getAllControls(nodeId);
 
-            const name: string = (inputs.slotName || [])[0] || "";
             const value: string = (inputs.value || [])[0] || "";
+
+            const name = controls.slotName as string;
 
             if (!name.length) {
                 throw new Error("Missing slot name!");
