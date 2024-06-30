@@ -10,6 +10,8 @@ export { ChatStoreInitNode } from "./_nodes/ChatStoreInitNode";
 export { ChatStoreRemoveNode } from "./_nodes/ChatStoreRemoveNode";
 export { CheckForNextMessageNode } from "./_nodes/CheckForNextMessageNode";
 export { ChunkTextForEmbedding } from "./_nodes/ChunkTextForEmbedding";
+export { DataModuleIONode } from "./_nodes/DataModuleIONode";
+export { DataModuleNode } from "./_nodes/DataModuleNode";
 export { DecodeBase64Node } from "./_nodes/DecodeBase64Node";
 export { DelayOutputNode } from "./_nodes/DelayOutputNode";
 export { EncodeBase64Node } from "./_nodes/EncodeBase64Node";
