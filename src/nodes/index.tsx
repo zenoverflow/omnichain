@@ -96,6 +96,7 @@ export { StringifyStringArrayNode } from "./_nodes/StringifyStringArrayNode";
 export { TemplateBuilderAdvancedNode } from "./_nodes/TemplateBuilderAdvancedNode";
 export { TemplateBuilderNode } from "./_nodes/TemplateBuilderNode";
 export { TextFieldNode } from "./_nodes/TextFieldNode";
+export { TextGenWebUICompletionNode } from "./_nodes/TextGenWebUICompletionNode";
 export { TextIsMaxLengthNode } from "./_nodes/TextIsMaxLengthNode";
 export { TextJoinNode } from "./_nodes/TextJoinNode";
 export { TextNode } from "./_nodes/TextNode";
