@@ -1,7 +1,7 @@
 import { makeNode } from "./_Base";
 
 const doc = [
-    "Generate embeddings for a vector DB using OpenAI's API (/v1/completions).",
+    "Generate embeddings for a vector DB using OpenAI's API.",
     "This node can be used with a custom backend by setting the",
     "base url property. Leaving the base url property",
     "empty will default to the official OpenAI API.",

@@ -1,3 +1,4 @@
+export { ArbiterNode } from "./_nodes/ArbiterNode";
 export { ArrayFromChatMessageNode } from "./_nodes/ArrayFromChatMessageNode";
 export { ArrayFromFileNode } from "./_nodes/ArrayFromFileNode";
 export { ArrayFromStringNode } from "./_nodes/ArrayFromStringNode";
@@ -24,6 +25,9 @@ export { GetFileContentNode } from "./_nodes/GetFileContentNode";
 export { GetFileMimeTypeNode } from "./_nodes/GetFileMimeTypeNode";
 export { GetFileNameNode } from "./_nodes/GetFileNameNode";
 export { GrabTextNode } from "./_nodes/GrabTextNode";
+export { LMStudioChatCompletionNode } from "./_nodes/LMStudioChatCompletionNode";
+export { LMStudioCompletionNode } from "./_nodes/LMStudioCompletionNode";
+export { LMStudioEmbeddingsNode } from "./_nodes/LMStudioEmbeddingsNode";
 export { LanceDBAddToTable } from "./_nodes/LanceDBAddToTable";
 export { LanceDBCreateTable } from "./_nodes/LanceDBCreateTable";
 export { LanceDBDeleteTable } from "./_nodes/LanceDBDeleteTable";
@@ -97,6 +101,7 @@ export { TemplateBuilderAdvancedNode } from "./_nodes/TemplateBuilderAdvancedNod
 export { TemplateBuilderNode } from "./_nodes/TemplateBuilderNode";
 export { TextFieldNode } from "./_nodes/TextFieldNode";
 export { TextGenWebUICompletionNode } from "./_nodes/TextGenWebUICompletionNode";
+export { TextGenWebUIEmbeddingsNode } from "./_nodes/TextGenWebUIEmbeddingsNode";
 export { TextIsMaxLengthNode } from "./_nodes/TextIsMaxLengthNode";
 export { TextJoinNode } from "./_nodes/TextJoinNode";
 export { TextNode } from "./_nodes/TextNode";
