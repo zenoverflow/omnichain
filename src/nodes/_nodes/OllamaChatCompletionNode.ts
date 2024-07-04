@@ -315,7 +315,7 @@ export const OllamaChatCompletionNode = makeNode(
                     repeat_last_n: controls.repeatLastN as number,
                     repeat_penalty: controls.repeatPenalty as number,
                     temperature: controls.temperature as number,
-                    seed: controls.seed ? (controls.seed as number) : undefined,
+                    seed: (controls.seed as number | null) ?? undefined,
                     stop: controls.stop
                         ? (controls.stop as string)
                               .split(",")

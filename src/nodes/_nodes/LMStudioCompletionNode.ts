@@ -204,7 +204,7 @@ export const LMStudioCompletionNode = makeNode(
                     repeat_penalty: controls.repeatPenalty as number,
                     // n: controls.numResponses as number,
                     // echo: controls.echo === "true",
-                    seed: (controls.seed as number | null) || undefined,
+                    seed: (controls.seed as number | null) ?? undefined,
                     stop: controls.stop
                         ? (controls.stop as string)
                               .split(",")

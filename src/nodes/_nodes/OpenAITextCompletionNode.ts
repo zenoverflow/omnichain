@@ -195,7 +195,7 @@ export const OpenAITextCompletionNode = makeNode(
                     presence_penalty: controls.presencePenalty as number,
                     n: controls.numResponses as number,
                     echo: controls.echo === "true",
-                    seed: (controls.seed as number | null) || undefined,
+                    seed: (controls.seed as number | null) ?? undefined,
                     stop: controls.stop
                         ? (controls.stop as string)
                               .split(",")
