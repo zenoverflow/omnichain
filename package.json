@@ -1,7 +1,7 @@
 {
     "name": "omnichain",
     "private": true,
-    "version": "0.0.21",
+    "version": "0.0.22",
     "type": "module",
     "engines": {
         "node": ">=20.11.0"
@@ -57,8 +57,7 @@
         "styled-components": "^6.1.8",
         "tsx": "^4.7.2",
         "uuid": "^9.0.1",
-        "vectordb": "^0.5.0",
-        "ws": "^8.16.0"
+        "vectordb": "^0.5.0"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^7.2.0",
