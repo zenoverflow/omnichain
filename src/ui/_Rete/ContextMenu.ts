@@ -38,7 +38,11 @@ const _makeRootMenu = (
                 await area.translate(n.id, { x, y });
             },
         }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+        .sort(
+            (a, b) =>
+                a.label.length - b.label.length ||
+                a.label.localeCompare(b.label)
+        );
 
     return filtered;
 };
