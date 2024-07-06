@@ -75,6 +75,7 @@ export { ReadCurrentMessageFilesNode } from "./_nodes/ReadCurrentMessageFilesNod
 export { ReadCurrentMessageNode } from "./_nodes/ReadCurrentMessageNode";
 export { ReadCurrentMessageTextNode } from "./_nodes/ReadCurrentMessageTextNode";
 export { ReadFileNode } from "./_nodes/ReadFileNode";
+export { ReadFolderNode } from "./_nodes/ReadFolderNode";
 export { ReadFromJSONNode } from "./_nodes/ReadFromJSONNode";
 export { ReadSessionMessagesNode } from "./_nodes/ReadSessionMessagesNode";
 export { RegexCheckNode } from "./_nodes/RegexCheckNode";

@@ -99,6 +99,7 @@ export const Editor: React.FC = () => {
                                 margin: 0,
                                 marginLeft: 10,
                                 fontSize: "14px",
+                                userSelect: "none",
                             }}
                         >
                             {`OmniChain v${version}`}

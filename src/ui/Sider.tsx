@@ -43,7 +43,11 @@ export const Sider: React.FC<{
 
     return (
         <AntSider
-            style={{ overflowY: "auto", overflowX: "hidden" }}
+            style={{
+                overflowY: "auto",
+                overflowX: "hidden",
+                userSelect: "none",
+            }}
             collapsed={collapsed}
             onBreakpoint={(broken) => {
                 setCollapsed(broken);
