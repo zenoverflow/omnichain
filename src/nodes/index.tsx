@@ -12,6 +12,8 @@ export { ChatStoreInitNode } from "./_nodes/ChatStoreInitNode";
 export { ChatStoreRemoveNode } from "./_nodes/ChatStoreRemoveNode";
 export { CheckForNextMessageNode } from "./_nodes/CheckForNextMessageNode";
 export { ChunkTextForEmbedding } from "./_nodes/ChunkTextForEmbedding";
+export { ControlModuleIONode } from "./_nodes/ControlModuleIONode";
+export { ControlModuleNode } from "./_nodes/ControlModuleNode";
 export { DataModuleIONode } from "./_nodes/DataModuleIONode";
 export { DataModuleNode } from "./_nodes/DataModuleNode";
 export { DecodeBase64Node } from "./_nodes/DecodeBase64Node";

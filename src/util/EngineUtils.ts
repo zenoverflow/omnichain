@@ -146,7 +146,7 @@ export const EngineUtils = {
         // Run control flow
         while (currentControl && context.getFlowActive()) {
             try {
-                const nodeInstance = nodeInstances[currentControl] as
+                let nodeInstance = nodeInstances[currentControl] as
                     | _RuntimeInstance
                     | undefined;
 
@@ -155,7 +155,12 @@ export const EngineUtils = {
                 const controlFlow =
                     nodeInstance.node.config.flowConfig?.controlFlow;
 
-                if (!controlFlow) {
+                if (
+                    !controlFlow &&
+                    !["ControlModuleNode", "ControlModuleIONode"].includes(
+                        nodeInstance.instance.nodeType
+                    )
+                ) {
                     console.log(
                         "Stopping: No control flow for",
                         nodeInstance.node.config.baseConfig.nodeName
@@ -164,11 +169,86 @@ export const EngineUtils = {
                 }
 
                 eventHandlers.onFlowNode(currentControl);
-                const sourceOutput = await controlFlow(
-                    nodeInstance.instance.nodeId,
-                    context,
-                    trigger
-                );
+                let sourceOutput: string | null = null;
+
+                if (nodeInstance.instance.nodeType === "ControlModuleNode") {
+                    sourceOutput = "triggerOut";
+
+                    // Find the ControlModuleIONode
+                    const moduleIONodeId = context
+                        .getGraph()
+                        .nodes.find(
+                            (n) =>
+                                n.nodeType === "ControlModuleIONode" &&
+                                context.getAllControls(n.nodeId).module ===
+                                    context.getAllControls(currentControl)
+                                        .module
+                        )?.nodeId;
+
+                    if (!moduleIONodeId) {
+                        throw new Error(
+                            `No matching module node found for module ID '${
+                                context.getAllControls(currentControl).module
+                            }'`
+                        );
+                    }
+
+                    // Set caller ID
+                    await context.updateControl(
+                        moduleIONodeId,
+                        "caller",
+                        currentControl
+                    );
+
+                    // Jump to the ControlModuleIONode
+                    currentControl = moduleIONodeId;
+                    nodeInstance = nodeInstances[currentControl] as
+                        | _RuntimeInstance
+                        | undefined;
+
+                    if (!nodeInstance) break;
+                }
+                // ControlModuleIONode
+                else if (
+                    nodeInstance.instance.nodeType === "ControlModuleIONode"
+                ) {
+                    sourceOutput = "triggerOut";
+
+                    // Find the ControlModuleNode (via the caller control value)
+                    const moduleNodeId = context
+                        .getGraph()
+                        .nodes.find(
+                            (n) =>
+                                n.nodeType === "ControlModuleNode" &&
+                                context.getAllControls(n.nodeId).module ===
+                                    context.getAllControls(currentControl)
+                                        .module
+                        )?.nodeId;
+
+                    if (!moduleNodeId) {
+                        throw new Error(
+                            `No matching module node found for module ID '${
+                                context.getAllControls(currentControl).module
+                            }'`
+                        );
+                    }
+
+                    // Jump to the ControlModuleNode
+                    currentControl = moduleNodeId;
+                    nodeInstance = nodeInstances[currentControl] as
+                        | _RuntimeInstance
+                        | undefined;
+
+                    if (!nodeInstance) break;
+                }
+                // Regular node
+                else if (controlFlow) {
+                    sourceOutput = await controlFlow(
+                        nodeInstance.instance.nodeId,
+                        context,
+                        trigger
+                    );
+                }
                 if (!sourceOutput || !context.getFlowActive()) break;
                 eventHandlers.onFlowNode(currentControl);
 
