@@ -296,6 +296,19 @@ const runGraph = async (
                             });
                         })();
                         break;
+                    case "reduceSession":
+                        (() => {
+                            const storage = executorStorage.get();
+                            if (!storage) return;
+                            const n = action.args.n;
+                            executorStorage.set({
+                                ...storage,
+                                sessionMessages: storage.sessionMessages.slice(
+                                    -n
+                                ),
+                            });
+                        })();
+                        break;
                     default:
                         externalActionObservable.next(action);
                         break;

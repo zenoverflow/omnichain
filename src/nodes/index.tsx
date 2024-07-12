@@ -97,6 +97,7 @@ export { RouteTriggerNode } from "./_nodes/RouteTriggerNode";
 export { RunCommandNode } from "./_nodes/RunCommandNode";
 export { SaveStateNode } from "./_nodes/SaveStateNode";
 export { SessionClearNode } from "./_nodes/SessionClearNode";
+export { SessionReduceNode } from "./_nodes/SessionReduceNode";
 export { SliceChatMessageArrayNode } from "./_nodes/SliceChatMessageArrayNode";
 export { SliceFileArrayNode } from "./_nodes/SliceFileArrayNode";
 export { SliceStringArrayNode } from "./_nodes/SliceStringArrayNode";

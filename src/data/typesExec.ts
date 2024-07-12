@@ -10,6 +10,7 @@ export type ExtraAction =
     | { type: "checkQueue"; args?: never }
     | { type: "readSessionMessages"; args?: never }
     | { type: "clearSession"; args?: never }
+    | { type: "reduceSession"; args: { n: number } }
     | { type: "grabNextMessage"; args?: never }
     | { type: "readCurrentMessage"; args?: never }
     | { type: "addMessageToSession"; args: { message: ChatMessage } }

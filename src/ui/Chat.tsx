@@ -19,6 +19,7 @@ import {
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 import { ChatMessage } from "../data/types";
 import { optionsStorage } from "../state/options";
@@ -33,6 +34,7 @@ const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
     return (
         <Markdown
             // className="c__keep-whitespace"
+            rehypePlugins={[rehypeRaw]}
             components={{
                 code(props) {
                     const { children, className, node, ...rest } = props;
