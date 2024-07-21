@@ -31,6 +31,34 @@ import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
 const { TextArea } = Input;
 
 const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
+    const stylizedContent = useMemo(() => {
+        // Add spans with orange text color around text with double quotes
+        // Ignore anything within code blocks (denoted by triple backticks)
+        const stylizedQuotes = content.replace(
+            /```[\s\S]*?```|`[\s\S]*?`|"(.*?)"/g,
+            (_, p1) => {
+                if (p1) {
+                    return `<span style="color: #fa8c16;">"${p1}"</span>`;
+                }
+                return _;
+            }
+        );
+
+        // Add spans with grey color around text surrounded by '*'
+        // The '*' are removed
+        // Ignore anything within code blocks (denoted by triple backticks)
+        const stylizedBold = stylizedQuotes.replace(
+            /```[\s\S]*?```|`[\s\S]*?`|\*(.*?)\*/g,
+            (_, p1) => {
+                if (p1) {
+                    return `<span style="color: #f0f0f0; font-style: italic;">${p1}</span>`;
+                }
+                return _;
+            }
+        );
+
+        return stylizedBold;
+    }, [content]);
     return (
         <Markdown
             // className="c__keep-whitespace"
@@ -56,7 +84,7 @@ const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
                 },
             }}
         >
-            {content}
+            {stylizedContent}
         </Markdown>
     );
 };
