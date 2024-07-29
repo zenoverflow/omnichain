@@ -42,6 +42,45 @@ export const editorLassoStorage = new StatefulObservable<{
 export const editorClipboardStorage =
     new StatefulObservable<EditorClipboard | null>(null);
 
+export const nodeContentVisibleState = new StatefulObservable<string | null>(
+    null
+);
+
+export const runNodeContentOnZoomOutListener = () => {
+    editorTargetStorage.subscribe((editorTarget) => {
+        if (!editorTarget) {
+            nodeContentVisibleState.set(null);
+            return;
+        }
+        const graphs = graphStorage.get();
+        const target = graphs[editorTarget];
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!target) {
+            nodeContentVisibleState.set(null);
+        } else {
+            nodeContentVisibleState.set(
+                target.zoom >= 0.3 ? editorTarget : null
+            );
+        }
+    });
+    graphStorage.subscribe((graphs) => {
+        const editorTarget = editorTargetStorage.get();
+        if (!editorTarget) {
+            nodeContentVisibleState.set(null);
+            return;
+        }
+        const target = graphs[editorTarget];
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!target) {
+            nodeContentVisibleState.set(null);
+        } else {
+            nodeContentVisibleState.set(
+                target.zoom >= 0.3 ? editorTarget : null
+            );
+        }
+    });
+};
+
 // ACTIONS //
 
 export const copySelectedNodes = (copyConnections = false) => {

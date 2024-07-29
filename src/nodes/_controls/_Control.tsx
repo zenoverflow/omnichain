@@ -5,6 +5,7 @@ import { graphStorage, updateNodeControl } from "../../state/graphs";
 import { executorStorage } from "../../state/executor";
 import { useOuterState } from "../../util/ObservableUtilsReact";
 import { controlObservable } from "../../state/watcher";
+import { nodeContentVisibleState } from "../../state/editor";
 
 export const useControlState = <T extends string | number | null>(
     graphId: string,
@@ -14,7 +15,6 @@ export const useControlState = <T extends string | number | null>(
 ) => {
     const [value, _setValue] = useState<T>(initValue);
 
-    const [graphs] = useOuterState(graphStorage);
     const [executor] = useOuterState(executorStorage);
 
     const [debouncer, setDebouncer] = useState<NodeJS.Timeout | null>(null);
@@ -24,7 +24,7 @@ export const useControlState = <T extends string | number | null>(
         [executor, graphId]
     );
 
-    const hidden = useMemo(() => graphs[graphId].zoom < 0.4, [graphId, graphs]);
+    const [visible] = useOuterState(nodeContentVisibleState);
 
     const setValue = useCallback(
         (v: T) => {
@@ -74,7 +74,7 @@ export const useControlState = <T extends string | number | null>(
         };
     }, [controlName, graphId, nodeId]);
 
-    return { value, setValue, disabled, hidden };
+    return { value, setValue, disabled, hidden: graphId !== visible };
 };
 
 export abstract class BaseControl<VALUE, CONFIG> extends ClassicPreset.Control {

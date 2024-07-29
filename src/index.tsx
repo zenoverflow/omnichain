@@ -13,6 +13,7 @@ import { checkForUpdatesAndNotify, loadAppVersion } from "./state/appVersion";
 import { QueueUtils } from "./util/QueueUtils";
 
 import { Editor } from "./ui/Editor";
+import { runNodeContentOnZoomOutListener } from "./state/editor";
 
 // const router = createBrowserRouter([
 //     {
@@ -32,6 +33,8 @@ export const run = async () => {
     await loadExecutor();
 
     void checkForUpdatesAndNotify();
+
+    runNodeContentOnZoomOutListener();
 
     QueueUtils.runQueue();
 

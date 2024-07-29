@@ -6,7 +6,7 @@ import { getMenuIcon } from "./NodeIcons";
 import { BtnDoc } from "./BtnDoc";
 import { useOuterState } from "../../util/ObservableUtilsReact";
 import { executorStorage, lastNodeErrorStorage } from "../../state/executor";
-import { graphStorage } from "../../state/graphs";
+import { nodeContentVisibleState } from "../../state/editor";
 
 const SOCKET_MARGIN = 6;
 const SOCKET_SIZE = 25;
@@ -177,14 +177,12 @@ export const SocketTitle: React.FC<{
     title: string;
     type: "output" | "input";
 }> = ({ node, title, type }) => {
-    const [graphs] = useOuterState(graphStorage);
+    const [visible] = useOuterState(nodeContentVisibleState);
 
-    const hidden = useMemo(
-        () => graphs[node.graphId].zoom < 0.4,
-        [graphs, node.graphId]
+    const _title = useMemo(
+        () => (visible !== node.graphId ? "" : title),
+        [visible, title, node.graphId]
     );
-
-    const _title = useMemo(() => (hidden ? "" : title), [hidden, title]);
 
     return (
         <div
@@ -198,12 +196,7 @@ export const SocketTitle: React.FC<{
 };
 
 export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
-    const [graphs] = useOuterState(graphStorage);
-
-    const hidden = useMemo(
-        () => graphs[node.graphId].zoom < 0.4,
-        [graphs, node.graphId]
-    );
+    const [visible] = useOuterState(nodeContentVisibleState);
 
     const cleanLabel = useMemo(() => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -214,7 +207,7 @@ export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
         return getMenuIcon(node.label);
     }, [node.label]);
 
-    if (hidden) return null;
+    if (visible !== node.graphId) return null;
 
     return (
         <div

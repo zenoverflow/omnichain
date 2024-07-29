@@ -48,6 +48,7 @@ const isGraphActive = (id: string): boolean => {
 const updateActiveNode = (graphId: string, nodeId: string) => {
     const storage = executorStorage.get();
     if (storage?.graphId !== graphId) return;
+    if (storage.step === nodeId) return;
     executorStorage.set({
         ...storage,
         step: nodeId,

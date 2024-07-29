@@ -43,6 +43,7 @@ const updateChecker = async () => {
     try {
         const messages = await ExecutorUtils.pingExecutor();
         for (const message of messages) {
+            console.log(message);
             switch (message.type) {
                 case "executorUpdate":
                     // console.log("Executor update", message.data);
