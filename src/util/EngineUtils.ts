@@ -67,7 +67,7 @@ export const EngineUtils = {
                 if (!inputs[inputName]) {
                     inputs[inputName] = [];
                 }
-                inputs[inputName]!.push(result);
+                inputs[inputName].push(result);
             };
 
             for (const dataInput of dataInputs) {
@@ -134,6 +134,10 @@ export const EngineUtils = {
 
                     addInputResult(dataInput, output[connection.sourceOutput]);
                 }
+            }
+
+            if (!context.getFlowActive()) {
+                throw new Error("Execution aborted by user");
             }
 
             return inputs;

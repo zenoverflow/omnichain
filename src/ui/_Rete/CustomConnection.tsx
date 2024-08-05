@@ -44,7 +44,6 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
     ) => {
         // If end is to the right, draw a slight cubic bezier curve
         if (end.x > start.x) {
-            // return `M${start.x},${start.y}L${end.x},${end.y}`;
             const c1 = {
                 x: start.x + 12,
                 y: start.y,
@@ -56,7 +55,7 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
             return `M${start.x},${start.y}C${c1.x},${c1.y},${c2.x},${c2.y},${end.x},${end.y}`;
         }
 
-        // Otherwise, follow a turn algo
+        // // Otherwise, follow a turn algo
 
         // standard deviation
         const sd = 70;
@@ -64,7 +63,7 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
         // First, make a point at x+100,y
         const p1 = {
             x: start.x + sd,
-            y: start.y,
+            y: start.y - 20,
         };
 
         // Next, make a point at p1.x,p1.y-120
@@ -82,7 +81,12 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
         // Next, make a point at p3.x,end.y
         const p4 = {
             x: p3.x,
-            y: end.y,
+            y:
+                start.y > end.y
+                    ? end.y + 20
+                    : start.y === end.y
+                    ? end.y
+                    : end.y - 20,
         };
 
         // Finally, draw the path
