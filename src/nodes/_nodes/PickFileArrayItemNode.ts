@@ -18,7 +18,6 @@ export const PickFileArrayItemNode = makeNode(
                     defaultValue: 0,
                     config: {
                         label: "index",
-                        min: 0,
                     },
                 },
             },
@@ -29,9 +28,20 @@ export const PickFileArrayItemNode = makeNode(
             const inputs = await context.fetchInputs(nodeId);
             const controls = context.getAllControls(nodeId);
 
-            const array = (inputs["array"] ?? [])[0] ?? [];
+            const array: any[] = (inputs["array"] ?? [])[0] ?? [];
+
+            const index = controls.index as number;
+
+            const normalizedIndex = index >= 0 ? index : array.length + index;
+
+            const result = array[normalizedIndex];
+
+            if (!result) {
+                throw new Error("PickFileArrayItemNode: Invalid index");
+            }
+
             return {
-                file: array[controls.index as number],
+                file: result,
             };
         },
     }

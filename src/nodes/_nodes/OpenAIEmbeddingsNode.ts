@@ -30,7 +30,7 @@ export const OpenAIEmbeddingsNode = makeNode(
         ],
         outputs: [
             //
-            { name: "results", type: "stringArray" },
+            { name: "results", type: "stringArray", label: "results (array)" },
         ],
         controls: [
             {

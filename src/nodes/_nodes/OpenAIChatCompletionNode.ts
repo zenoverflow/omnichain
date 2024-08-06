@@ -48,7 +48,14 @@ export const OpenAIChatCompletionNode = makeNode(
                 label: "message (single)",
             },
         ],
-        outputs: [{ name: "results", type: "stringArray" }],
+        outputs: [
+            //
+            {
+                name: "results",
+                type: "stringArray",
+                label: "results (array)",
+            },
+        ],
         controls: [
             {
                 name: "model",

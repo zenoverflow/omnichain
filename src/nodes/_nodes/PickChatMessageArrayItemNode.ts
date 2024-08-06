@@ -18,7 +18,6 @@ export const PickChatMessageArrayItemNode = makeNode(
                     defaultValue: 0,
                     config: {
                         label: "index",
-                        min: 0,
                     },
                 },
             },
@@ -29,12 +28,21 @@ export const PickChatMessageArrayItemNode = makeNode(
             const inputs = await context.fetchInputs(nodeId);
             const controls = context.getAllControls(nodeId);
 
-            const array = (inputs["array"] || [])[0] ?? [];
-            const message = array[controls.index as number];
-            if (!message) {
+            const array: any[] = (inputs["array"] ?? [])[0] ?? [];
+
+            const index = controls.index as number;
+
+            const normalizedIndex = index >= 0 ? index : array.length + index;
+
+            const result = array[normalizedIndex];
+
+            if (!result) {
                 throw new Error("PickChatMessageArrayItemNode: Invalid index");
             }
-            return { message };
+
+            return {
+                message: result,
+            };
         },
     }
 );

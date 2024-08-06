@@ -19,8 +19,18 @@ export const OpenAITextCompletionNode = makeNode(
         doc,
     },
     {
-        inputs: [{ name: "prompt", type: "string" }],
-        outputs: [{ name: "results", type: "stringArray" }],
+        inputs: [
+            //
+            { name: "prompt", type: "string" },
+        ],
+        outputs: [
+            //
+            {
+                name: "results",
+                type: "stringArray",
+                label: "results (array)",
+            },
+        ],
         controls: [
             {
                 name: "model",
