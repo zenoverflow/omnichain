@@ -171,11 +171,10 @@ export const OllamaEmbeddingsNode = makeNode(
                 name: "topK",
                 control: {
                     type: "number",
-                    defaultValue: 1.0,
+                    defaultValue: 20,
                     config: {
                         label: "top_k",
-                        min: 0.01,
-                        max: 1.0,
+                        min: 0,
                     },
                 },
             },

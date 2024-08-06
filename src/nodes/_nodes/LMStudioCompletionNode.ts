@@ -73,7 +73,6 @@ export const LMStudioCompletionNode = makeNode(
                     config: {
                         label: "top_k",
                         min: 0,
-                        max: 200,
                     },
                 },
             },
