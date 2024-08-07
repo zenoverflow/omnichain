@@ -117,6 +117,8 @@ export { TextGenWebUIEmbeddingsNode } from "./_nodes/TextGenWebUIEmbeddingsNode"
 export { TextIsMaxLengthNode } from "./_nodes/TextIsMaxLengthNode";
 export { TextJoinNode } from "./_nodes/TextJoinNode";
 export { TextNode } from "./_nodes/TextNode";
+export { TextReplaceNode } from "./_nodes/TextReplaceNode";
+export { TextReplaceRegexNode } from "./_nodes/TextReplaceRegexNode";
 export { TextSplitNode } from "./_nodes/TextSplitNode";
 export { TextSplitRegexNode } from "./_nodes/TextSplitRegexNode";
 export { TrimTextNode } from "./_nodes/TrimTextNode";
