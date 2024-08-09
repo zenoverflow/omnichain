@@ -15,7 +15,7 @@ export const TextReplaceRegexNode = makeNode(
     {
         nodeName: "TextReplaceRegexNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [350, 350],
+        dimensions: [350, 390],
         doc,
     },
     {
@@ -29,6 +29,12 @@ export const TextReplaceRegexNode = makeNode(
             //
             { name: "result", type: "string", label: "result" },
         ],
+
+        controlsOverride: {
+            start_index: "startIndex",
+            limit: "limit",
+            case_insensitive: "caseInsensitive",
+        },
         controls: [
             {
                 name: "startIndex",
@@ -71,7 +77,7 @@ export const TextReplaceRegexNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const startIndex = controls.startIndex as number;
             const limit = controls.limit as number;

@@ -15,6 +15,8 @@ import { QueueUtils } from "./util/QueueUtils";
 import { Editor } from "./ui/Editor";
 import { runNodeContentOnZoomOutListener } from "./state/editor";
 
+import "prismjs/themes/prism.css";
+
 // const router = createBrowserRouter([
 //     {
 //         path: "/",

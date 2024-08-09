@@ -24,7 +24,7 @@ export const OllamaTextCompletionNode = makeNode(
     {
         nodeName: "OllamaTextCompletionNode",
         nodeIcon: "LaptopOutlined",
-        dimensions: [620, 1130],
+        dimensions: [620, 1170],
         doc,
     },
     {
@@ -54,6 +54,30 @@ export const OllamaTextCompletionNode = makeNode(
             },
         ],
         outputs: [{ name: "result", type: "string" }],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            model: "model",
+            mirostat: "mirostat",
+            mirostat_eta: "mirostatEta",
+            mirostat_tau: "mirostatTau",
+            num_ctx: "numCtx",
+            repeat_last_n: "repeatLastN",
+            repeat_penalty: "repeatPenalty",
+            temperature: "temperature",
+            seed: "seed",
+            stop: "stop",
+            tfs_z: "tfsZ",
+            num_predict: "numPredict",
+            top_k: "topK",
+            top_p: "topP",
+            host: "host",
+            keep_alive: "keepAlive",
+            json: "json",
+            raw: "raw",
+        },
         controls: [
             {
                 name: "model",
@@ -266,7 +290,7 @@ export const OllamaTextCompletionNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const prompt = (inputs["prompt"] ?? [])[0];
 

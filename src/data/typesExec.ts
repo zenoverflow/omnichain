@@ -71,11 +71,23 @@ export type FlowContext = {
     extraAction: (action: ExtraAction) => Promise<any>;
 
     /**
-     * Allows a node to grab its control values from storage.
+     * Grabs a node's control values from storage.
+     *
+     * Does not include overrides from the special 'override' input.
      *
      * @returns The values of all the controls.
      */
     getAllControls: (nodeId: string) => { [x: string]: string | number | null };
+
+    /**
+     * Grabs a node's control values from storage and applies overrides.
+     *
+     * @returns The values of all the controls with overrides applied.
+     */
+    getControlsWithOverride: (
+        nodeId: string,
+        nodeInputs: { [x: string]: any[] | undefined }
+    ) => { [x: string]: string | number | null };
 
     /**
      * Allows nodes to read API keys from storage.

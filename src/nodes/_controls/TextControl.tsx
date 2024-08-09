@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
 import { Input, Button, Modal } from "antd";
 import { FullscreenOutlined } from "@ant-design/icons";
-import CodeMirror from "@uiw/react-codemirror";
-import { javascript as syntaxJs } from "@codemirror/lang-javascript";
-import { markdown as syntaxMd } from "@codemirror/lang-markdown";
-import { json as syntaxJson } from "@codemirror/lang-json";
+import Editor from "react-simple-code-editor";
+import Prism from "prismjs";
 
 import { BaseControl, useControlState } from "./_Control";
 
@@ -20,16 +18,23 @@ const _Modal: React.FC<{
     onChange: (v: string) => any;
     modalSyntaxHighlight?: string;
 }> = ({ closeModal, value, onChange, modalSyntaxHighlight }) => {
-    const syntaxExtensions = useMemo(() => {
+    const syntax = useMemo(() => {
         switch (modalSyntaxHighlight) {
             case "json":
-                return [syntaxJson()];
+                return (code: string) =>
+                    Prism.highlight(code, Prism.languages.json, "json");
             case "markdown":
-                return [syntaxMd({})];
+                return (code: string) =>
+                    Prism.highlight(code, Prism.languages.markdown, "markdown");
             case "javascript":
-                return [syntaxJs({})];
+                return (code: string) =>
+                    Prism.highlight(
+                        code,
+                        Prism.languages.javascript,
+                        "javascript"
+                    );
             default:
-                return [];
+                return (code: string) => code;
         }
     }, [modalSyntaxHighlight]);
     return (
@@ -49,7 +54,9 @@ const _Modal: React.FC<{
             width={"90vw"}
             style={{ top: "10px" }}
         >
-            <CodeMirror
+            <Editor
+                highlight={syntax}
+                textareaClassName="cm-editor cm-focused"
                 value={value}
                 onPointerDown={(e) => {
                     e.stopPropagation();
@@ -63,13 +70,9 @@ const _Modal: React.FC<{
                 onKeyUp={(e) => {
                     e.stopPropagation();
                 }}
-                onChange={(val, _viewUpdate) => {
+                onValueChange={(val) => {
                     onChange(val);
                 }}
-                // height="80vh"
-                // maxHeight="80vh"
-                extensions={syntaxExtensions}
-                autoFocus
             />
         </Modal>
     );

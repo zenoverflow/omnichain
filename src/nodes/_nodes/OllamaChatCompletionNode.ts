@@ -23,7 +23,7 @@ export const OllamaChatCompletionNode = makeNode(
     {
         nodeName: "OllamaChatCompletionNode",
         nodeIcon: "LaptopOutlined",
-        dimensions: [620, 1090],
+        dimensions: [620, 1130],
         doc,
     },
     {
@@ -52,6 +52,29 @@ export const OllamaChatCompletionNode = makeNode(
             { name: "result", type: "string", label: "result" },
             { name: "resultImages", type: "fileArray", label: "result images" },
         ],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            model: "model",
+            mirostat: "mirostat",
+            mirostat_eta: "mirostatEta",
+            mirostat_tau: "mirostatTau",
+            num_ctx: "numCtx",
+            repeat_last_n: "repeatLastN",
+            repeat_penalty: "repeatPenalty",
+            temperature: "temperature",
+            seed: "seed",
+            stop: "stop",
+            tfs_z: "tfsZ",
+            num_predict: "numPredict",
+            top_k: "topK",
+            top_p: "topP",
+            host: "host",
+            keep_alive: "keepAlive",
+            json: "json",
+        },
         controls: [
             {
                 name: "model",
@@ -250,7 +273,7 @@ export const OllamaChatCompletionNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const messages: ChatMessage[] = [
                 ...((inputs["messages"] ?? [])[0] || []),

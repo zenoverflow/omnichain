@@ -15,7 +15,7 @@ export const LMStudioEmbeddingsNode = makeNode(
     {
         nodeName: "LMStudioEmbeddingsNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 220],
+        dimensions: [620, 260],
         doc,
     },
     {
@@ -28,57 +28,11 @@ export const LMStudioEmbeddingsNode = makeNode(
             //
             { name: "results", type: "stringArray" },
         ],
+
+        controlsOverride: {
+            base_url: "baseUrl",
+        },
         controls: [
-            // {
-            //     name: "model",
-            //     control: {
-            //         type: "text",
-            //         defaultValue: "text-embedding-ada-002",
-            //         config: {
-            //             label: "model",
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "format",
-            //     control: {
-            //         type: "select",
-            //         defaultValue: "float",
-            //         config: {
-            //             label: "encoding_format",
-            //             values: [
-            //                 {
-            //                     label: "float",
-            //                     value: "float",
-            //                 },
-            //                 {
-            //                     label: "base64",
-            //                     value: "base64",
-            //                 },
-            //             ],
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "dimensions",
-            //     control: {
-            //         type: "number",
-            //         defaultValue: null,
-            //         config: {
-            //             label: "dimensions",
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "apiKeyName",
-            //     control: {
-            //         type: "text",
-            //         defaultValue: "",
-            //         config: {
-            //             label: "API key name",
-            //         },
-            //     },
-            // },
             {
                 name: "baseUrl",
                 control: {
@@ -94,7 +48,7 @@ export const LMStudioEmbeddingsNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const textsToEmbed = (inputs.textArray || [])[0] || [];
             const textSingle = (inputs.textSingle || [])[0];
@@ -107,26 +61,18 @@ export const LMStudioEmbeddingsNode = makeNode(
                 throw new Error("No text to embed!");
             }
 
-            // const apiKeyName = ((controls.apiKeyName as string) || "").trim();
-            // const apiKey = context.getApiKeyByName(apiKeyName) || "empty";
-
             const baseUrl = (
                 (controls.baseUrl as string) || "http://localhost:1234"
             ).trim();
-
-            // const model = ((controls.model as string) || "").trim();
 
             const response = await fetch(`${baseUrl}/v1/embeddings`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Authorization: `Bearer ${apiKey}`,
                 },
                 body: JSON.stringify({
                     model: "",
                     input: textsToEmbed,
-                    // encoding_format: controls.format,
-                    // dimensions: controls.dimensions,
                 }),
             });
 

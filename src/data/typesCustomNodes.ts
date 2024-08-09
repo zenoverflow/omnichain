@@ -56,6 +56,18 @@ export type CustomFlowConfig = {
 };
 
 export type CustomNodeIOConfig = {
+    /**
+     * Defines overrides that can be passed in via
+     * the special 'override' input.
+     *
+     * Each key in the map should be a descriptive
+     * name for a field, preferrably in snake_case.
+     *
+     * Each value value should be the key of the
+     * control to override.
+     */
+    controlsOverride?: { [key: string]: string };
+
     inputs: CustomIO[];
     outputs: CustomIO[];
     controls: CustomNodeControl[];

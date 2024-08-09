@@ -11,7 +11,7 @@ export const TextGenWebUICompletionNode = makeNode(
     {
         nodeName: "TextGenWebUICompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [630, 2420],
+        dimensions: [630, 2460],
         doc,
     },
     {
@@ -37,6 +37,57 @@ export const TextGenWebUICompletionNode = makeNode(
             //
             { name: "results", type: "stringArray" },
         ],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            max_new_tokens: "max_new_tokens",
+            temperature: "temperature",
+            top_p: "top_p",
+            top_k: "top_k",
+            typical_p: "typical_p",
+            min_p: "min_p",
+            repetition_penalty: "repetition_penalty",
+            frequency_penalty: "frequency_penalty",
+            presence_penalty: "presence_penalty",
+            repetition_penalty_range: "repetition_penalty_range",
+            do_sample: "do_sample",
+            dry_multiplier: "dry_multiplier",
+            dry_base: "dry_base",
+            dry_allowed_length: "dry_allowed_length",
+            dry_sequence_breakers: "dry_sequence_breakers",
+            auto_max_new_tokens: "auto_max_new_tokens",
+            ban_eos_token: "ban_eos_token",
+            add_bos_token: "add_bos_token",
+            custom_stopping_strings: "custom_stopping_strings",
+            custom_token_bans: "custom_token_bans",
+            penalty_alpha: "penalty_alpha",
+            guidance_scale: "guidance_scale",
+            mirostat_mode: "mirostat_mode",
+            mirostat_tau: "mirostat_tau",
+            mirostat_eta: "mirostat_eta",
+            epsilon_cutoff: "epsilon_cutoff",
+            eta_cutoff: "eta_cutoff",
+            encoder_repetition_penalty: "encoder_repetition_penalty",
+            no_repeat_ngram_size: "no_repeat_ngram_size",
+            tfs: "tfs",
+            top_a: "top_a",
+            smoothing_factor: "smoothing_factor",
+            smoothing_curve: "smoothing_curve",
+            dynamic_temperature: "dynamic_temperature",
+            dynatemp_low: "dynatemp_low",
+            dynatemp_high: "dynatemp_high",
+            dynatemp_exponent: "dynatemp_exponent",
+            temperature_last: "temperature_last",
+            sampler_priority: "sampler_priority",
+            truncation_length: "truncation_length",
+            prompt_lookup_num_tokens: "prompt_lookup_num_tokens",
+            seed: "seed",
+            skip_special_tokens: "skip_special_tokens",
+            num_responses: "n",
+            base_url: "baseUrl",
+        },
         controls: [
             {
                 name: "max_new_tokens",
@@ -303,17 +354,6 @@ export const TextGenWebUICompletionNode = makeNode(
                     },
                 },
             },
-            // used as input instead, left for reference
-            // {
-            //     name: "negative_prompt",
-            //     control: {
-            //         type: "text",
-            //         defaultValue: "",
-            //         config: {
-            //             label: "Negative prompt",
-            //         },
-            //     },
-            // },
             {
                 name: "mirostat_mode",
                 control: {
@@ -398,17 +438,6 @@ export const TextGenWebUICompletionNode = makeNode(
                     },
                 },
             },
-            // used as input instead, left for reference
-            // {
-            //     name: "grammar_string",
-            //     control: {
-            //         type: "text",
-            //         defaultValue: "",
-            //         config: {
-            //             label: "Grammar",
-            //         },
-            //     },
-            // },
             {
                 name: "tfs",
                 control: {
@@ -555,31 +584,6 @@ export const TextGenWebUICompletionNode = makeNode(
                     },
                 },
             },
-            // for gradio ui only, kept for reference
-            // {
-            //     name: "max_tokens_second",
-            //     control: {
-            //         type: "number",
-            //         defaultValue: 0,
-            //         config: {
-            //             label: "max_tokens_second",
-            //             min: 0,
-            //             max: 20,
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "max_updates_second",
-            //     control: {
-            //         type: "number",
-            //         defaultValue: 0,
-            //         config: {
-            //             label: "max_updates_second",
-            //             min: 0,
-            //             max: 24,
-            //         },
-            //     },
-            // },
             {
                 name: "seed",
                 control: {
@@ -604,21 +608,6 @@ export const TextGenWebUICompletionNode = makeNode(
                     },
                 },
             },
-            // not supported, kept for reference
-            // {
-            //     name: "stream",
-            //     control: {
-            //         type: "select",
-            //         defaultValue: "true",
-            //         config: {
-            //             label: "Activate text streaming",
-            //             values: [
-            //                 { value: "true", label: "true" },
-            //                 { value: "false", label: "false" },
-            //             ],
-            //         },
-            //     },
-            // },
             {
                 name: "n",
                 control: {
@@ -645,7 +634,7 @@ export const TextGenWebUICompletionNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const prompt = (inputs["prompt"] ?? [])[0];
             const negativePrompt = (inputs["negativePrompt"] ?? [])[0] || "";

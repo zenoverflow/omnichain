@@ -15,7 +15,7 @@ export const TextReplaceNode = makeNode(
     {
         nodeName: "TextReplaceNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [350, 300],
+        dimensions: [350, 340],
         doc,
     },
     {
@@ -29,6 +29,11 @@ export const TextReplaceNode = makeNode(
             //
             { name: "result", type: "string", label: "result" },
         ],
+
+        controlsOverride: {
+            start_index: "startIndex",
+            limit: "limit",
+        },
         controls: [
             {
                 name: "startIndex",
@@ -57,7 +62,7 @@ export const TextReplaceNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const startIndex = controls.startIndex as number;
             const limit = controls.limit as number;

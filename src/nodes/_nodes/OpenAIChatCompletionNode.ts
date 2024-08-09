@@ -24,7 +24,7 @@ export const OpenAIChatCompletionNode = makeNode(
     {
         nodeName: "OpenAIChatCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 850],
+        dimensions: [620, 890],
         doc,
     },
     {
@@ -56,6 +56,25 @@ export const OpenAIChatCompletionNode = makeNode(
                 label: "results (array)",
             },
         ],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            model: "model",
+            max_tokens: "maxTokens",
+            temperature: "temperature",
+            top_p: "topP",
+            frequency_penalty: "frequencyPenalty",
+            presence_penalty: "presencePenalty",
+            num_responses: "numResponses",
+            stop: "stop",
+            seed: "seed",
+            api_key_name: "apiKeyName",
+            base_url: "baseUrl",
+            vision: "vision",
+            json: "json",
+        },
         controls: [
             {
                 name: "model",
@@ -137,20 +156,6 @@ export const OpenAIChatCompletionNode = makeNode(
                     },
                 },
             },
-            // {
-            //     name: "echo",
-            //     control: {
-            //         type: "select",
-            //         defaultValue: "false",
-            //         config: {
-            //             label: "echo",
-            //             values: [
-            //                 { value: "true", label: "true" },
-            //                 { value: "false", label: "false" },
-            //             ],
-            //         },
-            //     },
-            // },
             {
                 name: "stop",
                 control: {
@@ -224,7 +229,7 @@ export const OpenAIChatCompletionNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const messages: ChatMessage[] = [
                 ...((inputs["messages"] ?? [])[0] || []),

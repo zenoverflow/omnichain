@@ -13,12 +13,29 @@ export const LMStudioCompletionNode = makeNode(
     {
         nodeName: "LMStudioCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 690],
+        dimensions: [620, 730],
         doc,
     },
     {
         inputs: [{ name: "prompt", type: "string" }],
         outputs: [{ name: "result", type: "string" }],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            model: "model",
+            max_tokens: "maxTokens",
+            temperature: "temperature",
+            top_p: "topP",
+            top_k: "topK",
+            frequency_penalty: "frequencyPenalty",
+            presence_penalty: "presencePenalty",
+            repeat_penalty: "repeatPenalty",
+            stop: "stop",
+            seed: "seed",
+            base_url: "baseUrl",
+        },
         controls: [
             {
                 name: "model",
@@ -112,31 +129,6 @@ export const LMStudioCompletionNode = makeNode(
                     },
                 },
             },
-            // {
-            //     name: "numResponses",
-            //     control: {
-            //         type: "number",
-            //         defaultValue: 1,
-            //         config: {
-            //             label: "num_responses",
-            //             min: 1,
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "echo",
-            //     control: {
-            //         type: "select",
-            //         defaultValue: "false",
-            //         config: {
-            //             label: "echo",
-            //             values: [
-            //                 { value: "true", label: "true" },
-            //                 { value: "false", label: "false" },
-            //             ],
-            //         },
-            //     },
-            // },
             {
                 name: "stop",
                 control: {
@@ -172,7 +164,7 @@ export const LMStudioCompletionNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const prompt = (inputs["prompt"] ?? [])[0];
 

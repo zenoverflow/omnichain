@@ -39,6 +39,10 @@ const baseConfigSchema = ajv.compile<CustomNodeBaseConfig>({
 const ioConfigSchema = ajv.compile<CustomNodeIOConfig>({
     type: "object",
     properties: {
+        controlsOverride: {
+            type: "object",
+            additionalProperties: { type: "string" },
+        },
         inputs: {
             type: "array",
             items: {
@@ -193,6 +197,16 @@ export const makeNode = (
     }
 
     const outputs = [...ioConfig.outputs];
+
+    // If an override map is used, add an override input
+    if (ioConfig.controlsOverride) {
+        ioConfig.inputs.push({
+            name: "override",
+            type: "string",
+            label: "override (json)",
+            multi: false,
+        });
+    }
 
     // If control flow is used, add an error output
     if (flowConfig?.controlFlow) {

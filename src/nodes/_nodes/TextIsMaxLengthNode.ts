@@ -12,7 +12,7 @@ export const TextIsMaxLengthNode = makeNode(
     {
         nodeName: "TextIsMaxLengthNode",
         nodeIcon: "CalculatorOutlined",
-        dimensions: [330, 290],
+        dimensions: [330, 330],
         doc,
     },
     {
@@ -42,6 +42,10 @@ export const TextIsMaxLengthNode = makeNode(
                 label: "no",
             },
         ],
+
+        controlsOverride: {
+            max_length: "maxLength",
+        },
         controls: [
             {
                 name: "maxLength",
@@ -60,7 +64,10 @@ export const TextIsMaxLengthNode = makeNode(
         async controlFlow(nodeId, context) {
             try {
                 const inputs = await context.fetchInputs(nodeId);
-                const controls = context.getAllControls(nodeId);
+                const controls = context.getControlsWithOverride(
+                    nodeId,
+                    inputs
+                );
 
                 const text: string = (inputs.text || [])[0] || "";
                 const maxLength = (controls.maxLength as number) || 100;

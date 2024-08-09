@@ -12,7 +12,7 @@ export const RegexCheckNode = makeNode(
     {
         nodeName: "RegexCheckNode",
         nodeIcon: "CodeOutlined",
-        dimensions: [580, 590],
+        dimensions: [580, 620],
         doc,
     },
     {
@@ -25,6 +25,10 @@ export const RegexCheckNode = makeNode(
             { name: "pass", type: "trigger", label: "pass" },
             { name: "fail", type: "trigger", label: "fail" },
         ],
+
+        controlsOverride: {
+            regex: "regex",
+        },
         controls: [
             {
                 name: "regex",
@@ -41,7 +45,11 @@ export const RegexCheckNode = makeNode(
     {
         async controlFlow(nodeId, context) {
             try {
-                const controls = context.getAllControls(nodeId);
+                const inputs = await context.fetchInputs(nodeId);
+                const controls = context.getControlsWithOverride(
+                    nodeId,
+                    inputs
+                );
 
                 const regexRaw = controls.regex as string;
 
@@ -50,8 +58,6 @@ export const RegexCheckNode = makeNode(
                 }
 
                 const regex = new RegExp(regexRaw);
-
-                const inputs = await context.fetchInputs(nodeId);
 
                 const data = (inputs.dataIn || [])[0] || "";
 

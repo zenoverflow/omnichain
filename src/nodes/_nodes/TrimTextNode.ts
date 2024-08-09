@@ -12,7 +12,7 @@ export const TrimTextNode = makeNode(
     {
         nodeName: "TrimTextNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [350, 170],
+        dimensions: [350, 210],
         doc,
     },
     {
@@ -30,6 +30,10 @@ export const TrimTextNode = makeNode(
                 label: "text (trimmed)",
             },
         ],
+
+        controlsOverride: {
+            sides: "sides",
+        },
         controls: [
             {
                 name: "sides",
@@ -51,7 +55,7 @@ export const TrimTextNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const text: string = (inputs.text || [])[0] || "";
 

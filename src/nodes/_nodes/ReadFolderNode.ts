@@ -17,7 +17,7 @@ export const ReadFolderNode = makeNode(
     {
         nodeName: "ReadFolderNode",
         nodeIcon: "FileOutlined",
-        dimensions: [330, 220],
+        dimensions: [330, 260],
         doc,
     },
     {
@@ -37,6 +37,11 @@ export const ReadFolderNode = makeNode(
                 label: "list (array)",
             },
         ],
+
+        controlsOverride: {
+            type: "type",
+            extension: "extension",
+        },
         controls: [
             {
                 name: "type",
@@ -67,7 +72,7 @@ export const ReadFolderNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const directoryPath: string | undefined = (inputs.path || [])[0];
 

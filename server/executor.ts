@@ -324,6 +324,11 @@ const runGraph = async (
                 )?.controls;
                 return controls || {};
             },
+            // Will be replaced by the real implementation
+            // when used by EngineUtils
+            getControlsWithOverride(_nodeId, _nodeInputs) {
+                return {};
+            },
             getApiKeyByName(name) {
                 return getApiKeyByName(dirData, name);
             },

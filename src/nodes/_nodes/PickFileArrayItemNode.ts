@@ -4,12 +4,16 @@ export const PickFileArrayItemNode = makeNode(
     {
         nodeName: "PickFileArrayItemNode",
         nodeIcon: "OrderedListOutlined",
-        dimensions: [330, 175],
+        dimensions: [330, 220],
         doc: "Pick an item from a file array by index.",
     },
     {
         inputs: [{ name: "array", type: "fileArray", label: "array" }],
         outputs: [{ name: "file", type: "file", label: "file" }],
+
+        controlsOverride: {
+            index: "index",
+        },
         controls: [
             {
                 name: "index",
@@ -26,7 +30,7 @@ export const PickFileArrayItemNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const array: any[] = (inputs["array"] ?? [])[0] ?? [];
 

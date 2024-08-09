@@ -4,12 +4,16 @@ export const PickChatMessageArrayItemNode = makeNode(
     {
         nodeName: "PickChatMessageArrayItemNode",
         nodeIcon: "OrderedListOutlined",
-        dimensions: [330, 175],
+        dimensions: [330, 220],
         doc: "Pick an item from a chat message array by index.",
     },
     {
         inputs: [{ name: "array", type: "chatMessageArray", label: "array" }],
         outputs: [{ name: "message", type: "chatMessage", label: "message" }],
+
+        controlsOverride: {
+            index: "index",
+        },
         controls: [
             {
                 name: "index",
@@ -26,7 +30,7 @@ export const PickChatMessageArrayItemNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const array: any[] = (inputs["array"] ?? [])[0] ?? [];
 

@@ -11,7 +11,7 @@ export const TextSplitRegexNode = makeNode(
     {
         nodeName: "TextSplitRegexNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [330, 180],
+        dimensions: [330, 220],
         doc,
     },
     {
@@ -23,6 +23,10 @@ export const TextSplitRegexNode = makeNode(
             //
             { name: "result", type: "stringArray", label: "result (array)" },
         ],
+
+        controlsOverride: {
+            regex: "regex",
+        },
         controls: [
             {
                 name: "regex",
@@ -39,7 +43,7 @@ export const TextSplitRegexNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const text: string = (inputs.in || [])[0] || "";
             const regex = new RegExp(controls.regex as string);

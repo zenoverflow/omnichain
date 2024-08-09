@@ -15,7 +15,7 @@ export const OpenAITextCompletionNode = makeNode(
     {
         nodeName: "OpenAITextCompletionNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 730],
+        dimensions: [620, 770],
         doc,
     },
     {
@@ -31,6 +31,24 @@ export const OpenAITextCompletionNode = makeNode(
                 label: "results (array)",
             },
         ],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            model: "model",
+            max_tokens: "maxTokens",
+            temperature: "temperature",
+            top_p: "topP",
+            frequency_penalty: "frequencyPenalty",
+            presence_penalty: "presencePenalty",
+            num_responses: "numResponses",
+            echo: "echo",
+            stop: "stop",
+            seed: "seed",
+            api_key_name: "apiKeyName",
+            base_url: "baseUrl",
+        },
         controls: [
             {
                 name: "model",
@@ -171,7 +189,7 @@ export const OpenAITextCompletionNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const prompt = (inputs["prompt"] ?? [])[0];
 

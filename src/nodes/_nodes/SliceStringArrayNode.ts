@@ -12,7 +12,7 @@ export const SliceStringArrayNode = makeNode(
     {
         nodeName: "SliceStringArrayNode",
         nodeIcon: "OrderedListOutlined",
-        dimensions: [330, 240],
+        dimensions: [330, 280],
         doc,
     },
     {
@@ -24,6 +24,11 @@ export const SliceStringArrayNode = makeNode(
             //
             { name: "result", type: "stringArray", label: "result" },
         ],
+
+        controlsOverride: {
+            start: "start",
+            end: "end",
+        },
         controls: [
             {
                 name: "start",
@@ -31,7 +36,7 @@ export const SliceStringArrayNode = makeNode(
                     type: "number",
                     defaultValue: null,
                     config: {
-                        label: "index",
+                        label: "start",
                     },
                 },
             },
@@ -41,7 +46,7 @@ export const SliceStringArrayNode = makeNode(
                     type: "number",
                     defaultValue: null,
                     config: {
-                        label: "index",
+                        label: "end",
                     },
                 },
             },
@@ -50,7 +55,7 @@ export const SliceStringArrayNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const array: string[] = (inputs["array"] || [])[0] ?? [];
 

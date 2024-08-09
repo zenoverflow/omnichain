@@ -231,7 +231,7 @@ export const CustomNodeTitle: React.FC<{ node: any }> = ({ node }) => {
                 <span style={{ paddingLeft: "5px" }}>{cleanLabel}</span>
             </div>
 
-            <BtnDoc nodeName={cleanLabel} doc={node.doc} />
+            <BtnDoc node={node.customNodeData} />
         </div>
     );
 };

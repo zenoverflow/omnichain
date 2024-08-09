@@ -183,6 +183,7 @@ export const GraphUtils = {
 
         class _NodeMaker extends ClassicPreset.Node<any, any, any> {
             customNodeType = nodeType;
+            customNodeData = customNode;
             doc = customNode.config.baseConfig.doc;
             width = customNode.config.baseConfig.dimensions[0];
             height = customNode.config.baseConfig.dimensions[1];

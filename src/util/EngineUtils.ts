@@ -105,18 +105,6 @@ export const EngineUtils = {
                         );
                     }
 
-                    const controls = context
-                        .getGraph()
-                        .nodes.find(
-                            (n) => n.nodeId === sourceInstance.instance.nodeId
-                        )?.controls;
-
-                    if (!controls) {
-                        throw new Error(
-                            `Error in fetchInputs()! Controls not found for ${sourceName}`
-                        );
-                    }
-
                     // Pass node activity signal to the target dataflow
                     eventHandlers.onFlowNode(sourceInstance.instance.nodeId);
 
@@ -141,6 +129,34 @@ export const EngineUtils = {
             }
 
             return inputs;
+        };
+
+        context.getControlsWithOverride = (nodeId, nodeInputs) => {
+            const targetNode = nodeInstances[nodeId];
+
+            const controls = {
+                ...targetNode.instance.controls,
+            };
+
+            const overrideMap =
+                targetNode.node.config.ioConfig.controlsOverride;
+
+            if (!overrideMap) return controls;
+
+            const override = (nodeInputs.override || [])[0];
+
+            if (!override) return controls;
+
+            const overrideObj = JSON.parse(override);
+
+            for (const key of Object.keys(overrideMap)) {
+                if (Object.keys(overrideObj).includes(key)) {
+                    const controlKey = overrideMap[key];
+                    controls[controlKey] = overrideObj[key];
+                }
+            }
+
+            return controls;
         };
 
         // Control flow run target

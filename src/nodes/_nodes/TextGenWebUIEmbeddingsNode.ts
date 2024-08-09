@@ -15,7 +15,7 @@ export const TextGenWebUIEmbeddingsNode = makeNode(
     {
         nodeName: "TextGenWebUIEmbeddingsNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 220],
+        dimensions: [620, 260],
         doc,
     },
     {
@@ -28,57 +28,11 @@ export const TextGenWebUIEmbeddingsNode = makeNode(
             //
             { name: "results", type: "stringArray" },
         ],
+
+        controlsOverride: {
+            base_url: "baseUrl",
+        },
         controls: [
-            // {
-            //     name: "model",
-            //     control: {
-            //         type: "text",
-            //         defaultValue: "text-embedding-ada-002",
-            //         config: {
-            //             label: "model",
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "format",
-            //     control: {
-            //         type: "select",
-            //         defaultValue: "float",
-            //         config: {
-            //             label: "encoding_format",
-            //             values: [
-            //                 {
-            //                     label: "float",
-            //                     value: "float",
-            //                 },
-            //                 {
-            //                     label: "base64",
-            //                     value: "base64",
-            //                 },
-            //             ],
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "dimensions",
-            //     control: {
-            //         type: "number",
-            //         defaultValue: null,
-            //         config: {
-            //             label: "dimensions",
-            //         },
-            //     },
-            // },
-            // {
-            //     name: "apiKeyName",
-            //     control: {
-            //         type: "text",
-            //         defaultValue: "",
-            //         config: {
-            //             label: "API key name",
-            //         },
-            //     },
-            // },
             {
                 name: "baseUrl",
                 control: {
@@ -94,7 +48,7 @@ export const TextGenWebUIEmbeddingsNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const textsToEmbed = (inputs.textArray || [])[0] || [];
             const textSingle = (inputs.textSingle || [])[0];

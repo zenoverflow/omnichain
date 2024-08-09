@@ -11,7 +11,7 @@ export const RegexExtractorNode = makeNode(
     {
         nodeName: "RegexExtractorNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [580, 475],
+        dimensions: [580, 510],
         doc,
     },
     {
@@ -23,6 +23,10 @@ export const RegexExtractorNode = makeNode(
             //
             { name: "results", type: "stringArray", label: "results (array)" },
         ],
+
+        controlsOverride: {
+            regex: "regex",
+        },
         controls: [
             {
                 name: "regex",
@@ -40,7 +44,7 @@ export const RegexExtractorNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const text: string = (inputs.text || [])[0] || "";
             const regex = new RegExp(controls.regex as string);

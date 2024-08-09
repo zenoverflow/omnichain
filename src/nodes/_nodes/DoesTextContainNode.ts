@@ -12,7 +12,7 @@ export const DoesTextContainNode = makeNode(
     {
         nodeName: "DoesTextContainNode",
         nodeIcon: "CodeOutlined",
-        dimensions: [580, 590],
+        dimensions: [580, 620],
         doc,
     },
     {
@@ -25,6 +25,9 @@ export const DoesTextContainNode = makeNode(
             { name: "pass", type: "trigger", label: "pass" },
             { name: "fail", type: "trigger", label: "fail" },
         ],
+        controlsOverride: {
+            text: "text",
+        },
         controls: [
             {
                 name: "text",
@@ -42,7 +45,10 @@ export const DoesTextContainNode = makeNode(
         async controlFlow(nodeId, context) {
             try {
                 const inputs = await context.fetchInputs(nodeId);
-                const controls = context.getAllControls(nodeId);
+                const controls = context.getControlsWithOverride(
+                    nodeId,
+                    inputs
+                );
 
                 const data = (inputs.dataIn || [])[0] || "";
 

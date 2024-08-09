@@ -13,7 +13,7 @@ export const TextJoinNode = makeNode(
     {
         nodeName: "TextJoinNode",
         nodeIcon: "FileTextOutlined",
-        dimensions: [300, 250],
+        dimensions: [300, 290],
         doc,
     },
     {
@@ -24,6 +24,10 @@ export const TextJoinNode = makeNode(
             { name: "textSingle2", type: "string", label: "text (single) 2" },
         ],
         outputs: [{ name: "result", type: "string", label: "result" }],
+
+        controlsOverride: {
+            separator: "separator",
+        },
         controls: [
             {
                 name: "separator",
@@ -40,7 +44,7 @@ export const TextJoinNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             let separator = (controls.separator as string) || "";
 

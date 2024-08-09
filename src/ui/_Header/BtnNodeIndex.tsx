@@ -2,19 +2,11 @@ import React, { useState, useMemo } from "react";
 import { Button, Modal, Space, Collapse, CollapseProps, Input } from "antd";
 import { ReadOutlined } from "@ant-design/icons";
 
+import { NodeDoc } from "../_Global/NodeDoc";
+
 import { useOuterState } from "../../util/ObservableUtilsReact";
 import { nodeRegistryStorage } from "../../state/nodeRegistry";
 import { getMenuIcon } from "../_Rete/NodeIcons";
-
-const _typeLabelStyle: React.CSSProperties = {
-    backgroundColor: "lightgray",
-    borderRadius: "6px",
-    padding: "3px 10px",
-    marginLeft: "5px",
-    display: "inline-flex",
-    justifyContent: "center",
-    alignItems: "center",
-};
 
 const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
     const [nodeRegistry] = useOuterState(nodeRegistryStorage);
@@ -35,35 +27,7 @@ const _Modal: React.FC<{ closeModal: () => any }> = ({ closeModal }) => {
                         <span>{node.config.baseConfig.nodeName}</span>
                     </Space>
                 ),
-                children: (
-                    <Space direction="vertical" style={{ width: "100%" }}>
-                        <div style={{ width: "100%" }}>
-                            {node.config.baseConfig.doc}
-                        </div>
-                        <Space direction="vertical" style={{ width: "100%" }}>
-                            <span style={{ fontWeight: "bold" }}>Inputs:</span>
-                            {node.config.ioConfig.inputs.map((i) => (
-                                <span key={i.name}>
-                                    {i.label || i.name}
-                                    <span style={_typeLabelStyle}>
-                                        {i.type}
-                                    </span>
-                                </span>
-                            ))}
-                        </Space>
-                        <Space direction="vertical" style={{ width: "100%" }}>
-                            <span style={{ fontWeight: "bold" }}>Outputs:</span>
-                            {node.config.ioConfig.outputs.map((i) => (
-                                <span key={i.name}>
-                                    {i.label || i.name}
-                                    <span style={_typeLabelStyle}>
-                                        {i.type}
-                                    </span>
-                                </span>
-                            ))}
-                        </Space>
-                    </Space>
-                ),
+                children: <NodeDoc node={node} />,
             }));
 
         const filtered = r.filter((i) =>

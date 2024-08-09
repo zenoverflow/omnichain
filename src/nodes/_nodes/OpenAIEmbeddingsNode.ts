@@ -19,7 +19,7 @@ export const OpenAIEmbeddingsNode = makeNode(
     {
         nodeName: "OpenAIEmbeddingsNode",
         nodeIcon: "OpenAIOutlined",
-        dimensions: [620, 430],
+        dimensions: [620, 470],
         doc,
     },
     {
@@ -32,6 +32,17 @@ export const OpenAIEmbeddingsNode = makeNode(
             //
             { name: "results", type: "stringArray", label: "results (array)" },
         ],
+
+        // includes all controls
+        // keys are display names in snake_case
+        // values are the real control names
+        controlsOverride: {
+            model: "model",
+            format: "format",
+            dimensions: "dimensions",
+            api_key_name: "apiKeyName",
+            base_url: "baseUrl",
+        },
         controls: [
             {
                 name: "model",
@@ -98,7 +109,7 @@ export const OpenAIEmbeddingsNode = makeNode(
     {
         async dataFlow(nodeId, context) {
             const inputs = await context.fetchInputs(nodeId);
-            const controls = context.getAllControls(nodeId);
+            const controls = context.getControlsWithOverride(nodeId, inputs);
 
             const textsToEmbed = (inputs.textArray || [])[0] || [];
             const textSingle = (inputs.textSingle || [])[0];
