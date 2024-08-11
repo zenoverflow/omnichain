@@ -5,6 +5,7 @@ export { ArrayFromStringNode } from "./_nodes/ArrayFromStringNode";
 export { BlockChatNode } from "./_nodes/BlockChatNode";
 export { BuildFileNode } from "./_nodes/BuildFileNode";
 export { BuildMessageNode } from "./_nodes/BuildMessageNode";
+export { ChatMessageArrayToContextManualNode } from "./_nodes/ChatMessageArrayToContextManualNode";
 export { ChatMessageArrayToContextNode } from "./_nodes/ChatMessageArrayToContextNode";
 export { ChatStoreAppendNode } from "./_nodes/ChatStoreAppendNode";
 export { ChatStoreGetNode } from "./_nodes/ChatStoreGetNode";
