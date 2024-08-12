@@ -12,4 +12,4 @@
 
 -   [API](https://omnichain.zenoverflow.com/docs/chains-api)
 
--   [Examples](https://omnichain.zenoverflow.com/examples/rag)
+-   [Examples](https://omnichain.zenoverflow.com/examples/basic-chatbot)
