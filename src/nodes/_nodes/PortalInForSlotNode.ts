@@ -16,7 +16,7 @@ export const PortalInForSlotNode = makeNode(
     {
         nodeName: "PortalInForSlotNode",
         nodeIcon: "LinkOutlined",
-        dimensions: [350, 150],
+        dimensions: [450, 150],
         doc,
     },
     {

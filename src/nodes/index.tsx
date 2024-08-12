@@ -46,6 +46,7 @@ export { LoopFileArrayAdvancedNode } from "./_nodes/LoopFileArrayAdvancedNode";
 export { LoopFileArrayNode } from "./_nodes/LoopFileArrayNode";
 export { LoopStringArrayAdvancedNode } from "./_nodes/LoopStringArrayAdvancedNode";
 export { LoopStringArrayNode } from "./_nodes/LoopStringArrayNode";
+export { MakeHttpRequestNode } from "./_nodes/MakeHttpRequestNode";
 export { MakeJSONRequestNode } from "./_nodes/MakeJSONRequestNode";
 export { MakeTextLowercaseNode } from "./_nodes/MakeTextLowercaseNode";
 export { MakeTextUppercaseNode } from "./_nodes/MakeTextUppercaseNode";

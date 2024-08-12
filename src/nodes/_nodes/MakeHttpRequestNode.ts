@@ -2,7 +2,7 @@ import { makeNode } from "./_Base";
 
 const doc = [
     //
-    "Make a request to a JSON-compatible http API.",
+    "Make a request to an http API.",
     "The headers are expected to be a JSON object as a string.",
     "The body can be any string, like raw text, base64, JSON, etc.",
     "The method is a string, like 'GET', 'POST', 'PUT', 'DELETE'.",
@@ -12,15 +12,13 @@ const doc = [
     "itself (before making the request), the error will be in",
     "the 'error' field, and the code will be 0.",
     "The timeout control can be set to 0 to disable it (default).",
-    "There is no real difference between this node and the",
-    "MakeHttpRequestNode, except the less confusing name.",
 ]
     .join(" ")
     .trim();
 
-export const MakeJSONRequestNode = makeNode(
+export const MakeHttpRequestNode = makeNode(
     {
-        nodeName: "MakeJSONRequestNode",
+        nodeName: "MakeHttpRequestNode",
         nodeIcon: "ApiOutlined",
         dimensions: [620, 290],
         doc,

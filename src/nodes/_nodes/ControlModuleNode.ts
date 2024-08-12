@@ -18,7 +18,7 @@ export const ControlModuleNode = makeNode(
     {
         nodeName: "ControlModuleNode",
         nodeIcon: "ApartmentOutlined",
-        dimensions: [430, 710],
+        dimensions: [530, 710],
         doc,
     },
     {

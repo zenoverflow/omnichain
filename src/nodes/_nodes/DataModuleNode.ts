@@ -18,7 +18,7 @@ export const DataModuleNode = makeNode(
     {
         nodeName: "DataModuleNode",
         nodeIcon: "ApartmentOutlined",
-        dimensions: [430, 630],
+        dimensions: [530, 630],
         doc,
     },
     {

@@ -15,7 +15,7 @@ export const PortalOutForFileNode = makeNode(
     {
         nodeName: "PortalOutForFileNode",
         nodeIcon: "LinkOutlined",
-        dimensions: [350, 150],
+        dimensions: [450, 150],
         doc,
     },
     {

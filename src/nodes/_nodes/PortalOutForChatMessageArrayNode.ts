@@ -15,7 +15,7 @@ export const PortalOutForChatMessageArrayNode = makeNode(
     {
         nodeName: "PortalOutForChatMessageArrayNode",
         nodeIcon: "LinkOutlined",
-        dimensions: [350, 150],
+        dimensions: [450, 150],
         doc,
     },
     {
