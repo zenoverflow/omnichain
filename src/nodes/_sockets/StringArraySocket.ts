@@ -1,7 +1,7 @@
 import { ClassicPreset } from "rete";
 
 export class StringArraySocket extends ClassicPreset.Socket {
-    public wireColor = "#1677ff";
+    public wireColor = "#2f54eb";
 
     constructor(name = StringArraySocket.name) {
         super(name);

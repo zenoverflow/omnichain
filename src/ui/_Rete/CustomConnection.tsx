@@ -106,7 +106,7 @@ export const makeColoredConnection = (stroke = "#f0f5ff") => {
         const [hovered, setHovered] = useState(false);
 
         const strokeColor = useMemo(
-            () => (hovered ? "#ffe58f" : stroke),
+            () => (hovered ? "#fff" : stroke),
             [hovered]
         );
 

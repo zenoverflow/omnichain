@@ -25,7 +25,7 @@ export const StyledSocket = styled.div`
     z-index: 2;
     box-sizing: border-box;
     &:hover {
-        background: #ffc53d;
+        background: #fff;
     }
 `;
 

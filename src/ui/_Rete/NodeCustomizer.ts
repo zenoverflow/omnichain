@@ -1,5 +1,6 @@
 import type { NodeEditor } from "rete";
 import { Presets } from "rete-react-plugin";
+import styled from "styled-components";
 
 import { CustomNode, StyledSocket } from "./CustomNode";
 import { makeColoredConnection } from "./CustomConnection";
@@ -35,8 +36,11 @@ export const NodeCustomizer = {
                 control(context) {
                     return renderControl(context.payload);
                 },
-                socket() {
-                    return StyledSocket;
+                socket(data) {
+                    const color = (data.payload as any).wireColor || "#fff";
+                    return styled(StyledSocket)`
+                        background: ${color};
+                    `;
                 },
                 connection(context) {
                     const connection = context.payload;
