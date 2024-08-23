@@ -16,8 +16,7 @@ import {
     DownloadOutlined,
     LoadingOutlined,
 } from "@ant-design/icons";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import Prism from "prismjs";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
@@ -69,19 +68,38 @@ const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
                 code(props) {
                     const { children, className, node, ...rest } = props;
                     const match = /language-(\w+)/.exec(className || "");
-                    return match ? (
-                        <SyntaxHighlighter
+
+                    if (!match) {
+                        return (
+                            <code {...rest} className={className}>
+                                {children}
+                            </code>
+                        );
+                    }
+
+                    const prismLanguage = Prism.languages[match[1]];
+
+                    if (!(prismLanguage as any)) {
+                        return (
+                            <code {...rest} className={className}>
+                                {children}
+                            </code>
+                        );
+                    }
+
+                    return (
+                        <div
+                            style={{ backgroundColor: "#000", padding: "10px" }}
+                            dangerouslySetInnerHTML={{
+                                __html: Prism.highlight(
+                                    String(children).replace(/\n$/, ""),
+                                    prismLanguage,
+                                    match[1]
+                                ),
+                            }}
                             {...(rest as any)}
-                            language={match[1]}
-                            style={atomDark}
-                            PreTag="div"
-                        >
-                            {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                    ) : (
-                        <code {...rest} className={className}>
-                            {children}
-                        </code>
+                            className={className}
+                        />
                     );
                 },
             }}

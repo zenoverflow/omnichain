@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [
         react(),
         prismjs({
-            languages: ["json", "javascript", "markdown"],
+            languages: "all",
         }),
     ],
     build: {

@@ -56,6 +56,8 @@ const _Modal: React.FC<{
         >
             <Editor
                 highlight={syntax}
+                className="cm-editor-darkened"
+                padding={10}
                 textareaClassName="cm-editor cm-focused"
                 value={value}
                 onPointerDown={(e) => {
