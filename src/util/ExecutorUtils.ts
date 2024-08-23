@@ -1,31 +1,25 @@
+import axios from "axios";
 import { EnvUtils } from "./EnvUtils";
-
 import type { ChatMessage } from "../data/types";
 
 export const ExecutorUtils = {
     async runGraph(graphId: string) {
-        const execState = await fetch(
-            `${EnvUtils.baseUrl()}/api/executor/run/${graphId}`,
-            {
-                method: "POST",
-            }
+        const execState = await axios.post(
+            `${EnvUtils.baseUrl()}/api/executor/run/${graphId}`
         );
-        const res = await execState.json();
-        return res as Record<string, any>;
+        return execState.data as Record<string, any>;
     },
 
     async stopGraph() {
-        await fetch(`${EnvUtils.baseUrl()}/api/executor/stop`, {
-            method: "POST",
-        });
+        await axios.post(`${EnvUtils.baseUrl()}/api/executor/stop`);
     },
 
     async pingExecutor() {
         try {
-            const response = await fetch(
+            const response = await axios.get(
                 `${EnvUtils.baseUrl()}/api/executor/ping`
             );
-            return (await response.json()) as { type: string; data: any }[];
+            return response.data as { type: string; data: any }[];
         } catch (error) {
             console.error(error);
             return [];
@@ -34,10 +28,10 @@ export const ExecutorUtils = {
 
     async getState() {
         try {
-            const response = await fetch(
+            const response = await axios.get(
                 `${EnvUtils.baseUrl()}/api/executor/state`
             );
-            const res = (await response.json()) as Record<string, any>;
+            const res = response.data as Record<string, any>;
             if (res.state) {
                 return res.state as Record<string, any>;
             }
@@ -49,12 +43,14 @@ export const ExecutorUtils = {
     },
 
     async sendMessage(message: ChatMessage) {
-        await fetch(`${EnvUtils.baseUrl()}/api/executor/message`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(message),
-        });
+        await axios.post(
+            `${EnvUtils.baseUrl()}/api/executor/message`,
+            message,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
     },
 };

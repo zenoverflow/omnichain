@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -654,12 +656,9 @@ export const TextGenWebUICompletionNode = makeNode(
 
             // eslint-disable-next-line no-useless-catch
             try {
-                const response = await fetch(`${baseUrl}/v1/completions`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
+                const response = await axios.post(
+                    `${baseUrl}/v1/completions`,
+                    {
                         // all parameters from controls
                         ...controls,
 
@@ -683,10 +682,15 @@ export const TextGenWebUICompletionNode = makeNode(
 
                         // fix max tokens bug
                         max_tokens: controls.max_new_tokens,
-                    }),
-                });
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
 
-                const textCompletion = await response.json();
+                const textCompletion = response.data;
 
                 return {
                     results: textCompletion.choices.map(

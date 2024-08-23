@@ -1,5 +1,5 @@
+import axios from "axios";
 import { EnvUtils } from "./EnvUtils";
-
 import type { ResourceIndex } from "../data/types";
 
 export const BackendResourceUtils = {
@@ -7,10 +7,10 @@ export const BackendResourceUtils = {
 
     async getSingle(resource: string) {
         try {
-            const res = await fetch(
+            const res = await axios.get(
                 `${EnvUtils.baseUrl()}/api/resource/single/${resource}`
             );
-            return (await res.json()) as Record<string, any>;
+            return res.data as Record<string, any>;
         } catch (error) {
             console.error(error);
             return {} as Record<string, any>;
@@ -19,14 +19,13 @@ export const BackendResourceUtils = {
 
     async setSingle(resource: string, data: Record<string, any>) {
         try {
-            await fetch(
+            await axios.post(
                 `${EnvUtils.baseUrl()}/api/resource/single/${resource}`,
+                data,
                 {
-                    method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(data),
                 }
             );
         } catch (error) {
@@ -36,11 +35,8 @@ export const BackendResourceUtils = {
 
     async deleteSingle(resource: string) {
         try {
-            await fetch(
-                `${EnvUtils.baseUrl()}/api/resource/single/${resource}`,
-                {
-                    method: "DELETE",
-                }
+            await axios.delete(
+                `${EnvUtils.baseUrl()}/api/resource/single/${resource}`
             );
         } catch (error) {
             console.error(error);
@@ -51,10 +47,10 @@ export const BackendResourceUtils = {
 
     async getMultiIndex(resource: string) {
         try {
-            const res = await fetch(
+            const res = await axios.get(
                 `${EnvUtils.baseUrl()}/api/resource/multi/index/${resource}`
             );
-            return (await res.json()) as ResourceIndex;
+            return res.data as ResourceIndex;
         } catch (error) {
             console.error(error);
             return {} as ResourceIndex;
@@ -63,10 +59,10 @@ export const BackendResourceUtils = {
 
     async getMultiAll<T>(resource: string) {
         try {
-            const res = await fetch(
+            const res = await axios.get(
                 `${EnvUtils.baseUrl()}/api/resource/multi/all/${resource}`
             );
-            return (await res.json()) as Record<string, T>;
+            return res.data as Record<string, T>;
         } catch (error) {
             console.error(error);
             return {} as Record<string, T>;
@@ -74,10 +70,15 @@ export const BackendResourceUtils = {
     },
 
     async getMultiSingle<T>(resource: string, id: string) {
-        const res = await fetch(
-            `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`
-        );
-        return (await res.json()) as T;
+        try {
+            const res = await axios.get(
+                `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`
+            );
+            return res.data as T;
+        } catch (error) {
+            console.error(error);
+            return {} as T;
+        }
     },
 
     async setMultiSingle(
@@ -86,14 +87,13 @@ export const BackendResourceUtils = {
         data: Record<string, any>
     ) {
         try {
-            await fetch(
+            await axios.post(
                 `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`,
+                data,
                 {
-                    method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(data),
                 }
             );
         } catch (error) {
@@ -103,11 +103,8 @@ export const BackendResourceUtils = {
 
     async deleteMultiSingle(resource: string, id: string) {
         try {
-            await fetch(
-                `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`,
-                {
-                    method: "DELETE",
-                }
+            await axios.delete(
+                `${EnvUtils.baseUrl()}/api/resource/multi/single/${resource}/${id}`
             );
         } catch (error) {
             console.error(error);

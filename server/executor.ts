@@ -4,8 +4,10 @@ import path from "path";
 import type Router from "koa-router";
 import { v4 as uuid } from "uuid";
 
-import { readJsonFile, buildNodeRegistry } from "./utils.ts";
+import { globalServerConfig } from "./config.ts";
+import { readJsonFile } from "./utils.ts";
 import { setupOpenAiCompatibleAPI } from "./openai.ts";
+import { callExternalModule } from "./external.ts";
 
 import type { ExtraAction } from "../src/data/typesExec.ts";
 import type { ControlUpdate } from "../src/data/typesExec.ts";
@@ -106,18 +108,14 @@ const getApiKeyByName = (dirData: string, name: string): string | null => {
     return target || null;
 };
 
-const runGraph = async (
-    graphId: string,
-    dirData: string,
-    dirCustomNodes: string
-) => {
+const runGraph = async (graphId: string) => {
     // Do nothing if already running
     if (isGraphActive(graphId)) return;
 
     // Ensure other graph is stopped
     stopCurrentGraph();
 
-    const nodeRegistry = buildNodeRegistry(dirCustomNodes);
+    const { nodeRegistry, dirData } = globalServerConfig;
 
     const graphPath = path.join(dirData, "chains", `${graphId}.json`);
 
@@ -246,6 +244,13 @@ const runGraph = async (
                 let result: any = null;
 
                 switch (action.type) {
+                    case "callExternalModule":
+                        result = await callExternalModule(
+                            action.args.module,
+                            action.args.action,
+                            action.args.data
+                        );
+                        break;
                     case "chatBlock":
                         handleChatBlock(action.args.blocked);
                         break;
@@ -378,12 +383,9 @@ const runGraph = async (
 
 // Main logic
 
-export const setupExecutorApi = (
-    router: Router,
-    dirData: string,
-    dirCustomNodes: string,
-    portOpenAi: number
-) => {
+export const setupExecutorApi = (router: Router, portOpenAi: number) => {
+    const { dirData } = globalServerConfig;
+
     // Executor connection for ping api
     executorStorage.subscribe((instance) => {
         events.push({
@@ -457,7 +459,7 @@ export const setupExecutorApi = (
             const chainId = latestMessage.chainId;
 
             // Ensure the correct chain is running
-            await runGraph(chainId, dirData, dirCustomNodes);
+            await runGraph(chainId);
 
             for (const message of messages) {
                 addMessageToSession(message);
@@ -516,7 +518,7 @@ export const setupExecutorApi = (
             return;
         }
 
-        await runGraph(graphId, dirData, dirCustomNodes);
+        await runGraph(graphId);
 
         ctx.body = JSON.stringify(executorStorage.get());
     });

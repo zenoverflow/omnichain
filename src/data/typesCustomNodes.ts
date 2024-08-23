@@ -3,10 +3,14 @@ import type { NumberControlConfig } from "../nodes/_controls/NumberControl";
 import type { SelectControlConfig } from "../nodes/_controls/SelectControl";
 import type { TextControlConfig } from "../nodes/_controls/TextControl";
 
+// TODO: Add more external modules here
+export type ExternalModuleOption = "python";
+
 export type CustomNodeBaseConfig = {
     nodeName: string;
     nodeIcon: string;
     dimensions: [number, number];
+    externalModules?: string[];
     doc: string;
 };
 

@@ -23,6 +23,8 @@ export { DoesTextContainNode } from "./_nodes/DoesTextContainNode";
 export { EncodeBase64Node } from "./_nodes/EncodeBase64Node";
 export { EvalJsCodeNode } from "./_nodes/EvalJsCodeNode";
 export { EvalJsExpressionNode } from "./_nodes/EvalJsExpressionNode";
+// export { ExternalFlorence2Node } from "./_nodes/ExternalFlorence2Node";
+// export { ExternalModuleLoadModelNode } from "./_nodes/ExternalModuleLoadModelNode";
 export { ExtractOfficeFileText } from "./_nodes/ExtractOfficeFileText";
 export { ExtractOfficeFileTextMultiNode } from "./_nodes/ExtractOfficeFileTextMultiNode";
 export { GenerateRandomNumberNode } from "./_nodes/GenerateRandomNumberNode";

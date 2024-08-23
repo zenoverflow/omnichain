@@ -78,6 +78,7 @@ module.exports = {
                 "@typescript-eslint/no-unsafe-call": "off",
                 "@typescript-eslint/require-await": "off",
                 "@typescript-eslint/restrict-template-expressions": "off",
+                "@typescript-eslint/no-unnecessary-template-expression": "off",
             },
             files: ["./server/**/*.{ts,tsx}", "./server.ts"],
         },

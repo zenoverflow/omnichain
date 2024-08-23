@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -178,12 +180,9 @@ export const LMStudioCompletionNode = makeNode(
 
             const model = ((controls.model as string) || "").trim();
 
-            const response = await fetch(`${baseUrl}/v1/completions`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                `${baseUrl}/v1/completions`,
+                {
                     model,
                     prompt,
                     max_tokens: controls.maxTokens as number,
@@ -193,8 +192,6 @@ export const LMStudioCompletionNode = makeNode(
                     frequency_penalty: controls.frequencyPenalty as number,
                     presence_penalty: controls.presencePenalty as number,
                     repeat_penalty: controls.repeatPenalty as number,
-                    // n: controls.numResponses as number,
-                    // echo: controls.echo === "true",
                     seed: (controls.seed as number | null) ?? undefined,
                     stop: controls.stop
                         ? (controls.stop as string)
@@ -202,10 +199,15 @@ export const LMStudioCompletionNode = makeNode(
                               .map((s) => s.trim())
                         : undefined,
                     stream: false,
-                }),
-            });
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
-            const textCompletion = await response.json();
+            const textCompletion = response.data;
 
             return {
                 result: textCompletion.choices[0].text,

@@ -1,13 +1,15 @@
 import type { ChatMessage, ExecutorInstance } from "../data/types";
 
-import { StatefulObservable } from "../util/ObservableUtils";
 import { updateNodeControl, pullSingleGraph } from "./graphs";
 import { controlObservable } from "./watcher";
 import { showNotification } from "./notifications";
+import { finishGlobalLoading, startGlobalLoading } from "./loader";
+
+import { StatefulObservable } from "../util/ObservableUtils";
 import { ExecutorUtils } from "../util/ExecutorUtils";
 import { QueueUtils } from "../util/QueueUtils";
 import { MsgUtils } from "../util/MsgUtils";
-import { finishGlobalLoading, startGlobalLoading } from "./loader";
+import { ExternalModuleUtils } from "../util/ExternalModuleUtils";
 
 export const executorStorage = new StatefulObservable<ExecutorInstance | null>(
     null
@@ -109,6 +111,11 @@ export const runGraph = async (graphId: string) => {
     while (QueueUtils.busy()) {
         await new Promise((r) => setTimeout(r, 100));
     }
+
+    const externalModulesSatisfied =
+        await ExternalModuleUtils.checkGraphModuleRequirements(graphId);
+
+    if (!externalModulesSatisfied) return;
 
     const executorUpdate = await ExecutorUtils.runGraph(graphId);
     executorStorage.set(executorUpdate as any);

@@ -1,3 +1,4 @@
+import axios, { AxiosRequestConfig } from "axios";
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -84,47 +85,26 @@ export const MakeHttpRequestNode = makeNode(
                     throw new Error("Missing required inputs!");
                 }
 
-                const abortSignal =
-                    controls.timeout === 0
-                        ? undefined
-                        : AbortSignal.timeout(controls.timeout as number);
-
-                const req: RequestInit = {
+                const config: AxiosRequestConfig = {
                     method,
+                    headers: JSON.parse(headers),
+                    timeout: controls.timeout as number,
                 };
 
-                const reqHeaders = JSON.parse(headers);
-
-                if (Object.keys(reqHeaders).length > 0) {
-                    req.headers = reqHeaders;
-                }
-
                 if (body?.length > 0) {
-                    req.body = body;
-                    req.headers = {
+                    config.data = body;
+                    config.headers = {
                         "Content-Type": "application/json",
-                        ...reqHeaders,
+                        ...config.headers,
                     };
                 }
 
-                if (abortSignal !== undefined) {
-                    req.signal = abortSignal;
-                }
-
-                const result = await fetch(url, req);
-
-                let resultData = await result.text();
-
-                try {
-                    resultData = JSON.parse(resultData);
-                } catch (error) {
-                    // ignore, data is allowed to be non-JSON
-                }
+                const response = await axios(url, config);
 
                 return {
                     result: JSON.stringify({
-                        code: result.status,
-                        data: resultData,
+                        code: response.status,
+                        data: response.data,
                         error: null,
                     }),
                 };
@@ -132,7 +112,7 @@ export const MakeHttpRequestNode = makeNode(
                 console.error(error);
                 return {
                     result: JSON.stringify({
-                        code: error.status || 0,
+                        code: error.response?.status || 0,
                         data: null,
                         error: error.message || error,
                     }),

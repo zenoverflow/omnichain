@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { makeNode } from "./_Base";
 
 import type { ChatMessage } from "../../data/types";
@@ -231,13 +233,9 @@ export const LMStudioChatCompletionNode = makeNode(
 
             const systemMessage = ((inputs["system"] || [])[0] || "").trim();
 
-            const response = await fetch(`${baseUrl}/v1/chat/completions`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    // Authorization: `Bearer ${apiKey}`,
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                `${baseUrl}/v1/chat/completions`,
+                {
                     model,
                     messages: [
                         // system message
@@ -281,8 +279,6 @@ export const LMStudioChatCompletionNode = makeNode(
                     frequency_penalty: controls.frequencyPenalty as number,
                     presence_penalty: controls.presencePenalty as number,
                     repeat_penalty: controls.repeatPenalty as number,
-                    // n: controls.numResponses as number,
-                    // echo: controls.echo === "true",
                     seed: (controls.seed as number | null) ?? undefined,
                     stop: controls.stop
                         ? (controls.stop as string)
@@ -290,16 +286,10 @@ export const LMStudioChatCompletionNode = makeNode(
                               .map((s) => s.trim())
                         : undefined,
                     stream: false,
-                    // response_format:
-                    //     controls.json === "true"
-                    //         ? { type: "json_object" }
-                    //         : undefined,
-                }),
-            });
+                }
+            );
 
-            const chatCompletion = await response.json();
-
-            console.log(chatCompletion);
+            const chatCompletion = response.data;
 
             return {
                 result: chatCompletion.choices[0].message.content,

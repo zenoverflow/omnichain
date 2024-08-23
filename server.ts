@@ -8,9 +8,12 @@ import Router from "koa-router";
 import { koaBody } from "koa-body";
 import serve from "koa-static";
 
-import { ensureDirExists } from "./server/utils.ts";
+import { globalServerConfig } from "./server/config.ts";
+import { buildNodeRegistry, ensureDirExists } from "./server/utils.ts";
 import { setupResourcesApi } from "./server/resources.ts";
 import { setupExecutorApi } from "./server/executor.ts";
+
+import { pingExternalModule } from "./server/external.ts";
 
 import { makeNode } from "./src/nodes/_nodes/_Base.ts";
 import { AppVersionUtils } from "./src/util/AppVersionUtils.ts";
@@ -35,6 +38,18 @@ const DIR_CUSTOM_NODES = path.join(__dirname, "custom_nodes");
 
 ensureDirExists(DIR_DATA);
 ensureDirExists(DIR_CUSTOM_NODES);
+ensureDirExists(DIR_FRONTEND);
+
+globalServerConfig.dirFrontend = DIR_FRONTEND;
+
+globalServerConfig.dirData = DIR_DATA;
+
+globalServerConfig.dirCustomNodes = DIR_CUSTOM_NODES;
+
+globalServerConfig.modulePythonUrl =
+    argv.module_python_url || "http://localhost:12619";
+
+globalServerConfig.nodeRegistry = buildNodeRegistry(DIR_CUSTOM_NODES);
 
 // Server setup
 
@@ -48,8 +63,16 @@ routerMain.get("/app-version", (ctx) => {
     ctx.body = { version: process.env.npm_package_version };
 });
 
-setupResourcesApi(routerMain, DIR_DATA, DIR_CUSTOM_NODES);
-setupExecutorApi(routerMain, DIR_DATA, DIR_CUSTOM_NODES, portOpenAi);
+// Setup a simple route to ping external modules
+routerMain.get("/ping-module/:module", async (ctx) => {
+    const available = await pingExternalModule(ctx.params.module as any);
+    ctx.status = available ? 200 : 400;
+    ctx.body = "";
+});
+
+// Setup internal APIs
+setupResourcesApi(routerMain);
+setupExecutorApi(routerMain, portOpenAi);
 
 appMain
     // body parsing

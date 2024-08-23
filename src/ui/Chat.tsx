@@ -31,10 +31,12 @@ import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
 const { TextArea } = Input;
 
 const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
+    const stringContent = useMemo(() => `${content as any}`, [content]);
+
     const stylizedContent = useMemo(() => {
         // Add spans with orange text color around text with double quotes
         // Ignore anything within code blocks (denoted by triple backticks)
-        const stylizedQuotes = content.replace(
+        const stylizedQuotes = stringContent.replace(
             /```[\s\S]*?```|`[\s\S]*?`|"(.*?)"/g,
             (_, p1) => {
                 if (p1) {
@@ -58,7 +60,7 @@ const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
         );
 
         return stylizedBold;
-    }, [content]);
+    }, [stringContent]);
     return (
         <Markdown
             // className="c__keep-whitespace"

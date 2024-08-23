@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -65,18 +67,20 @@ export const LMStudioEmbeddingsNode = makeNode(
                 (controls.baseUrl as string) || "http://localhost:1234"
             ).trim();
 
-            const response = await fetch(`${baseUrl}/v1/embeddings`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                `${baseUrl}/v1/embeddings`,
+                {
                     model: "",
                     input: textsToEmbed,
-                }),
-            });
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
-            const embeddingsData = await response.json();
+            const embeddingsData = response.data;
 
             return {
                 results: embeddingsData.data.map((embObj: any) =>

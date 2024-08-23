@@ -30,6 +30,11 @@ const baseConfigSchema = ajv.compile<CustomNodeBaseConfig>({
             minItems: 2,
             maxItems: 2,
         },
+        // external modules, optional, enum; possible values: "python"
+        externalModules: {
+            type: "array",
+            items: { type: "string", enum: ["python"] },
+        },
         doc: { type: "string" },
     },
     required: ["nodeName", "nodeIcon", "dimensions", "doc"],

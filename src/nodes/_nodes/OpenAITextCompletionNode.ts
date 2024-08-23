@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -207,13 +209,9 @@ export const OpenAITextCompletionNode = makeNode(
 
             const model = ((controls.model as string) || "").trim();
 
-            const response = await fetch(`${baseUrl}/v1/completions`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${apiKey}`,
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                `${baseUrl}/v1/completions`,
+                {
                     model,
                     prompt,
                     max_tokens: controls.maxTokens as number,
@@ -230,10 +228,16 @@ export const OpenAITextCompletionNode = makeNode(
                               .map((s) => s.trim())
                         : undefined,
                     stream: false,
-                }),
-            });
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                }
+            );
 
-            const textCompletion = await response.json();
+            const textCompletion = response.data;
 
             return {
                 results: textCompletion.choices.map(

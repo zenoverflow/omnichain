@@ -3,17 +3,19 @@ import fs from "fs";
 
 import type Router from "koa-router";
 
+import { globalServerConfig } from "./config.ts";
 import { readJsonFile, ensureDirExists, buildNodeRegistry } from "./utils.ts";
 
-export const setupResourcesApi = (
-    router: Router,
-    dirData: string,
-    dirCustomNodes: string
-) => {
+export const setupResourcesApi = (router: Router) => {
+    const dirData = globalServerConfig.dirData;
+
     // API: node_registry (fetch only)
 
     router.get("/api/node_registry", (ctx) => {
-        ctx.body = JSON.stringify(buildNodeRegistry(dirCustomNodes, true));
+        // Build a serializable node registry without flow functions
+        ctx.body = JSON.stringify(
+            buildNodeRegistry(globalServerConfig.dirCustomNodes, true)
+        );
     });
 
     // API: single-file resources

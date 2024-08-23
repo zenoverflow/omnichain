@@ -1,4 +1,5 @@
 import type { ChatMessage, SerializedGraph } from "./types";
+import type { ExternalModuleOption } from "./typesCustomNodes";
 
 export type ExecutionEvent = {
     type: "error" | "info" | "warning" | "success";
@@ -6,6 +7,14 @@ export type ExecutionEvent = {
 };
 
 export type ExtraAction =
+    | {
+          type: "callExternalModule";
+          args: {
+              module: ExternalModuleOption;
+              action: string;
+              data: Record<string, any>;
+          };
+      }
     | { type: "chatBlock"; args: { blocked: boolean } }
     | { type: "checkQueue"; args?: never }
     | { type: "readSessionMessages"; args?: never }

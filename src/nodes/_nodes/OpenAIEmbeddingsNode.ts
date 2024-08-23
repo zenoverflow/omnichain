@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { makeNode } from "./_Base";
 
 const doc = [
@@ -132,21 +134,23 @@ export const OpenAIEmbeddingsNode = makeNode(
 
             const model = ((controls.model as string) || "").trim();
 
-            const response = await fetch(`${baseUrl}/v1/embeddings`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${apiKey}`,
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                `${baseUrl}/v1/embeddings`,
+                {
                     model,
                     input: textsToEmbed,
                     encoding_format: controls.format,
                     dimensions: controls.dimensions,
-                }),
-            });
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                }
+            );
 
-            const embeddingsData = await response.json();
+            const embeddingsData = response.data;
 
             return {
                 results: embeddingsData.data.map((embObj: any) =>

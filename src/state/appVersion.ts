@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { AppVersionUtils } from "../util/AppVersionUtils";
 import { showNotification } from "./notifications";
 import { StatefulObservable } from "../util/ObservableUtils";
@@ -5,10 +7,13 @@ import { StatefulObservable } from "../util/ObservableUtils";
 export const versionStorage = new StatefulObservable<string>("");
 
 export const loadAppVersion = async () => {
-    const currentVersion = await fetch("/app-version")
-        .then((res) => res.json())
-        .then((data) => data.version as string);
-    versionStorage.set(currentVersion);
+    try {
+        const response = await axios.get("/app-version");
+        const currentVersion = response.data.version as string;
+        versionStorage.set(currentVersion);
+    } catch (error) {
+        console.error("Failed to load app version:", error);
+    }
 };
 
 export const checkForUpdatesAndNotify = async () => {
@@ -16,7 +21,7 @@ export const checkForUpdatesAndNotify = async () => {
     try {
         const latestVersion = await AppVersionUtils.getVersionFromGithub();
 
-        // eslint-disable-next-line @typescript-eslint/no-useless-template-literals
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
         if (`${latestVersion}` !== `${currentVersion}`) {
             showNotification({
                 type: "warning",

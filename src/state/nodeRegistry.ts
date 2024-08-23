@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { EnvUtils } from "../util/EnvUtils";
 import { StatefulObservable } from "../util/ObservableUtils";
 
@@ -8,6 +10,11 @@ export const nodeRegistryStorage = new StatefulObservable<
 >({});
 
 export const loadNodeRegistry = async () => {
-    const res = await fetch(`${EnvUtils.baseUrl()}/api/node_registry`);
-    nodeRegistryStorage.set(await res.json());
+    try {
+        const res = await axios.get(`${EnvUtils.baseUrl()}/api/node_registry`);
+        nodeRegistryStorage.set(res.data);
+    } catch (error) {
+        // Handle error
+        console.error("Failed to load node registry:", error);
+    }
 };
