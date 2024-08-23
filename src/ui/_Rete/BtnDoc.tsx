@@ -9,10 +9,16 @@ import { NodeDoc } from "../_Global/NodeDoc";
 const _Modal: React.FC<{
     closeModal: () => any;
     node: CustomNode;
-}> = ({ closeModal, node }) => {
+    nodeId: string;
+}> = ({ closeModal, node, nodeId }) => {
     return (
         <Modal
-            title={<h3>{node.config.baseConfig.nodeName}</h3>}
+            title={
+                <>
+                    <h3>{node.config.baseConfig.nodeName}</h3>
+                    <h6>ID: {nodeId}</h6>
+                </>
+            }
             open={true}
             afterClose={closeModal}
             // onOk={handleApply}
@@ -32,7 +38,10 @@ const _Modal: React.FC<{
     );
 };
 
-export const BtnDoc: React.FC<{ node: CustomNode }> = ({ node }) => {
+export const BtnDoc: React.FC<{ node: CustomNode; nodeId: string }> = ({
+    node,
+    nodeId,
+}) => {
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleOpenModal = () => {
@@ -47,7 +56,11 @@ export const BtnDoc: React.FC<{ node: CustomNode }> = ({ node }) => {
         <>
             <QuestionCircleOutlined onClick={handleOpenModal} />
             {modalOpen ? (
-                <_Modal closeModal={handleCloseModal} node={node} />
+                <_Modal
+                    closeModal={handleCloseModal}
+                    node={node}
+                    nodeId={nodeId}
+                />
             ) : null}
         </>
     );

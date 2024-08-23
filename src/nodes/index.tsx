@@ -30,6 +30,8 @@ export { ExtractOfficeFileTextMultiNode } from "./_nodes/ExtractOfficeFileTextMu
 export { GenerateRandomNumberNode } from "./_nodes/GenerateRandomNumberNode";
 export { GenerateV4UUIDNode } from "./_nodes/GenerateV4UUIDNode";
 export { GetApiKeyNode } from "./_nodes/GetApiKeyNode";
+export { GetChatMessageContentNode } from "./_nodes/GetChatMessageContentNode";
+export { GetChatMessageFilesNode } from "./_nodes/GetChatMessageFilesNode";
 export { GetFileContentNode } from "./_nodes/GetFileContentNode";
 export { GetFileMimeTypeNode } from "./_nodes/GetFileMimeTypeNode";
 export { GetFileNameNode } from "./_nodes/GetFileNameNode";

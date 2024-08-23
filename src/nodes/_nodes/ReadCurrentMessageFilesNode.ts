@@ -5,7 +5,7 @@ import type { ChatMessage } from "../../data/types";
 import { makeNode } from "./_Base";
 
 const doc = [
-    "Reads the current message's files from the session.",
+    "Reads the current user message's files from the session.",
     "The message must first be saved to the session using",
     "the AwaitNextMessage node. Consecutive use of this node",
     "will return text from the same message until a new one is saved.",
