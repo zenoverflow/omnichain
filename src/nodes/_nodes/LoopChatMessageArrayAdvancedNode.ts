@@ -25,7 +25,7 @@ export const LoopChatMessageArrayAdvancedNode = makeNode(
     {
         nodeName: "LoopChatMessageArrayAdvancedNode",
         nodeIcon: "OrderedListOutlined",
-        dimensions: [300, 360],
+        dimensions: [380, 380],
         doc,
     },
     {
