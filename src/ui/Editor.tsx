@@ -13,6 +13,7 @@ import { ChatInterface } from "./Chat";
 import { BtnAvatars } from "./_Header/BtnAvatars";
 import { BtnApiKeys } from "./_Header/BtnApiKeys";
 import { BtnNodeIndex } from "./_Header/BtnNodeIndex";
+import { BtnSettings } from "./_Header/BtnSettings";
 
 import { editorTargetStorage, closeEditor } from "../state/editor";
 import { loaderStorage } from "../state/loader";
@@ -120,6 +121,7 @@ export const Editor: React.FC = () => {
                             <BtnAvatars />
                             <BtnApiKeys />
                             <BtnNodeIndex />
+                            <BtnSettings />
                         </Space>
                     </Space>
                 </Header>
@@ -134,7 +136,9 @@ export const Editor: React.FC = () => {
 
             <ComplexErrorModal />
 
-            {loading ? <Spin fullscreen /> : null}
+            {loading ? (
+                <Spin fullscreen rootClassName="cm-loader-global" />
+            ) : null}
         </>
     );
 };

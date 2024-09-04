@@ -1,21 +1,17 @@
 import { makeNode } from "./_Base";
 
-const doc = [
-    //
-    "Load/unload a model via an external OmniChain module.",
-    "The module needs to be running on a port accessible to the server.",
-    "The server also needs to be configured to use the correct url if it",
-    "is not the default url.",
-]
-    .join(" ")
-    .trim();
-
-export const ExternalModuleLoadModelNode = makeNode(
+export const ExtLoadFlorence2Node = makeNode(
     {
-        nodeName: "ExternalModuleLoadModelNode",
+        nodeName: "ExtLoadFlorence2Node",
         nodeIcon: "CodeOutlined",
-        dimensions: [380, 390],
-        doc,
+        dimensions: [380, 340],
+        externalModules: ["python"],
+        doc: [
+            //
+            "Load/unload the Florence2 model in OmniChain's external Python module.",
+            "You need to install and run the external Python module to use this node.",
+            "If the model hasn't been downloaded yet, you will have to wait for the download.",
+        ].join(" "),
     },
     {
         inputs: [
@@ -29,8 +25,8 @@ export const ExternalModuleLoadModelNode = makeNode(
 
         controlsOverride: {
             action: "action",
-            module: "module",
             model: "model",
+            device: "device",
         },
         controls: [
             {
@@ -48,20 +44,6 @@ export const ExternalModuleLoadModelNode = makeNode(
                 },
             },
             {
-                name: "module",
-                control: {
-                    type: "select",
-                    defaultValue: "python",
-                    config: {
-                        label: "module",
-                        values: [
-                            // TODO: Add more modules here eventually
-                            { label: "Python", value: "python" },
-                        ],
-                    },
-                },
-            },
-            {
                 name: "model",
                 control: {
                     type: "select",
@@ -69,7 +51,6 @@ export const ExternalModuleLoadModelNode = makeNode(
                     config: {
                         label: "model",
                         values: [
-                            // TODO: Add more modules here eventually
                             { label: "Florence2", value: "florence2" },
                             { label: "Florence2-FT", value: "florence2-ft" },
                         ],
@@ -98,35 +79,27 @@ export const ExternalModuleLoadModelNode = makeNode(
                 );
 
                 const action = controls.action as string;
-                const module = controls.module as string;
-                const model = controls.model as string;
                 const device = controls.device as string;
 
-                let modelPath = model;
-                let modelId: string | null = null;
+                let model: string | null = null;
 
-                switch (model) {
+                switch (controls.model as string) {
                     case "florence2":
-                        modelPath = "florence2";
-                        modelId = "microsoft/Florence-2-large";
+                        model = "microsoft/Florence-2-large";
                         break;
                     case "florence2-ft":
-                        modelPath = "florence2";
-                        modelId = "microsoft/Florence-2-large-ft";
+                        model = "microsoft/Florence-2-large-ft";
                         break;
                     default:
-                        break;
+                        throw new Error("Invalid model");
                 }
 
                 await context.extraAction({
                     type: "callExternalModule",
                     args: {
-                        module: module as any,
-                        action: `/${modelPath}/${action}`,
-                        data: {
-                            device,
-                            model: modelId,
-                        },
+                        module: "python",
+                        action: `/florence2/${action}`,
+                        data: { device, model },
                     },
                 });
 

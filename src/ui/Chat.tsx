@@ -16,9 +16,9 @@ import {
     DownloadOutlined,
     LoadingOutlined,
 } from "@ant-design/icons";
-import Prism from "prismjs";
-import Markdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
+
+import { BtnSpeak } from "./_Chat/BtnSpeak";
+import { EmptyChat } from "./_Chat/EmptyChat";
 
 import { ChatMessage } from "../data/types";
 import { optionsStorage } from "../state/options";
@@ -26,121 +26,9 @@ import { avatarStorage } from "../state/avatars";
 import { useOuterState } from "../util/ObservableUtilsReact";
 import { addUserMessage, executorStorage } from "../state/executor";
 import { startGlobalLoading, finishGlobalLoading } from "../state/loader";
+import { CMarkdown } from "./_Chat/CMarkdown";
 
 const { TextArea } = Input;
-
-const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
-    const stringContent = useMemo(() => `${content as any}`, [content]);
-
-    const stylizedContent = useMemo(() => {
-        // Add spans with orange text color around text with double quotes
-        // Ignore anything within code blocks (denoted by triple backticks)
-        const stylizedQuotes = stringContent.replace(
-            /```[\s\S]*?```|`[\s\S]*?`|"(.*?)"/g,
-            (_, p1) => {
-                if (p1) {
-                    return `<span style="color: #fa8c16;">"${p1}"</span>`;
-                }
-                return _;
-            }
-        );
-
-        // Add spans with grey color around text surrounded by '*'
-        // The '*' are removed
-        // Ignore anything within code blocks (denoted by triple backticks)
-        const stylizedBold = stylizedQuotes.replace(
-            /```[\s\S]*?```|`[\s\S]*?`|\*(.*?)\*/g,
-            (_, p1) => {
-                if (p1) {
-                    return `<span style="color: #f0f0f0; font-style: italic;">${p1}</span>`;
-                }
-                return _;
-            }
-        );
-
-        return stylizedBold;
-    }, [stringContent]);
-    return (
-        <Markdown
-            // className="c__keep-whitespace"
-            rehypePlugins={[rehypeRaw]}
-            components={{
-                code(props) {
-                    const { children, className, node, ...rest } = props;
-                    const match = /language-(\w+)/.exec(className || "");
-
-                    if (!match) {
-                        return (
-                            <code {...rest} className={className}>
-                                {children}
-                            </code>
-                        );
-                    }
-
-                    const prismLanguage = Prism.languages[match[1]];
-
-                    if (!(prismLanguage as any)) {
-                        return (
-                            <code {...rest} className={className}>
-                                {children}
-                            </code>
-                        );
-                    }
-
-                    return (
-                        <div
-                            style={{ backgroundColor: "#000", padding: "10px" }}
-                            dangerouslySetInnerHTML={{
-                                __html: Prism.highlight(
-                                    String(children).replace(/\n$/, ""),
-                                    prismLanguage,
-                                    match[1]
-                                ),
-                            }}
-                            {...(rest as any)}
-                            className={className}
-                        />
-                    );
-                },
-            }}
-        >
-            {stylizedContent}
-        </Markdown>
-    );
-};
-
-export const EmptyChat: React.FC = () => {
-    return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                height: "100%",
-                color: "#f2f2f2",
-            }}
-        >
-            <div
-                className="c__mstyle"
-                style={{
-                    maxWidth: "700px",
-                    fontSize: "32px",
-                    marginBottom: "10px",
-                }}
-            >
-                Welcome!
-            </div>
-
-            <div style={{ maxWidth: "700px" }}>
-                To start chatting, create a chain (+Chain in the sidebar on the
-                left), configure it, click the run button to start it, and then
-                come back here.
-            </div>
-        </div>
-    );
-};
 
 export const FileGrid: React.FC<{
     files: ChatMessage["files"];
@@ -295,7 +183,7 @@ export const ChatInterface: React.FC = () => {
     const listRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<any>(null);
 
-    const [{ userAvatarId }] = useOuterState(optionsStorage);
+    const [{ userAvatarId, whisperAutoSend }] = useOuterState(optionsStorage);
     const [executor] = useOuterState(executorStorage);
     const [avatars] = useOuterState(avatarStorage);
 
@@ -303,37 +191,53 @@ export const ChatInterface: React.FC = () => {
     const [images, setImages] = useState<ChatMessage["files"]>([]);
     const [files, setFiles] = useState<ChatMessage["files"]>([]);
 
+    const [audioBusy, setAudioBusy] = useState(false);
+
     const messages = useMemo(() => executor?.sessionMessages ?? [], [executor]);
 
     const initCondSatisfied = useMemo(() => !!executor, [executor]);
 
-    const blocked = executor?.chatBlocked || false;
+    const blocked = executor?.chatBlocked || audioBusy;
 
-    const sendMessage = useCallback(() => {
-        if (!blocked && initCondSatisfied && message.length > 0) {
-            const chainId = executor?.graphId;
-            if (chainId) {
-                addUserMessage(
-                    chainId,
-                    message,
-                    userAvatarId ? avatars[userAvatarId].name : "User",
-                    [...images, ...files]
-                );
+    const sendMessage = useCallback(
+        (messageOverride?: string | null) => {
+            if (!blocked && initCondSatisfied) {
+                const chainId = executor?.graphId;
+                if (chainId) {
+                    addUserMessage(
+                        chainId,
+                        messageOverride ? messageOverride : message,
+                        userAvatarId ? avatars[userAvatarId].name : "User",
+                        [...images, ...files]
+                    );
+                }
+                setMessage("");
+                setFiles([]);
+                setImages([]);
             }
-            setMessage("");
-            setFiles([]);
-            setImages([]);
-        }
-    }, [
-        avatars,
-        blocked,
-        executor?.graphId,
-        files,
-        images,
-        initCondSatisfied,
-        message,
-        userAvatarId,
-    ]);
+        },
+        [
+            avatars,
+            blocked,
+            executor?.graphId,
+            files,
+            images,
+            initCondSatisfied,
+            message,
+            userAvatarId,
+        ]
+    );
+
+    const handleTextFromSpeech = useCallback(
+        (text: string) => {
+            if (whisperAutoSend) {
+                sendMessage(text);
+            } else {
+                setMessage(text);
+            }
+        },
+        [sendMessage, whisperAutoSend]
+    );
 
     const handleTextboxEnter = useCallback(
         (e: KeyboardEvent) => {
@@ -512,6 +416,10 @@ export const ChatInterface: React.FC = () => {
                             alignItems: "center",
                         }}
                     >
+                        <BtnSpeak
+                            onBusyState={setAudioBusy}
+                            onText={handleTextFromSpeech}
+                        />
                         <div style={{ width: "5px" }} />
                         <TextArea
                             className="c__mstyle"
@@ -555,7 +463,9 @@ export const ChatInterface: React.FC = () => {
                             size="large"
                             icon={<SendOutlined />}
                             style={{ height: "100%" }}
-                            onClick={sendMessage}
+                            onClick={() => {
+                                sendMessage();
+                            }}
                             disabled={blocked}
                         />
                         <div style={{ width: "5px" }} />

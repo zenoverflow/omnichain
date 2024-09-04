@@ -11,6 +11,7 @@ import { loadExecutor } from "./state/executor";
 import { checkForUpdatesAndNotify, loadAppVersion } from "./state/appVersion";
 
 import { QueueUtils } from "./util/QueueUtils";
+import { MediaRecorderUtils } from "./util/MediaRecorderUtils";
 
 import { Editor } from "./ui/Editor";
 import { runNodeContentOnZoomOutListener } from "./state/editor";
@@ -33,6 +34,8 @@ export const run = async () => {
     await loadApiKeys();
     await loadOptions();
     await loadExecutor();
+
+    await MediaRecorderUtils.init();
 
     void checkForUpdatesAndNotify();
 

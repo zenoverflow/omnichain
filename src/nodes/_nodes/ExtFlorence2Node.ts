@@ -2,23 +2,17 @@ import { makeNode } from "./_Base";
 
 import type { ChatMessageFile } from "../../data/types";
 
-const doc = [
-    //
-    "Use the Florence2 vision model via OmniChain's external Python module.",
-    "The module needs to be running on a port accessible to the server.",
-    "The server also needs to be configured to use the correct url if it",
-    "is not the default url.",
-]
-    .join(" ")
-    .trim();
-
-export const ExternalFlorence2Node = makeNode(
+export const ExtFlorence2Node = makeNode(
     {
-        nodeName: "ExternalFlorence2Node",
+        nodeName: "ExtFlorence2Node",
         nodeIcon: "CodeOutlined",
         dimensions: [500, 250],
         externalModules: ["python"],
-        doc,
+        doc: [
+            //
+            "Use the Florence2 vision model via OmniChain's external Python module.",
+            "You need to install and run the external Python module to use this node.",
+        ].join(" "),
     },
     {
         inputs: [

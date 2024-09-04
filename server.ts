@@ -17,6 +17,7 @@ import { pingExternalModule } from "./server/external.ts";
 
 import { makeNode } from "./src/nodes/_nodes/_Base.ts";
 import { AppVersionUtils } from "./src/util/AppVersionUtils.ts";
+import { setupTranscriptionAPI } from "./server/transcribe.ts";
 
 // Attach node maker for custom nodes to use
 (global as any).__ocMakeNode = makeNode;
@@ -72,6 +73,7 @@ routerMain.get("/ping-module/:module", async (ctx) => {
 
 // Setup internal APIs
 setupResourcesApi(routerMain);
+setupTranscriptionAPI(routerMain);
 setupExecutorApi(routerMain, portOpenAi);
 
 appMain
@@ -90,7 +92,6 @@ void (async () => {
     try {
         const latestVersion = await AppVersionUtils.getVersionFromGithub();
         const currentVersion = process.env.npm_package_version;
-        // eslint-disable-next-line @typescript-eslint/no-useless-template-literals
         if (`${latestVersion}` !== `${currentVersion}`) {
             console.log("---");
             console.log(
