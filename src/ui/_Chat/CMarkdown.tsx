@@ -4,7 +4,10 @@ import Prism from "prismjs";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
-export const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
+export const CMarkdown: React.FC<{
+    content: string;
+    stylizeContent?: boolean;
+}> = ({ content, stylizeContent = true }) => {
     const stringContent = useMemo(() => `${content as any}`, [content]);
 
     const stylizedContent = useMemo(() => {
@@ -35,6 +38,7 @@ export const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
 
         return stylizedBold;
     }, [stringContent]);
+
     return (
         <Markdown
             // className="c__keep-whitespace"
@@ -94,7 +98,7 @@ export const CMarkdown: React.FC<{ content: string }> = ({ content }) => {
                 },
             }}
         >
-            {stylizedContent}
+            {stylizeContent ? stylizedContent : stringContent}
         </Markdown>
     );
 };

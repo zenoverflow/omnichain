@@ -14,8 +14,8 @@ export const pingExternalModule = async (
 export const callExternalModule = async (
     module: "python",
     action: string,
-    data: Record<string, any>
-): Promise<Record<string, any>> => {
+    data?: Record<string, any>
+): Promise<Record<string, any> | string> => {
     const available = await pingExternalModule(module);
 
     if (!available) {

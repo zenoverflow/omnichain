@@ -1,25 +1,26 @@
 import { CMarkdown } from "./CMarkdown";
 
 const whatIsNew = `
-### External Python Module beta!
+### External Python Module (beta)
 
 The new external Python module is now in beta! This module exists as a separate Python-based project
-built for plugging into OmniChain. It allows you to use Python code in your custom nodes, as well as
-predefined models. For now it's mainly used for enabling Whisper transcriptions in the chat view.
-You can find the project [here](https://github.com/zenoverflow/omnichain_external_python).
+built for plugging into OmniChain. It augments the core of OmniChain with several features:
 
-Note that this module is highly experimental, has no documentation yet, and may have bugs. If you
-find a bug, please report it on the project's GitHub issues page.
+- Use FasterWhisper to transcribe speech to text in the integrated chat view.
 
-### Whisper Transcription in the chat view
+- Load and use the lightweight Microsoft Florence2 image-processing models directly via their
+respective nodes (ExtLoadFlorence2 and ExtFlorence2).
 
-If you installed the Python module, you can now use any models available via FasterWhisper to transcribe
-your speech into text messages when using the chat view. You can enable this feature in the settings menu.
+- Write custom Python functions which you can call via the new ExtCallPythonModule node
 
-### Florence2 nodes
+- Call your custom Python functions in custom nodes and JS eval nodes via the "callExternalModule" extra
+action in the \`context\` parameter (exposed as \`_context\` in the eval nodes).
 
-The new Python module also allows you to use Microsoft's Florence2 models via two new nodes
-(ExtLoadFlorence2 and ExtFlorence2). These nodes support all actions listed on the Florence2 HuggingFace repo.
+This module will slowly be expanded to include more integrated features. Note that it's fresh off the
+production line, has no documentation yet, and may have bugs. If you find a bug, please report it
+on the project's GitHub issues page.
+
+You can find the repo [here](https://github.com/zenoverflow/omnichain_external_python).
 `.trim();
 
 export const EmptyChat: React.FC = () => {
@@ -51,7 +52,7 @@ export const EmptyChat: React.FC = () => {
                 >
                     {"What's new?"}
                 </div>
-                <CMarkdown content={whatIsNew} />
+                <CMarkdown content={whatIsNew} stylizeContent={false} />
             </div>
         </div>
     );

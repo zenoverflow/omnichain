@@ -23,6 +23,7 @@ export { DoesTextContainNode } from "./_nodes/DoesTextContainNode";
 export { EncodeBase64Node } from "./_nodes/EncodeBase64Node";
 export { EvalJsCodeNode } from "./_nodes/EvalJsCodeNode";
 export { EvalJsExpressionNode } from "./_nodes/EvalJsExpressionNode";
+export { ExtCallPythonModuleNode } from "./_nodes/ExtCallPythonModuleNode";
 export { ExtFlorence2Node } from "./_nodes/ExtFlorence2Node";
 export { ExtLoadFlorence2Node } from "./_nodes/ExtLoadFlorence2Node";
 export { ExtractOfficeFileText } from "./_nodes/ExtractOfficeFileText";

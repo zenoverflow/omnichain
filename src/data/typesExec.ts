@@ -12,7 +12,7 @@ export type ExtraAction =
           args: {
               module: ExternalModuleOption;
               action: string;
-              data: Record<string, any>;
+              data?: Record<string, any>;
           };
       }
     | { type: "chatBlock"; args: { blocked: boolean } }
