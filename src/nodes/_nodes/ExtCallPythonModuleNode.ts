@@ -80,7 +80,7 @@ export const ExtCallPythonModuleNode = makeNode(
                 result:
                     typeof result === "string"
                         ? result
-                        : JSON.stringify(result),
+                        : JSON.stringify(result, null, 2),
             };
         },
     }
