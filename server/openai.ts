@@ -1,11 +1,11 @@
+import fs from "fs";
+import path from "path";
+
 import Koa from "koa";
 import Router from "koa-router";
 import { koaBody } from "koa-body";
 import { v4 as uuid } from "uuid";
 import mime from "mime-types";
-
-import fs from "fs";
-import path from "path";
 
 import { ChatMessage } from "../src/data/types.ts";
 import { MsgUtils } from "../src/util/MsgUtils.ts";
@@ -35,10 +35,7 @@ export const setupOpenAiCompatibleAPI = (
     routerOpenAi.get("/v1/models", async (ctx) => {
         try {
             const chainFiles = await fs.promises.readdir(
-                path.join(
-                    globalServerConfig.dirData,
-                    'chains',
-                ),
+                path.join(globalServerConfig.dirData, "chains"),
                 { withFileTypes: true }
             );
 
@@ -49,29 +46,26 @@ export const setupOpenAiCompatibleAPI = (
                 })
             );
 
-            ctx.set('Content-Type', 'application/json');
+            ctx.set("Content-Type", "application/json");
             ctx.body = JSON.stringify({
-              object: "list",
-              data: chains.map(
-                (c) => ({
+                object: "list",
+                data: chains.map((c) => ({
                     id: c.graphId,
                     name: c.name,
                     object: "model",
                     created: Math.floor(c.created / 1000),
                     owned_by: "omnichain",
-                })
-              )
+                })),
             });
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             ctx.status = 500;
             ctx.body = JSON.stringify({
                 object: "error",
-                message: "Internal server error"
+                message: "Internal server error",
             });
             return;
         }
-
     });
 
     routerOpenAi.post("/v1/completions", async (ctx) => {
@@ -93,7 +87,7 @@ export const setupOpenAiCompatibleAPI = (
                 () => requestActive,
                 clearSessionOnResponse
             );
-            ctx.set('Content-Type', 'application/json');
+            ctx.set("Content-Type", "application/json");
             ctx.body = JSON.stringify({
                 id: uuid(),
                 object: "text_completion",
@@ -196,32 +190,39 @@ export const setupOpenAiCompatibleAPI = (
                 clearSessionOnResponse
             );
 
+            // Stream response
             if (stream) {
-                ctx.set('Content-Type', 'text/event-stream');
-                ctx.set('Cache-Control', 'no-cache');
-                ctx.set('Connection', 'keep-alive');
+                ctx.set("Content-Type", "text/event-stream");
+                ctx.set("Cache-Control", "no-cache");
+                ctx.set("Connection", "keep-alive");
                 ctx.status = 200;
 
                 // Send the response in a single chunk
-                ctx.res.write(`data: ${JSON.stringify({
-                    id: uuid(),
-                    object: "chat.completion.chunk",
-                    created: result?.created ?? Date.now(),
-                    model: result?.chainId ?? model,
-                    choices: [{
-                        index: 0,
-                        delta: {
-                            content: result?.content ?? "",
-                        },
-                        finish_reason: "stop"
-                    }]
-                })}\n\n`);
+                ctx.res.write(
+                    `data: ${JSON.stringify({
+                        id: uuid(),
+                        object: "chat.completion.chunk",
+                        created: result?.created ?? Date.now(),
+                        model: result?.chainId ?? model,
+                        choices: [
+                            {
+                                index: 0,
+                                delta: {
+                                    content: result?.content ?? "",
+                                },
+                                finish_reason: "stop",
+                            },
+                        ],
+                    })}\n\n`
+                );
 
                 // Send the [DONE] message
-                ctx.res.write('data: [DONE]\n\n');
+                ctx.res.write("data: [DONE]\n\n");
                 ctx.res.end();
-            } else {
-                ctx.set('Content-Type', 'application/json');
+            }
+            // Normal response
+            else {
+                ctx.set("Content-Type", "application/json");
 
                 ctx.body = JSON.stringify({
                     id: uuid(),

@@ -21,6 +21,13 @@ production line, has no documentation yet, and may have bugs. If you find a bug,
 on the project's GitHub issues page.
 
 You can find the repo [here](https://github.com/zenoverflow/omnichain_external_python).
+
+### OpenWebUI Compatibility
+
+The OmniChain API is now compatible with OpenWebUI thanks to [Ivan Charapanau](https://github.com/av)!
+
+The new model listing (\`/v1/models\`) lists all the chains in your project, while the chat completion endpoint
+(\`/v1/chat/completions\`) now supports streaming responses.
 `.trim();
 
 export const EmptyChat: React.FC = () => {
