@@ -4,8 +4,13 @@ import { koaBody } from "koa-body";
 import { v4 as uuid } from "uuid";
 import mime from "mime-types";
 
+import fs from "fs";
+import path from "path";
+
 import { ChatMessage } from "../src/data/types.ts";
 import { MsgUtils } from "../src/util/MsgUtils.ts";
+import { globalServerConfig } from "./config.ts";
+import { readJsonFile } from "./utils.ts";
 
 const appOpenAi = new Koa();
 const routerOpenAi = new Router();
@@ -27,6 +32,48 @@ export const setupOpenAiCompatibleAPI = (
         clearSessionOnResponse?: boolean
     ) => Promise<ChatMessage | null>
 ) => {
+    routerOpenAi.get("/v1/models", async (ctx) => {
+        try {
+            const chainFiles = await fs.promises.readdir(
+                path.join(
+                    globalServerConfig.dirData,
+                    'chains',
+                ),
+                { withFileTypes: true }
+            );
+
+            const chains = await Promise.all(
+                chainFiles.map(async (chain) => {
+                    const chainPath = path.join(chain.path, chain.name);
+                    return readJsonFile(chainPath);
+                })
+            );
+
+            ctx.set('Content-Type', 'application/json');
+            ctx.body = JSON.stringify({
+              object: "list",
+              data: chains.map(
+                (c) => ({
+                    id: c.graphId,
+                    name: c.name,
+                    object: "model",
+                    created: Math.floor(c.created / 1000),
+                    owned_by: "omnichain",
+                })
+              )
+            });
+        } catch(e) {
+            console.error(e);
+            ctx.status = 500;
+            ctx.body = JSON.stringify({
+                object: "error",
+                message: "Internal server error"
+            });
+            return;
+        }
+
+    });
+
     routerOpenAi.post("/v1/completions", async (ctx) => {
         try {
             const { model, prompt } = ctx.request.body;
@@ -46,6 +93,7 @@ export const setupOpenAiCompatibleAPI = (
                 () => requestActive,
                 clearSessionOnResponse
             );
+            ctx.set('Content-Type', 'application/json');
             ctx.body = JSON.stringify({
                 id: uuid(),
                 object: "text_completion",
@@ -74,7 +122,7 @@ export const setupOpenAiCompatibleAPI = (
 
     routerOpenAi.post("/v1/chat/completions", async (ctx) => {
         try {
-            const { model, messages } = ctx.request.body;
+            const { model, messages, stream = false } = ctx.request.body;
 
             const clearSessionOnResponse =
                 ctx.request.body._ocClearSession || true;
@@ -148,29 +196,57 @@ export const setupOpenAiCompatibleAPI = (
                 clearSessionOnResponse
             );
 
-            ctx.body = JSON.stringify({
-                id: uuid(),
-                object: "chat.completion",
-                created: result?.created ?? Date.now(),
-                model: result?.chainId ?? model,
-                system_fingerprint: "",
-                choices: [
-                    {
+            if (stream) {
+                ctx.set('Content-Type', 'text/event-stream');
+                ctx.set('Cache-Control', 'no-cache');
+                ctx.set('Connection', 'keep-alive');
+                ctx.status = 200;
+
+                // Send the response in a single chunk
+                ctx.res.write(`data: ${JSON.stringify({
+                    id: uuid(),
+                    object: "chat.completion.chunk",
+                    created: result?.created ?? Date.now(),
+                    model: result?.chainId ?? model,
+                    choices: [{
                         index: 0,
-                        message: {
-                            role: "assistant",
-                            text: result?.content ?? "",
+                        delta: {
+                            content: result?.content ?? "",
                         },
-                        logprobs: null,
-                        finish_reason: "stop",
+                        finish_reason: "stop"
+                    }]
+                })}\n\n`);
+
+                // Send the [DONE] message
+                ctx.res.write('data: [DONE]\n\n');
+                ctx.res.end();
+            } else {
+                ctx.set('Content-Type', 'application/json');
+
+                ctx.body = JSON.stringify({
+                    id: uuid(),
+                    object: "chat.completion",
+                    created: result?.created ?? Date.now(),
+                    model: result?.chainId ?? model,
+                    system_fingerprint: "",
+                    choices: [
+                        {
+                            index: 0,
+                            message: {
+                                role: "assistant",
+                                content: result?.content ?? "",
+                            },
+                            logprobs: null,
+                            finish_reason: "stop",
+                        },
+                    ],
+                    usage: {
+                        prompt_tokens: 0,
+                        completion_tokens: 0,
+                        total_tokens: 0,
                     },
-                ],
-                usage: {
-                    prompt_tokens: 0,
-                    completion_tokens: 0,
-                    total_tokens: 0,
-                },
-            });
+                });
+            }
         } catch (error) {
             console.error(error);
             ctx.status = 400;
