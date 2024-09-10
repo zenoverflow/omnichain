@@ -70,7 +70,7 @@ export const setupOpenAiCompatibleAPI = (
 
     routerOpenAi.post("/v1/completions", async (ctx) => {
         try {
-            const { model, prompt } = ctx.request.body;
+            const { model, prompt, stream = false } = ctx.request.body;
 
             const clearSessionOnResponse =
                 ctx.request.body._ocClearSession || true;
@@ -87,27 +87,61 @@ export const setupOpenAiCompatibleAPI = (
                 () => requestActive,
                 clearSessionOnResponse
             );
-            ctx.set("Content-Type", "application/json");
-            ctx.body = JSON.stringify({
-                id: uuid(),
-                object: "text_completion",
-                created: result?.created ?? Date.now(),
-                model: result?.chainId ?? model,
-                system_fingerprint: "",
-                choices: [
-                    {
-                        text: result?.content ?? "",
-                        index: 0,
-                        logprobs: null,
-                        finish_reason: "stop",
+
+            // Stream response
+            if (stream) {
+                ctx.set("Content-Type", "text/event-stream");
+                ctx.set("Cache-Control", "no-cache");
+                ctx.set("Connection", "keep-alive");
+                ctx.status = 200;
+
+                // Send the response in a single chunk
+                ctx.res.write(
+                    `data: ${JSON.stringify({
+                        id: uuid(),
+                        object: "text_completion.chunk",
+                        created: result?.created ?? Date.now(),
+                        model: result?.chainId ?? model,
+                        choices: [
+                            {
+                                text: result?.content ?? "",
+                                index: 0,
+                                logprobs: null,
+                                finish_reason: "stop",
+                            },
+                        ],
+                    })}\n\n`
+                );
+
+                // Send the [DONE] message
+                ctx.res.write("data: [DONE]\n\n");
+                ctx.res.end();
+            }
+            // Normal response
+            else {
+                ctx.set("Content-Type", "application/json");
+
+                ctx.body = JSON.stringify({
+                    id: uuid(),
+                    object: "text_completion",
+                    created: result?.created ?? Date.now(),
+                    model: result?.chainId ?? model,
+                    system_fingerprint: "",
+                    choices: [
+                        {
+                            text: result?.content ?? "",
+                            index: 0,
+                            logprobs: null,
+                            finish_reason: "stop",
+                        },
+                    ],
+                    usage: {
+                        prompt_tokens: 0,
+                        completion_tokens: 0,
+                        total_tokens: 0,
                     },
-                ],
-                usage: {
-                    prompt_tokens: 0,
-                    completion_tokens: 0,
-                    total_tokens: 0,
-                },
-            });
+                });
+            }
         } catch (error) {
             console.error(error);
             ctx.status = 400;
