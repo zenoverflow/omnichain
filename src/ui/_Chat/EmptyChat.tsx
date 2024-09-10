@@ -1,10 +1,10 @@
 import { CMarkdown } from "./CMarkdown";
 
 const whatIsNew = `
-### External Python Module (beta)
+### External Python Module
 
-The new external Python module is now in beta! This module exists as a separate Python-based project
-built for plugging into OmniChain. It augments the core of OmniChain with several features:
+This module exists as a separate Python-based project built for plugging into OmniChain.
+It augments the core of OmniChain with several features:
 
 - Use FasterWhisper to transcribe speech to text in the integrated chat view.
 
@@ -16,11 +16,8 @@ respective nodes (ExtLoadFlorence2 and ExtFlorence2).
 - Call your custom Python functions in custom nodes and JS eval nodes via the "callExternalModule" extra
 action in the \`context\` parameter (exposed as \`_context\` in the eval nodes).
 
-This module will slowly be expanded to include more integrated features. Note that it's fresh off the
-production line, has no documentation yet, and may have bugs. If you find a bug, please report it
-on the project's GitHub issues page.
-
-You can find the repo [here](https://github.com/zenoverflow/omnichain_external_python).
+This module will slowly be expanded to include more integrated features. You can find the
+repo [here](https://github.com/zenoverflow/omnichain_external_python).
 
 ### OpenWebUI Compatibility
 
