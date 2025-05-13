@@ -8,6 +8,8 @@ This approach may not have the same token efficiency as static chains of thought
 
 As such, I am archiving this repo. The codebase might still be useful to someone as a stepping stone to build something entirely different, so feel free to fork it and build what you like.
 
+You can find the old documentation for the project in its own repo [here](https://github.com/zenoverflow/omnichain-docs).
+
 ---
 
 ## OmniChain
